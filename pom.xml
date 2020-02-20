@@ -16,7 +16,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <log4j.version>1.2.17</log4j.version>
+        <log4j.version>2.8.2</log4j.version>
         <junit.jupiter.version>5.4.0</junit.jupiter.version>
         <jacoco.plugin.version>0.8.4</jacoco.plugin.version>
         <tinkerpop.version>3.4.5</tinkerpop.version>
@@ -30,13 +30,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
             <version>${log4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tinkerpop</groupId>
             <artifactId>gremlin-core</artifactId>
+            <version>${tinkerpop.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tinkerpop</groupId>
+            <artifactId>tinkergraph-gremlin</artifactId>
             <version>${tinkerpop.version}</version>
         </dependency>
     </dependencies>
