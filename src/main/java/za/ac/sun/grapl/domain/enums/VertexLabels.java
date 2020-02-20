@@ -1,6 +1,7 @@
 package za.ac.sun.grapl.domain.enums;
 
 public enum VertexLabels {
+    META_DATA,
     FILE,
     METHOD,
     METHOD_PARAMETER_IN,
