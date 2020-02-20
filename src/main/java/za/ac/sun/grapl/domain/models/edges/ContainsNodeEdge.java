@@ -10,15 +10,10 @@ import za.ac.sun.grapl.domain.models.GraPLVertex;
 public class ContainsNodeEdge implements GraPLEdge {
     public static final EdgeLabels LABEL = EdgeLabels.CONTAINS_NODE;
 
-    public final GraPLVertex inV;
-    public final GraPLVertex outV;
-
     public final String localName;
     public final int index;
 
     public ContainsNodeEdge(GraPLVertex inV, GraPLVertex outV, String localName, int index) {
-        this.inV = inV;
-        this.outV = outV;
         this.localName = localName;
         this.index = index;
     }

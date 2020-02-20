@@ -6,7 +6,4 @@ public interface GraPLEdge {
 
     EdgeLabels LABEL = EdgeLabels.AST;
 
-    GraPLVertex inV = null;
-    GraPLVertex outV = null;
-
 }
