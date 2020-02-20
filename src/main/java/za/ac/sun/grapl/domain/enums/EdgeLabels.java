@@ -5,10 +5,6 @@ public enum EdgeLabels {
     CFG,
     CONTAINS_NODE,
     CAPTURED_BY,
-    CONDITION,
-    BINDS,
     REF,
     BINDS_TO,
-    RECEIVER,
-    ARGUMENT
 }
