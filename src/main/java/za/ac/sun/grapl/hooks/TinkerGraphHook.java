@@ -40,7 +40,14 @@ public class TinkerGraphHook implements IHook {
                 .stream(gv.getClass().getFields())
                 .filter((field -> !"LABEL".equals(field.getName()) && !"TRAITS".equals(field.getName())))
                 .toArray(Field[]::new);
-        final Vertex v = this.graph.addVertex(gv.LABEL.name());
+        // Get the implementing class label parameter
+        String label = "UNKNOWN";
+        try {
+            label = ((VertexLabels) gv.getClass().getField("LABEL").get("LABEL")).name();
+        } catch (NoSuchFieldException | IllegalAccessException ignored) {
+        }
+        // Get the implementing classes fields and values
+        final Vertex v = this.graph.addVertex(label);
         Arrays.stream(fields).forEach(f -> {
             try {
                 v.property(f.getName(), f.get(gv));
