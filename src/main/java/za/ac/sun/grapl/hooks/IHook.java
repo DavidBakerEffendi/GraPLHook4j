@@ -9,4 +9,6 @@ public interface IHook {
 
     void getVertex(Object identifier, VertexLabels label);
 
+    boolean putVertexIfAbsent(GraPLVertex v, String key, Object value);
+
 }

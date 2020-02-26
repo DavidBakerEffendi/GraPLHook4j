@@ -4,21 +4,22 @@ import org.junit.jupiter.api.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import za.ac.sun.grapl.domain.enums.DispatchTypes;
 import za.ac.sun.grapl.domain.enums.EvaluationStrategies;
+import za.ac.sun.grapl.domain.enums.ModifierTypes;
 import za.ac.sun.grapl.domain.enums.VertexLabels;
+import za.ac.sun.grapl.domain.models.GraPLVertex;
 import za.ac.sun.grapl.domain.models.vertices.*;
 import za.ac.sun.grapl.hooks.TinkerGraphHook.TinkerGraphHookBuilder;
 
 import java.io.File;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TinkerGraphHookTest {
 
-    private static final String testGraphML = "/tmp/testGraph.xml";
-    private static final String testGraphJSON = "/tmp/testGraph.json";
-    private static final String testGryo = "/tmp/testGraph.kryo";
+    private static final String testGraphML = "/tmp/grapl/testGraph.xml";
+    private static final String testGraphJSON = "/tmp/grapl/testGraph.json";
+    private static final String testGryo = "/tmp/grapl/testGraph.kryo";
 
     @AfterAll
     static void tearDownAll() {
@@ -71,7 +72,7 @@ public class TinkerGraphHookTest {
 
         @Test
         public void testImportingInvalidExtension() {
-            assertThrows(IllegalArgumentException.class, () -> new TinkerGraphHookBuilder("/tmp/invalid.txt").createNewGraph(true).build());
+            assertThrows(IllegalArgumentException.class, () -> new TinkerGraphHookBuilder("/tmp/grapl/invalid.txt").createNewGraph(true).build());
         }
     }
 
@@ -151,7 +152,7 @@ public class TinkerGraphHookTest {
             hook.createVertex(new MethodRefVertex("c", 0, 0, "m", "m", 0));
             hook.createVertex(new MethodReturnVertex("c", EvaluationStrategies.BY_REFERENCE, "t", 0, 0));
             hook.createVertex(new MethodVertex("n", "f", "s", 0, 0));
-            hook.createVertex(new ModifierVertex(EvaluationStrategies.BY_REFERENCE, "t", 0, 0));
+            hook.createVertex(new ModifierVertex(ModifierTypes.PUBLIC, 0));
             hook.createVertex(new NamespaceBlockVertex("n", "f", 0));
             hook.createVertex(new ReturnVertex(0, 0, 0, "c"));
             hook.createVertex(new TypeArgumentVertex(0));
@@ -181,5 +182,19 @@ public class TinkerGraphHookTest {
             assertThrows(NotImplementedException.class, () -> hook.getVertex(1, VertexLabels.UNKNOWN));
         }
 
+        @Test
+        public void testPutIfVertexIfAbsentPositive() {
+            GraPLVertex v = new ModifierVertex(ModifierTypes.PUBLIC, 0);
+            assertTrue(this.hook.putVertexIfAbsent(v, "modifierType", ModifierTypes.PUBLIC.toString()));
+        }
+
+        @Test
+        public void testPutIfVertexIfAbsentNegative() {
+            GraPLVertex v = new ModifierVertex(ModifierTypes.PUBLIC, 0);
+            this.hook.createVertex(v);
+            assertFalse(this.hook.putVertexIfAbsent(v, "modifierType", ModifierTypes.PUBLIC.toString()));
+        }
+
     }
+
 }

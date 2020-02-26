@@ -2,6 +2,8 @@ package za.ac.sun.grapl.hooks;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.tinkerpop.gremlin.process.traversal.P;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
@@ -50,17 +52,32 @@ public class TinkerGraphHook implements IHook {
         final Vertex v = this.graph.addVertex(label);
         Arrays.stream(fields).forEach(f -> {
             try {
-                v.property(f.getName(), f.get(gv));
+                v.property(f.getName(), f.get(gv).toString());
             } catch (IllegalAccessException e) {
                 log.error("Illegal field access when adding properties to '" + gv.LABEL.name() + "'.", e);
             }
         });
-
     }
 
     @Override
     public void getVertex(Object identifier, VertexLabels label) {
         throw new NotImplementedException();
+    }
+
+    @Override
+    public boolean putVertexIfAbsent(GraPLVertex v, String key, Object value) {
+        String label = "UNKNOWN";
+        try {
+            label = ((VertexLabels) v.getClass().getField("LABEL").get("LABEL")).name();
+        } catch (NoSuchFieldException | IllegalAccessException ignored) {
+        }
+        final GraphTraversal<Vertex, Vertex> t = this.graph.traversal().V().hasLabel(label).has(key, P.eq(value));
+        if (!t.hasNext()) {
+            createVertex(v);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void exportCurrentGraph() {
