@@ -3,7 +3,6 @@ package za.ac.sun.grapl.hooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
-import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Graph;
@@ -13,10 +12,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import za.ac.sun.grapl.domain.enums.EdgeLabels;
 import za.ac.sun.grapl.domain.enums.VertexLabels;
 import za.ac.sun.grapl.domain.models.GraPLVertex;
-import za.ac.sun.grapl.domain.models.vertices.MethodParameterInVertex;
-import za.ac.sun.grapl.domain.models.vertices.MethodReturnVertex;
-import za.ac.sun.grapl.domain.models.vertices.MethodVertex;
-import za.ac.sun.grapl.domain.models.vertices.ModifierVertex;
+import za.ac.sun.grapl.domain.models.vertices.*;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -153,25 +149,45 @@ public class TinkerGraphHook implements IHook {
         }
     }
 
-    private Vertex findMethodVertex(MethodVertex from) {
+    private Vertex findVertex(MethodVertex from) {
         GraphTraversalSource g = graph.traversal();
         return g.V().has(MethodVertex.LABEL.toString(), "fullName", from.fullName)
                 .has("signature", from.signature).next();
     }
 
+    private Vertex findVertex(FileVertex from) {
+        GraphTraversalSource g = graph.traversal();
+        return g.V().has(FileVertex.LABEL.toString(), "name", from.name).next();
+    }
+
+    private Vertex findVertex(NamespaceBlockVertex from) {
+        GraphTraversalSource g = graph.traversal();
+        return g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", from.fullName).next();
+    }
+
     @Override
     public void createAndAddToMethod(MethodVertex from, MethodParameterInVertex to) {
-        findMethodVertex(from).addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(to));
+        findVertex(from).addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(to));
     }
 
     @Override
     public void createAndAddToMethod(MethodVertex from, MethodReturnVertex to) {
-        findMethodVertex(from).addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(to));
+        findVertex(from).addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(to));
     }
 
     @Override
     public void createAndAddToMethod(MethodVertex from, ModifierVertex to) {
-        findMethodVertex(from).addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(to));
+        findVertex(from).addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(to));
+    }
+
+    @Override
+    public void joinFileVertexTo(FileVertex from, NamespaceBlockVertex to) {
+        findVertex(from).addEdge(EdgeLabels.AST.toString(), findVertex(to));
+    }
+
+    @Override
+    public void joinFileVertexTo(FileVertex from, MethodVertex to) {
+        findVertex(from).addEdge(EdgeLabels.AST.toString(), findVertex(to));
     }
 
     public void exportCurrentGraph() {

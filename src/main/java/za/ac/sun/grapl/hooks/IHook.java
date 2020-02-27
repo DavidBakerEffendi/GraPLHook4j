@@ -1,10 +1,7 @@
 package za.ac.sun.grapl.hooks;
 
 import za.ac.sun.grapl.domain.models.GraPLVertex;
-import za.ac.sun.grapl.domain.models.vertices.MethodParameterInVertex;
-import za.ac.sun.grapl.domain.models.vertices.MethodReturnVertex;
-import za.ac.sun.grapl.domain.models.vertices.MethodVertex;
-import za.ac.sun.grapl.domain.models.vertices.ModifierVertex;
+import za.ac.sun.grapl.domain.models.vertices.*;
 
 public interface IHook {
 
@@ -17,5 +14,9 @@ public interface IHook {
     void createAndAddToMethod(MethodVertex from, MethodReturnVertex to);
 
     void createAndAddToMethod(MethodVertex from, ModifierVertex to);
+
+    void joinFileVertexTo(FileVertex from, NamespaceBlockVertex to);
+
+    void joinFileVertexTo(FileVertex from, MethodVertex to);
 
 }
