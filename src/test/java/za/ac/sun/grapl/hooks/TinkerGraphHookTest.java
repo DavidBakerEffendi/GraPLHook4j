@@ -1,11 +1,10 @@
 package za.ac.sun.grapl.hooks;
 
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.jupiter.api.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-import za.ac.sun.grapl.domain.enums.DispatchTypes;
-import za.ac.sun.grapl.domain.enums.EvaluationStrategies;
-import za.ac.sun.grapl.domain.enums.ModifierTypes;
-import za.ac.sun.grapl.domain.enums.VertexLabels;
+import za.ac.sun.grapl.domain.enums.*;
 import za.ac.sun.grapl.domain.models.GraPLVertex;
 import za.ac.sun.grapl.domain.models.vertices.*;
 import za.ac.sun.grapl.hooks.TinkerGraphHook.TinkerGraphHookBuilder;
@@ -23,12 +22,12 @@ public class TinkerGraphHookTest {
 
     @AfterAll
     static void tearDownAll() {
-        File f = new File(testGraphML);
-        if (f.exists()) f.delete();
-        f = new File(testGraphJSON);
-        if (f.exists()) f.delete();
-        f = new File(testGryo);
-        if (f.exists()) f.delete();
+//        File f = new File(testGraphML);
+//        if (f.exists()) f.delete();
+//        f = new File(testGraphJSON);
+//        if (f.exists()) f.delete();
+//        f = new File(testGryo);
+//        if (f.exists()) f.delete();
     }
 
     @Nested
@@ -171,15 +170,60 @@ public class TinkerGraphHookTest {
     class ValidateGraphInteraction {
 
         private TinkerGraphHook hook;
+        private TinkerGraph testGraph;
 
         @BeforeEach
         public void setUp() {
             this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).build();
+            this.testGraph = TinkerGraph.open();
         }
 
         @Test
-        public void testGetVertexPlaceholder() {
-            assertThrows(NotImplementedException.class, () -> hook.getVertex(1, VertexLabels.UNKNOWN));
+        public void testJoinMethod2MethodParamIn() {
+            MethodVertex m = new MethodVertex("test", "io.grapl.test.Main.run", "(I)", 0, 0);
+            this.hook.createVertex(m);
+            this.hook.createAndAddToMethod(m, new MethodParameterInVertex("test", "I", EvaluationStrategies.BY_VALUE, "I", 1, 1));
+
+            GraphTraversalSource  g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+
+            assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
+            assertTrue(g.V().hasLabel(MethodVertex.LABEL.toString())
+                    .out(EdgeLabels.AST.toString())
+                    .has(MethodParameterInVertex.LABEL.toString(), "code", "test")
+                    .hasNext());
+        }
+
+        @Test
+        public void testJoinMethod2MethodReturn() {
+            MethodVertex m = new MethodVertex("test", "io.grapl.test.Main.run", "(I)V", 0, 0);
+            this.hook.createVertex(m);
+            this.hook.createAndAddToMethod(m, new MethodReturnVertex("(I)V", EvaluationStrategies.BY_VALUE, "I", 0, 0));
+
+            GraphTraversalSource  g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+
+            assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
+            assertTrue(g.V().hasLabel(MethodVertex.LABEL.toString())
+                    .out(EdgeLabels.AST.toString())
+                    .has(MethodReturnVertex.LABEL.toString(), "code", "(I)V")
+                    .hasNext());
+        }
+
+        @Test
+        public void testJoinMethod2Modifier() {
+            MethodVertex m = new MethodVertex("test", "io.grapl.test.Main.run", "(I)V", 0, 0);
+            this.hook.createVertex(m);
+            this.hook.createAndAddToMethod(m, new ModifierVertex(ModifierTypes.PUBLIC, 0));
+
+            GraphTraversalSource  g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+
+            assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
+            assertTrue(g.V().hasLabel(MethodVertex.LABEL.toString())
+                    .out(EdgeLabels.AST.toString())
+                    .has(ModifierVertex.LABEL.toString(), "modifierType", ModifierTypes.PUBLIC.toString())
+                    .hasNext());
         }
 
         @Test

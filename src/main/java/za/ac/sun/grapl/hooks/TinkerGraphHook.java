@@ -3,13 +3,20 @@ package za.ac.sun.grapl.hooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
+import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import za.ac.sun.grapl.domain.enums.EdgeLabels;
 import za.ac.sun.grapl.domain.enums.VertexLabels;
 import za.ac.sun.grapl.domain.models.GraPLVertex;
+import za.ac.sun.grapl.domain.models.vertices.MethodParameterInVertex;
+import za.ac.sun.grapl.domain.models.vertices.MethodReturnVertex;
+import za.ac.sun.grapl.domain.models.vertices.MethodVertex;
+import za.ac.sun.grapl.domain.models.vertices.ModifierVertex;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -37,8 +44,7 @@ public class TinkerGraphHook implements IHook {
         return g;
     }
 
-    @Override
-    public void createVertex(GraPLVertex gv) {
+    private Vertex createTinkerGraphVertex(GraPLVertex gv) {
         final Field[] fields = Arrays
                 .stream(gv.getClass().getFields())
                 .filter((field -> !"LABEL".equals(field.getName()) && !"TRAITS".equals(field.getName())))
@@ -58,6 +64,12 @@ public class TinkerGraphHook implements IHook {
                 log.error("Illegal field access when adding properties to '" + gv.LABEL.name() + "'.", e);
             }
         });
+        return v;
+    }
+
+    @Override
+    public void createVertex(GraPLVertex gv) {
+        createTinkerGraphVertex(gv);
     }
 
     public void getVertex(GraPLVertex v) {
@@ -139,6 +151,27 @@ public class TinkerGraphHook implements IHook {
         } else {
             return false;
         }
+    }
+
+    private Vertex findMethodVertex(MethodVertex from) {
+        GraphTraversalSource g = graph.traversal();
+        return g.V().has(MethodVertex.LABEL.toString(), "fullName", from.fullName)
+                .has("signature", from.signature).next();
+    }
+
+    @Override
+    public void createAndAddToMethod(MethodVertex from, MethodParameterInVertex to) {
+        findMethodVertex(from).addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(to));
+    }
+
+    @Override
+    public void createAndAddToMethod(MethodVertex from, MethodReturnVertex to) {
+        findMethodVertex(from).addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(to));
+    }
+
+    @Override
+    public void createAndAddToMethod(MethodVertex from, ModifierVertex to) {
+        findMethodVertex(from).addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(to));
     }
 
     public void exportCurrentGraph() {
