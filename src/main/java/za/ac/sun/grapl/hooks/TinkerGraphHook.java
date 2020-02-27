@@ -13,6 +13,7 @@ import za.ac.sun.grapl.domain.models.GraPLVertex;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class TinkerGraphHook implements IHook {
 
@@ -59,9 +60,69 @@ public class TinkerGraphHook implements IHook {
         });
     }
 
-    @Override
-    public void getVertex(Object identifier, VertexLabels label) {
+    public void getVertex(GraPLVertex v) {
+        // TODO: This should infer the key and be used when joining two vertices
         throw new NotImplementedException();
+    }
+
+    private HashSet<String> inferIdKeys(VertexLabels label) {
+        final HashSet<String> keys = new HashSet<>();
+        switch (label) {
+            case META_DATA:
+                keys.add("language");
+                break;
+            case FILE:
+                keys.add("name");
+                break;
+            case METHOD:
+                keys.add("fullName");
+                keys.add("signature");
+                break;
+            case METHOD_PARAMETER_IN:
+            case METHOD_RETURN:
+                keys.add("typeFullName");
+                break;
+            case MODIFIER:
+                keys.add("modifierType");
+                break;
+            case TYPE:
+                break;
+            case TYPE_DECL:
+                break;
+            case BINDING:
+                break;
+            case TYPE_PARAMETER:
+                break;
+            case TYPE_ARGUMENT:
+                break;
+            case MEMBER:
+                break;
+            case NAMESPACE_BLOCK:
+                break;
+            case LITERAL:
+                break;
+            case CALL:
+                break;
+            case LOCAL:
+                break;
+            case IDENTIFIER:
+                break;
+            case FIELD_IDENTIFIER:
+                break;
+            case RETURN:
+                break;
+            case BLOCK:
+                break;
+            case ARRAY_INITIALIZER:
+                break;
+            case METHOD_REF:
+                break;
+            case CONTROL_STRUCTURE:
+                break;
+            case UNKNOWN:
+                break;
+        }
+        return keys;
     }
 
     @Override
