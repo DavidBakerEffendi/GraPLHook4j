@@ -3,15 +3,14 @@ package za.ac.sun.grapl.hooks;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.jupiter.api.*;
-import za.ac.sun.grapl.domain.enums.DispatchTypes;
-import za.ac.sun.grapl.domain.enums.EdgeLabels;
-import za.ac.sun.grapl.domain.enums.EvaluationStrategies;
-import za.ac.sun.grapl.domain.enums.ModifierTypes;
+import za.ac.sun.grapl.domain.enums.*;
+import za.ac.sun.grapl.domain.models.GraPLEdge;
 import za.ac.sun.grapl.domain.models.GraPLVertex;
 import za.ac.sun.grapl.domain.models.vertices.*;
 import za.ac.sun.grapl.hooks.TinkerGraphHook.TinkerGraphHookBuilder;
 
 import java.io.File;
+import java.util.EnumSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -135,6 +134,13 @@ public class TinkerGraphHookTest {
         }
 
         @Test
+        public void testInterfaceDefaults() {
+            assertEquals("UNKNOWN", GraPLVertex.LABEL.toString());
+            assertEquals(EnumSet.noneOf(VertexBaseTraits.class), GraPLVertex.TRAITS);
+            assertEquals("AST", GraPLEdge.LABEL.toString());
+        }
+
+        @Test
         public void testTinkerGraphCanHandleAllVertexTypes() {
             hook.createVertex(new ArrayInitializerVertex());
             hook.createVertex(new BindingVertex("n", "s"));
@@ -151,7 +157,7 @@ public class TinkerGraphHookTest {
             hook.createVertex(new MetaDataVertex("Java", "1.8"));
             hook.createVertex(new MethodParameterInVertex("c", "n", EvaluationStrategies.BY_REFERENCE, "t", 0, 0));
             hook.createVertex(new MethodRefVertex("c", 0, 0, "m", "m", 0));
-            hook.createVertex(new MethodReturnVertex("c", EvaluationStrategies.BY_REFERENCE, "t", 0, 0));
+            hook.createVertex(new MethodReturnVertex("c", "t", EvaluationStrategies.BY_REFERENCE, 0, 0));
             hook.createVertex(new MethodVertex("n", "f", "s", 0, 0));
             hook.createVertex(new ModifierVertex(ModifierTypes.PUBLIC, 0));
             hook.createVertex(new NamespaceBlockVertex("n", "f", 0));
@@ -199,7 +205,7 @@ public class TinkerGraphHookTest {
 
         @Test
         public void testJoinMethod2MethodReturn() {
-            this.hook.createAndAddToMethod(m, new MethodReturnVertex("(I)V", EvaluationStrategies.BY_VALUE, "I", 0, 0));
+            this.hook.createAndAddToMethod(m, new MethodReturnVertex("INTEGER", "I", EvaluationStrategies.BY_VALUE, 0, 0));
             this.hook.exportCurrentGraph();
 
             GraphTraversalSource g = testGraph.traversal();
@@ -208,7 +214,7 @@ public class TinkerGraphHookTest {
             assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
             assertTrue(g.V().hasLabel(MethodVertex.LABEL.toString())
                     .out(EdgeLabels.AST.toString())
-                    .has(MethodReturnVertex.LABEL.toString(), "code", "(I)V")
+                    .has(MethodReturnVertex.LABEL.toString(), "name", "INTEGER")
                     .hasNext());
         }
 
@@ -223,7 +229,7 @@ public class TinkerGraphHookTest {
             assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
             assertTrue(g.V().hasLabel(MethodVertex.LABEL.toString())
                     .out(EdgeLabels.AST.toString())
-                    .has(ModifierVertex.LABEL.toString(), "modifierType", ModifierTypes.PUBLIC.toString())
+                    .has(ModifierVertex.LABEL.toString(), "name", ModifierTypes.PUBLIC.toString())
                     .hasNext());
         }
     }
@@ -276,32 +282,6 @@ public class TinkerGraphHookTest {
                     .has(MethodVertex.LABEL.toString(), "fullName", "io.grapl.Test.run")
                     .hasNext());
         }
-    }
-
-    @Nested
-    @DisplayName("TinkerGraph: Graph interaction methods")
-    class ValidateGraphInteraction {
-        private TinkerGraphHook hook;
-
-        @BeforeEach
-        public void setUp() {
-            this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).build();
-        }
-
-
-        @Test
-        public void testPutIfVertexIfAbsentPositive() {
-            GraPLVertex v = new ModifierVertex(ModifierTypes.PUBLIC, 0);
-            assertTrue(this.hook.putVertexIfAbsent(v, "modifierType", ModifierTypes.PUBLIC.toString()));
-        }
-
-        @Test
-        public void testPutIfVertexIfAbsentNegative() {
-            GraPLVertex v = new ModifierVertex(ModifierTypes.PUBLIC, 0);
-            this.hook.createVertex(v);
-            assertFalse(this.hook.putVertexIfAbsent(v, "modifierType", ModifierTypes.PUBLIC.toString()));
-        }
-
     }
 
 }

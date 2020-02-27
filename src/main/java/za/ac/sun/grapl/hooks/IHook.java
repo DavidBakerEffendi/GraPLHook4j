@@ -7,8 +7,6 @@ public interface IHook {
 
     void createVertex(GraPLVertex v);
 
-    boolean putVertexIfAbsent(GraPLVertex v, String key, Object value);
-
     void createAndAddToMethod(MethodVertex from, MethodParameterInVertex to);
 
     void createAndAddToMethod(MethodVertex from, MethodReturnVertex to);
