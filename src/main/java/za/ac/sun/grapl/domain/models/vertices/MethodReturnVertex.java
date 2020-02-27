@@ -16,14 +16,14 @@ public class MethodReturnVertex implements GraPLVertex {
             EnumSet.of(VertexBaseTraits.CFG_NODE,
                     VertexBaseTraits.TRACKING_POINT);
 
-    public final String code;
+    public final String name;
     public final EvaluationStrategies evaluationStrategy;
     public final String typeFullName;
     public final int lineNumber;
     public final int order;
 
-    public MethodReturnVertex(String code, EvaluationStrategies evaluationStrategy, String typeFullName, int lineNumber, int order) {
-        this.code = code;
+    public MethodReturnVertex(String name, String typeFullName, EvaluationStrategies evaluationStrategy, int lineNumber, int order) {
+        this.name = name;
         this.evaluationStrategy = evaluationStrategy;
         this.typeFullName = typeFullName;
         this.lineNumber = lineNumber;

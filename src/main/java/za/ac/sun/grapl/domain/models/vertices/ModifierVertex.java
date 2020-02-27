@@ -14,11 +14,11 @@ public class ModifierVertex implements GraPLVertex {
     public static final VertexLabels LABEL = VertexLabels.MODIFIER;
     public static final EnumSet<VertexBaseTraits> TRAITS = EnumSet.of(VertexBaseTraits.AST_NODE);
 
-    public final ModifierTypes modifierType;
+    public final ModifierTypes name;
     public final int order;
 
     public ModifierVertex(ModifierTypes modifierType, int order) {
-        this.modifierType = modifierType;
+        this.name = modifierType;
         this.order = order;
     }
 }
