@@ -183,6 +183,7 @@ public class TinkerGraphHookTest {
             MethodVertex m = new MethodVertex("test", "io.grapl.test.Main.run", "(I)", 0, 0);
             this.hook.createVertex(m);
             this.hook.createAndAddToMethod(m, new MethodParameterInVertex("test", "I", EvaluationStrategies.BY_VALUE, "I", 1, 1));
+            this.hook.exportCurrentGraph();
 
             GraphTraversalSource  g = testGraph.traversal();
             g.io(testGraphML).read().iterate();
@@ -199,6 +200,7 @@ public class TinkerGraphHookTest {
             MethodVertex m = new MethodVertex("test", "io.grapl.test.Main.run", "(I)V", 0, 0);
             this.hook.createVertex(m);
             this.hook.createAndAddToMethod(m, new MethodReturnVertex("(I)V", EvaluationStrategies.BY_VALUE, "I", 0, 0));
+            this.hook.exportCurrentGraph();
 
             GraphTraversalSource  g = testGraph.traversal();
             g.io(testGraphML).read().iterate();
@@ -215,6 +217,7 @@ public class TinkerGraphHookTest {
             MethodVertex m = new MethodVertex("test", "io.grapl.test.Main.run", "(I)V", 0, 0);
             this.hook.createVertex(m);
             this.hook.createAndAddToMethod(m, new ModifierVertex(ModifierTypes.PUBLIC, 0));
+            this.hook.exportCurrentGraph();
 
             GraphTraversalSource  g = testGraph.traversal();
             g.io(testGraphML).read().iterate();
