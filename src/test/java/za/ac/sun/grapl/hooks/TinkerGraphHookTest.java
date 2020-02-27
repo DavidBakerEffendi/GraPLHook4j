@@ -1,24 +1,25 @@
 package za.ac.sun.grapl.hooks;
 
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.jupiter.api.*;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-import za.ac.sun.grapl.domain.enums.DispatchTypes;
-import za.ac.sun.grapl.domain.enums.EvaluationStrategies;
-import za.ac.sun.grapl.domain.enums.VertexLabels;
+import za.ac.sun.grapl.domain.enums.*;
+import za.ac.sun.grapl.domain.models.GraPLEdge;
+import za.ac.sun.grapl.domain.models.GraPLVertex;
 import za.ac.sun.grapl.domain.models.vertices.*;
 import za.ac.sun.grapl.hooks.TinkerGraphHook.TinkerGraphHookBuilder;
 
 import java.io.File;
+import java.util.EnumSet;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TinkerGraphHookTest {
 
-    private static final String testGraphML = "/tmp/testGraph.xml";
-    private static final String testGraphJSON = "/tmp/testGraph.json";
-    private static final String testGryo = "/tmp/testGraph.kryo";
+    private static final String testGraphML = "/tmp/grapl/testGraph.xml";
+    private static final String testGraphJSON = "/tmp/grapl/testGraph.json";
+    private static final String testGryo = "/tmp/grapl/testGraph.kryo";
 
     @AfterAll
     static void tearDownAll() {
@@ -71,7 +72,7 @@ public class TinkerGraphHookTest {
 
         @Test
         public void testImportingInvalidExtension() {
-            assertThrows(IllegalArgumentException.class, () -> new TinkerGraphHookBuilder("/tmp/invalid.txt").createNewGraph(true).build());
+            assertThrows(IllegalArgumentException.class, () -> new TinkerGraphHookBuilder("/tmp/grapl/invalid.txt").createNewGraph(true).build());
         }
     }
 
@@ -133,6 +134,13 @@ public class TinkerGraphHookTest {
         }
 
         @Test
+        public void testInterfaceDefaults() {
+            assertEquals("UNKNOWN", GraPLVertex.LABEL.toString());
+            assertEquals(EnumSet.noneOf(VertexBaseTraits.class), GraPLVertex.TRAITS);
+            assertEquals("AST", GraPLEdge.LABEL.toString());
+        }
+
+        @Test
         public void testTinkerGraphCanHandleAllVertexTypes() {
             hook.createVertex(new ArrayInitializerVertex());
             hook.createVertex(new BindingVertex("n", "s"));
@@ -149,9 +157,9 @@ public class TinkerGraphHookTest {
             hook.createVertex(new MetaDataVertex("Java", "1.8"));
             hook.createVertex(new MethodParameterInVertex("c", "n", EvaluationStrategies.BY_REFERENCE, "t", 0, 0));
             hook.createVertex(new MethodRefVertex("c", 0, 0, "m", "m", 0));
-            hook.createVertex(new MethodReturnVertex("c", EvaluationStrategies.BY_REFERENCE, "t", 0, 0));
+            hook.createVertex(new MethodReturnVertex("c", "t", EvaluationStrategies.BY_REFERENCE, 0, 0));
             hook.createVertex(new MethodVertex("n", "f", "s", 0, 0));
-            hook.createVertex(new ModifierVertex(EvaluationStrategies.BY_REFERENCE, "t", 0, 0));
+            hook.createVertex(new ModifierVertex(ModifierTypes.PUBLIC, 0));
             hook.createVertex(new NamespaceBlockVertex("n", "f", 0));
             hook.createVertex(new ReturnVertex(0, 0, 0, "c"));
             hook.createVertex(new TypeArgumentVertex(0));
@@ -166,20 +174,114 @@ public class TinkerGraphHookTest {
     }
 
     @Nested
-    @DisplayName("TinkerGraph: Graph interaction methods")
-    class ValidateGraphInteraction {
-
+    @DisplayName("TinkerGraph: Join method vertex to method related vertices")
+    class MethodJoinInteraction {
         private TinkerGraphHook hook;
+        private TinkerGraph testGraph;
+        private MethodVertex m;
 
         @BeforeEach
         public void setUp() {
             this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).build();
+            this.testGraph = TinkerGraph.open();
+            this.m = new MethodVertex("test", "io.grapl.Test.run", "(I)", 0, 0);
+            this.hook.createVertex(m);
         }
 
         @Test
-        public void testGetVertexPlaceholder() {
-            assertThrows(NotImplementedException.class, () -> hook.getVertex(1, VertexLabels.UNKNOWN));
+        public void testJoinMethod2MethodParamIn() {
+            this.hook.createAndAddToMethod(m, new MethodParameterInVertex("test", "I", EvaluationStrategies.BY_VALUE, "I", 1, 1));
+            this.hook.exportCurrentGraph();
+
+            GraphTraversalSource g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+
+            assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
+            assertTrue(g.V().hasLabel(MethodVertex.LABEL.toString())
+                    .out(EdgeLabels.AST.toString())
+                    .has(MethodParameterInVertex.LABEL.toString(), "code", "test")
+                    .hasNext());
         }
 
+        @Test
+        public void testJoinMethod2MethodReturn() {
+            this.hook.createAndAddToMethod(m, new MethodReturnVertex("INTEGER", "I", EvaluationStrategies.BY_VALUE, 0, 0));
+            this.hook.exportCurrentGraph();
+
+            GraphTraversalSource g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+
+            assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
+            assertTrue(g.V().hasLabel(MethodVertex.LABEL.toString())
+                    .out(EdgeLabels.AST.toString())
+                    .has(MethodReturnVertex.LABEL.toString(), "name", "INTEGER")
+                    .hasNext());
+        }
+
+        @Test
+        public void testJoinMethod2Modifier() {
+            this.hook.createAndAddToMethod(m, new ModifierVertex(ModifierTypes.PUBLIC, 0));
+            this.hook.exportCurrentGraph();
+
+            GraphTraversalSource g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+
+            assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
+            assertTrue(g.V().hasLabel(MethodVertex.LABEL.toString())
+                    .out(EdgeLabels.AST.toString())
+                    .has(ModifierVertex.LABEL.toString(), "name", ModifierTypes.PUBLIC.toString())
+                    .hasNext());
+        }
     }
+
+    @Nested
+    @DisplayName("TinkerGraph: Join file vertex to file related vertices")
+    class FileJoinInteraction {
+        private TinkerGraphHook hook;
+        private TinkerGraph testGraph;
+        private FileVertex f;
+
+        @BeforeEach
+        public void setUp() {
+            this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).build();
+            this.testGraph = TinkerGraph.open();
+            this.f = new FileVertex("io.grapl.Test", 0);
+            this.hook.createVertex(f);
+        }
+
+        @Test
+        public void testJoinFile2NamespaceBlock() {
+            NamespaceBlockVertex nbv = new NamespaceBlockVertex("grapl", "io.grapl", 0);
+            this.hook.createVertex(nbv);
+            this.hook.joinFileVertexTo(f, nbv);
+            this.hook.exportCurrentGraph();
+
+            GraphTraversalSource g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+
+            assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
+            assertTrue(g.V().hasLabel(FileVertex.LABEL.toString())
+                    .out(EdgeLabels.AST.toString())
+                    .has(NamespaceBlockVertex.LABEL.toString(), "fullName", "io.grapl")
+                    .hasNext());
+        }
+
+        @Test
+        public void testJoinFile2Method() {
+            MethodVertex mv = new MethodVertex("test", "io.grapl.Test.run", "(I)", 0, 0);
+            this.hook.createVertex(mv);
+            this.hook.joinFileVertexTo(f, mv);
+            this.hook.exportCurrentGraph();
+
+            GraphTraversalSource g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+
+            assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
+            assertTrue(g.V().hasLabel(FileVertex.LABEL.toString())
+                    .out(EdgeLabels.AST.toString())
+                    .has(MethodVertex.LABEL.toString(), "fullName", "io.grapl.Test.run")
+                    .hasNext());
+        }
+    }
+
 }
