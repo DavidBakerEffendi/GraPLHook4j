@@ -2,9 +2,12 @@ package za.ac.sun.grapl.hooks;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.structure.VertexProperty;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import za.ac.sun.grapl.domain.enums.EdgeLabels;
 import za.ac.sun.grapl.domain.enums.VertexLabels;
@@ -103,6 +106,35 @@ public class TinkerGraphHook implements IHook {
     @Override
     public void joinFileVertexTo(FileVertex from, MethodVertex to) {
         findVertex(from).addEdge(EdgeLabels.AST.toString(), findVertex(to));
+    }
+
+    @Override
+    public int assignVarToLiteral(MethodVertex mv, String varName, String litName, String varType, String litType, int argInd, int lineNo, int order) {
+        // TODO: This is a bit messy in terms of what I can gather from how these variables are used
+        BlockVertex block = new BlockVertex("=", order++, argInd, varType, lineNo);
+
+        LocalVertex local = new LocalVertex(varName, varName, varType, lineNo, order++);
+        LiteralVertex literal = new LiteralVertex(litName, order, argInd, litType, lineNo);
+
+        Vertex blockVertex = createTinkerGraphVertex(block);
+        findVertex(mv).addEdge(EdgeLabels.AST.toString(), blockVertex);
+        blockVertex.addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(local));
+        blockVertex.addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(literal));
+        return order;
+    }
+
+    @Override
+    public void updateVarName(MethodVertex mv, String oldName, String newName) {
+        GraphTraversalSource g = graph.traversal();
+        Vertex methodVertex = findVertex(mv);
+        final GraphTraversal<Vertex, Vertex> var = g.V(methodVertex).repeat(__.out("AST")).emit()
+                .has(LocalVertex.LABEL.toString(), "name", oldName);
+        if (var.hasNext()) {
+            System.out.println("FOUND VERT");
+            var.next().property(VertexProperty.Cardinality.single, "name", newName);
+        } else {
+            System.out.println("NOT FOUND");
+        }
     }
 
     public void exportCurrentGraph() {

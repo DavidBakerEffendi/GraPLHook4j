@@ -17,4 +17,8 @@ public interface IHook {
 
     void joinFileVertexTo(FileVertex from, MethodVertex to);
 
+    int assignVarToLiteral(MethodVertex mv, String varName, String litName, String varType, String litType, int argInd, int lineNo, int order);
+
+    void updateVarName(MethodVertex mv, String oldName, String newName);
+
 }

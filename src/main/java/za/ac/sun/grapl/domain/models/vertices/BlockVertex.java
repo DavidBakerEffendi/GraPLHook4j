@@ -13,14 +13,14 @@ public class BlockVertex implements GraPLVertex {
     public static final VertexLabels LABEL = VertexLabels.BLOCK;
     public static final EnumSet<VertexBaseTraits> TRAITS = EnumSet.of(VertexBaseTraits.EXPRESSION);
 
-    public final String code;
+    public final String name;
     public final int order;
     public final int argumentIndex;
     public final String typeFullName;
     public final int lineNumber;
 
-    public BlockVertex(String code, int order, int argumentIndex, String typeFullName, int lineNumber) {
-        this.code = code;
+    public BlockVertex(String name, int order, int argumentIndex, String typeFullName, int lineNumber) {
+        this.name = name;
         this.order = order;
         this.argumentIndex = argumentIndex;
         this.typeFullName = typeFullName;
