@@ -284,4 +284,81 @@ public class TinkerGraphHookTest {
         }
     }
 
+    @Nested
+    @DisplayName("TinkerGraph: Join file vertex to file related vertices")
+    class BlockJoinInteraction {
+        private static final String ROOT_METHOD = "root";
+        private static final String FIRST_BLOCK = "firstBlock";
+        private static final String TEST_ID = "test";
+        private TinkerGraphHook hook;
+        private TinkerGraph testGraph;
+        private MethodVertex m;
+
+        @BeforeEach
+        public void setUp() {
+            this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).build();
+            this.testGraph = TinkerGraph.open();
+            this.m = new MethodVertex(ROOT_METHOD, "io.grapl.Test.run", "(I)", 0, 0);
+            this.hook.createVertex(m);
+            this.hook.assignToBlock(m, new BlockVertex(FIRST_BLOCK, 1, 1, "INTEGER", 5), 0);
+        }
+
+        @Test
+        public void testMethodJoinBlockTest() {
+            this.hook.exportCurrentGraph();
+
+            GraphTraversalSource g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+            assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
+            assertTrue(g.V().hasLabel(MethodVertex.LABEL.toString())
+                    .out(EdgeLabels.AST.toString())
+                    .has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+                    .hasNext());
+        }
+
+        @Test
+        public void testBlockJoinBlockTest() {
+            BlockVertex bv2 = new BlockVertex(TEST_ID, 2, 1, "INTEGER", 6);
+            this.hook.assignToBlock(m, bv2, 1);
+            this.hook.exportCurrentGraph();
+
+            GraphTraversalSource g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+
+            assertTrue(g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+                    .out(EdgeLabels.AST.toString())
+                    .has(BlockVertex.LABEL.toString(), "name", TEST_ID)
+                    .hasNext());
+        }
+
+        @Test
+        public void testAssignLiteralToBlock() {
+            LiteralVertex lv = new LiteralVertex(TEST_ID, 2, 1, "INTEGER", 5);
+            this.hook.assignToBlock(m, lv, 1);
+            this.hook.exportCurrentGraph();
+
+            GraphTraversalSource g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+
+            assertTrue(g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+                    .out(EdgeLabels.AST.toString())
+                    .has(LiteralVertex.LABEL.toString(), "name", TEST_ID)
+                    .hasNext());
+        }
+
+        @Test
+        public void testAssignLocalToBlock() {
+            LocalVertex lv = new LocalVertex("1", TEST_ID, "INTEGER", 5, 2);
+            this.hook.assignToBlock(m, lv, 1);
+            this.hook.exportCurrentGraph();
+
+            GraphTraversalSource g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+
+            assertTrue(g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+                    .out(EdgeLabels.AST.toString())
+                    .has(LocalVertex.LABEL.toString(), "name", TEST_ID)
+                    .hasNext());
+        }
+    }
 }

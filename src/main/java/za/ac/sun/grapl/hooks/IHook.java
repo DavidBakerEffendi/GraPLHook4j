@@ -17,8 +17,10 @@ public interface IHook {
 
     void joinFileVertexTo(FileVertex from, MethodVertex to);
 
-    int assignVarToLiteral(MethodVertex mv, String varName, String litName, String varType, String litType, int argInd, int lineNo, int order);
+    void assignToBlock(MethodVertex rootMethod, LocalVertex local, int blockOrder);
 
-    void updateVarName(MethodVertex mv, String oldName, String newName);
+    void assignToBlock(MethodVertex rootMethod, LiteralVertex literal, int blockOrder);
+
+    void assignToBlock(MethodVertex rootMethod, BlockVertex block, int blockOrder);
 
 }
