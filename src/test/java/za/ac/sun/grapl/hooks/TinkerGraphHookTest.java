@@ -34,8 +34,13 @@ public class TinkerGraphHookTest {
     @Nested
     @DisplayName("TinkerGraph: Graph import file types")
     class ValidateGraphImportFileTypes {
-
         private TinkerGraphHook hook;
+        private TinkerGraph testGraph;
+
+        @BeforeEach
+        public void setUp() {
+            this.testGraph = TinkerGraph.open();
+        }
 
         @Test
         public void testImportingGraphML() {
@@ -44,8 +49,12 @@ public class TinkerGraphHookTest {
             hook.createVertex(new FileVertex("Test2", 1));
             hook.exportCurrentGraph();
 
-            hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(false).build();
-            // TODO: Once getVertex is coded, check if there are file vertices
+            assertDoesNotThrow(new TinkerGraphHookBuilder(testGraphML).createNewGraph(false)::build);
+
+            GraphTraversalSource g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+            assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test1").hasNext());
+            assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test2").hasNext());
         }
 
         @Test
@@ -55,8 +64,12 @@ public class TinkerGraphHookTest {
             hook.createVertex(new FileVertex("Test2", 1));
             hook.exportCurrentGraph();
 
-            hook = new TinkerGraphHookBuilder(testGraphJSON).createNewGraph(false).build();
-            // TODO: Once getVertex is coded, check if there are file vertices
+            assertDoesNotThrow(new TinkerGraphHookBuilder(testGraphJSON).createNewGraph(false)::build);
+
+            GraphTraversalSource g = testGraph.traversal();
+            g.io(testGraphJSON).read().iterate();
+            assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test1").hasNext());
+            assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test2").hasNext());
         }
 
         @Test
@@ -66,20 +79,30 @@ public class TinkerGraphHookTest {
             hook.createVertex(new FileVertex("Test2", 1));
             hook.exportCurrentGraph();
 
-            hook = new TinkerGraphHookBuilder(testGryo).createNewGraph(false).build();
-            // TODO: Once getVertex is coded, check if there are file vertices
+            assertDoesNotThrow(new TinkerGraphHookBuilder(testGryo).createNewGraph(false)::build);
+
+            GraphTraversalSource g = testGraph.traversal();
+            g.io(testGryo).read().iterate();
+            assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test1").hasNext());
+            assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test2").hasNext());
+        }
+
+        @Test
+        public void testImportingGraphThatDNE() {
+            assertThrows(IllegalStateException.class,
+                    () -> new TinkerGraphHookBuilder("/tmp/grapl/DNE.kryo").createNewGraph(false).build());
         }
 
         @Test
         public void testImportingInvalidExtension() {
-            assertThrows(IllegalArgumentException.class, () -> new TinkerGraphHookBuilder("/tmp/grapl/invalid.txt").createNewGraph(true).build());
+            assertThrows(IllegalArgumentException.class,
+                    () -> new TinkerGraphHookBuilder("/tmp/grapl/invalid.txt").createNewGraph(true).build());
         }
     }
 
     @Nested
     @DisplayName("TinkerGraph: Graph export file types")
     class ValidateGraphExportFileTypes {
-
         private TinkerGraphHook hook;
 
         @BeforeEach
@@ -123,7 +146,6 @@ public class TinkerGraphHookTest {
     @Nested
     @DisplayName("TinkerGraph: Graph export methods")
     class ValidateGraphExport {
-
         private TinkerGraphHook hook;
 
         @BeforeEach
