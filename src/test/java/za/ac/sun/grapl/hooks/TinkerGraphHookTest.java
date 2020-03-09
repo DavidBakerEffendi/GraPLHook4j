@@ -6,6 +6,7 @@ import org.junit.jupiter.api.*;
 import za.ac.sun.grapl.domain.enums.*;
 import za.ac.sun.grapl.domain.models.GraPLEdge;
 import za.ac.sun.grapl.domain.models.GraPLVertex;
+import za.ac.sun.grapl.domain.models.edges.ASTEdge;
 import za.ac.sun.grapl.domain.models.vertices.*;
 import za.ac.sun.grapl.hooks.TinkerGraphHook.TinkerGraphHookBuilder;
 
@@ -282,9 +283,9 @@ public class TinkerGraphHookTest {
             g.io(testGraphML).read().iterate();
 
             assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
-            assertTrue(g.V().hasLabel(FileVertex.LABEL.toString())
+            assertTrue(g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", "io.grapl")
                     .out(EdgeLabels.AST.toString())
-                    .has(NamespaceBlockVertex.LABEL.toString(), "fullName", "io.grapl")
+                    .hasLabel(FileVertex.LABEL.toString())
                     .hasNext());
         }
 
@@ -381,6 +382,72 @@ public class TinkerGraphHookTest {
                     .out(EdgeLabels.AST.toString())
                     .has(LocalVertex.LABEL.toString(), "name", TEST_ID)
                     .hasNext());
+        }
+    }
+
+    @Nested
+    @DisplayName("TinkerGraph: Join namespace block related vertices")
+    class NamespaceBlockJoinInteraction {
+        private static final String ROOT_NAME = "za";
+        private static final String FIRST_BLOCK = "ac";
+        private static final String SECOND_BLOCK = "sun";
+        private TinkerGraphHook hook;
+        private TinkerGraph testGraph;
+        private NamespaceBlockVertex root;
+
+        @BeforeEach
+        public void setUp() {
+            this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).build();
+            this.testGraph = TinkerGraph.open();
+            this.root = new NamespaceBlockVertex(ROOT_NAME, ROOT_NAME, 0);
+            this.hook.createVertex(root);
+        }
+
+        @Test
+        public void joinTwoNamespaceBlocks() {
+            NamespaceBlockVertex n1 = new NamespaceBlockVertex(FIRST_BLOCK, ROOT_NAME.concat(".").concat(FIRST_BLOCK), 1);
+            this.hook.joinNamespaceBlocks(root, n1);
+            this.hook.exportCurrentGraph();
+
+            GraphTraversalSource g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+
+            assertTrue(g.V().has(NamespaceBlockVertex.LABEL.toString(), "name", ROOT_NAME)
+                    .out(ASTEdge.LABEL.toString())
+                    .has(NamespaceBlockVertex.LABEL.toString(), "name", FIRST_BLOCK).hasNext());
+        }
+
+        @Test
+        public void joinThreeNamespaceBlocks() {
+            NamespaceBlockVertex n1 = new NamespaceBlockVertex(FIRST_BLOCK, ROOT_NAME.concat(".").concat(FIRST_BLOCK), 1);
+            NamespaceBlockVertex n2 = new NamespaceBlockVertex(SECOND_BLOCK, ROOT_NAME.concat(".").concat(SECOND_BLOCK), 1);
+            this.hook.joinNamespaceBlocks(root, n1);
+            this.hook.joinNamespaceBlocks(n1, n2);
+            this.hook.exportCurrentGraph();
+
+            GraphTraversalSource g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+
+            assertTrue(g.V().has(NamespaceBlockVertex.LABEL.toString(), "name", ROOT_NAME)
+                    .out(ASTEdge.LABEL.toString())
+                    .has(NamespaceBlockVertex.LABEL.toString(), "name", FIRST_BLOCK).hasNext());
+            assertTrue(g.V().has(NamespaceBlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+                    .out(ASTEdge.LABEL.toString())
+                    .has(NamespaceBlockVertex.LABEL.toString(), "name", SECOND_BLOCK).hasNext());
+        }
+
+        @Test
+        public void joinExistingConnection() {
+            NamespaceBlockVertex n1 = new NamespaceBlockVertex(FIRST_BLOCK, ROOT_NAME.concat(".").concat(FIRST_BLOCK), 1);
+            this.hook.joinNamespaceBlocks(root, n1);
+            this.hook.joinNamespaceBlocks(root, n1);
+            this.hook.exportCurrentGraph();
+
+            GraphTraversalSource g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+
+            assertEquals(1, g.V().has(NamespaceBlockVertex.LABEL.toString(), "name", ROOT_NAME)
+                    .out(ASTEdge.LABEL.toString()).count().next());
         }
     }
 }
