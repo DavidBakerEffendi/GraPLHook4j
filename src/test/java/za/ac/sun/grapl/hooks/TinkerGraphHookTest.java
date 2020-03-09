@@ -4,9 +4,7 @@ import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSo
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.jupiter.api.*;
 import za.ac.sun.grapl.domain.enums.*;
-import za.ac.sun.grapl.domain.models.GraPLEdge;
 import za.ac.sun.grapl.domain.models.GraPLVertex;
-import za.ac.sun.grapl.domain.models.edges.ASTEdge;
 import za.ac.sun.grapl.domain.models.vertices.*;
 import za.ac.sun.grapl.hooks.TinkerGraphHook.TinkerGraphHookBuilder;
 
@@ -160,7 +158,6 @@ public class TinkerGraphHookTest {
         public void testInterfaceDefaults() {
             assertEquals("UNKNOWN", GraPLVertex.LABEL.toString());
             assertEquals(EnumSet.noneOf(VertexBaseTraits.class), GraPLVertex.TRAITS);
-            assertEquals("AST", GraPLEdge.LABEL.toString());
         }
 
         @Test
@@ -413,7 +410,7 @@ public class TinkerGraphHookTest {
             g.io(testGraphML).read().iterate();
 
             assertTrue(g.V().has(NamespaceBlockVertex.LABEL.toString(), "name", ROOT_NAME)
-                    .out(ASTEdge.LABEL.toString())
+                    .out(EdgeLabels.AST.toString())
                     .has(NamespaceBlockVertex.LABEL.toString(), "name", FIRST_BLOCK).hasNext());
         }
 
@@ -429,10 +426,10 @@ public class TinkerGraphHookTest {
             g.io(testGraphML).read().iterate();
 
             assertTrue(g.V().has(NamespaceBlockVertex.LABEL.toString(), "name", ROOT_NAME)
-                    .out(ASTEdge.LABEL.toString())
+                    .out(EdgeLabels.AST.toString())
                     .has(NamespaceBlockVertex.LABEL.toString(), "name", FIRST_BLOCK).hasNext());
             assertTrue(g.V().has(NamespaceBlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
-                    .out(ASTEdge.LABEL.toString())
+                    .out(EdgeLabels.AST.toString())
                     .has(NamespaceBlockVertex.LABEL.toString(), "name", SECOND_BLOCK).hasNext());
         }
 
@@ -447,7 +444,7 @@ public class TinkerGraphHookTest {
             g.io(testGraphML).read().iterate();
 
             assertEquals(1, g.V().has(NamespaceBlockVertex.LABEL.toString(), "name", ROOT_NAME)
-                    .out(ASTEdge.LABEL.toString()).count().next());
+                    .out(EdgeLabels.AST.toString()).count().next());
         }
     }
 }
