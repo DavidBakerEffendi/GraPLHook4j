@@ -44,10 +44,10 @@ public interface IHook {
      * Joins the vertex associated with the given {@link FileVertex} in the database and the vertex associated with the
      * given {@link NamespaceBlockVertex}.
      *
-     * @param from the {@link FileVertex} in the database.
-     * @param to   the {@link NamespaceBlockVertex} in the database.
+     * @param to   the {@link FileVertex} in the database.
+     * @param from the {@link NamespaceBlockVertex} in the database.
      */
-    void joinFileVertexTo(FileVertex from, NamespaceBlockVertex to);
+    void joinFileVertexTo(FileVertex to, NamespaceBlockVertex from);
 
     /**
      * Joins the vertex associated with the given {@link FileVertex} in the database and the vertex associated with the
@@ -57,6 +57,16 @@ public interface IHook {
      * @param to   the {@link MethodVertex} in the database.
      */
     void joinFileVertexTo(FileVertex from, MethodVertex to);
+
+    /**
+     * Joins two namespace block vertices associated with the given {@link NamespaceBlockVertex} parameters. If one or
+     * both of the {@link NamespaceBlockVertex} parameters do no have an associated vertex in the database, they are
+     * created.
+     *
+     * @param from the from vertex.
+     * @param to   the to vertex.
+     */
+    void joinNamespaceBlocks(NamespaceBlockVertex from, NamespaceBlockVertex to);
 
     /**
      * Creates and assigns the {@link LocalVertex} to the associated {@link BlockVertex} vertex in the database

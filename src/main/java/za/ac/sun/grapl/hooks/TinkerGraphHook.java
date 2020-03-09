@@ -15,6 +15,8 @@ import za.ac.sun.grapl.domain.models.vertices.*;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
+import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
+
 public class TinkerGraphHook implements IHook {
 
     private static Logger log = LogManager.getLogger();
@@ -41,11 +43,6 @@ public class TinkerGraphHook implements IHook {
         TinkerGraph g = TinkerGraph.open();
         g.traversal().io(dir).read().iterate();
         return g;
-    }
-
-    @Override
-    public void createVertex(GraPLVertex v) {
-        createTinkerGraphVertex(v);
     }
 
     /**
@@ -82,6 +79,22 @@ public class TinkerGraphHook implements IHook {
         return g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", from.fullName).next();
     }
 
+    /**
+     * Checks if there is an associated {@link Vertex} with the given {@link NamespaceBlockVertex}.
+     *
+     * @param v the {@link NamespaceBlockVertex} to look up.
+     * @return true if there is an associated vertex, false if otherwise.
+     */
+    private boolean isVertexPresent(NamespaceBlockVertex v) {
+        GraphTraversalSource g = graph.traversal();
+        return g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", v.fullName).hasNext();
+    }
+
+    @Override
+    public void createVertex(GraPLVertex v) {
+        createTinkerGraphVertex(v);
+    }
+
     @Override
     public void createAndAddToMethod(MethodVertex from, MethodParameterInVertex to) {
         findVertex(from).addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(to));
@@ -98,13 +111,23 @@ public class TinkerGraphHook implements IHook {
     }
 
     @Override
-    public void joinFileVertexTo(FileVertex from, NamespaceBlockVertex to) {
+    public void joinFileVertexTo(FileVertex to, NamespaceBlockVertex from) {
         findVertex(from).addEdge(EdgeLabels.AST.toString(), findVertex(to));
     }
 
     @Override
     public void joinFileVertexTo(FileVertex from, MethodVertex to) {
         findVertex(from).addEdge(EdgeLabels.AST.toString(), findVertex(to));
+    }
+
+    @Override
+    public void joinNamespaceBlocks(NamespaceBlockVertex from, NamespaceBlockVertex to) {
+        if (!isVertexPresent(from)) createVertex(from);
+        if (!isVertexPresent(to)) createVertex(to);
+        Vertex n1 = findVertex(from);
+        Vertex n2 = findVertex(to);
+        if (!graph.traversal().V(n1).outE(EdgeLabels.AST.toString()).filter(inV().is(n2)).hasNext())
+            n1.addEdge(EdgeLabels.AST.toString(), n2);
     }
 
     @Override
@@ -179,7 +202,6 @@ public class TinkerGraphHook implements IHook {
     }
 
     public static class TinkerGraphHookBuilder {
-
         private boolean createNewGraph;
         private String graphDir;
 
@@ -207,7 +229,5 @@ public class TinkerGraphHook implements IHook {
         public TinkerGraphHook build() {
             return new TinkerGraphHook(this);
         }
-
     }
-
 }
