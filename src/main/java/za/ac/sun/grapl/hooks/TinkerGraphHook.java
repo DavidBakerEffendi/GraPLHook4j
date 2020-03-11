@@ -149,6 +149,11 @@ public class TinkerGraphHook implements IHook {
         }
     }
 
+    @Override
+    public void assignToBlock(MethodVertex rootMethod, ControlStructureVertex control, int blockOrder) {
+        findBlock(rootMethod, blockOrder).addEdge("AST", createTinkerGraphVertex(control));
+    }
+
     /**
      * Finds the associated {@link Vertex} in the graph to the block based on the {@link MethodVertex} and the AST order
      * under which this block occurs under this {@link MethodVertex}.

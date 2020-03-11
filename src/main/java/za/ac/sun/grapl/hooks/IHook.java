@@ -98,4 +98,14 @@ public interface IHook {
      */
     void assignToBlock(MethodVertex rootMethod, BlockVertex block, int blockOrder);
 
+    /**
+     * Creates and assigns the {@link ControlStructureVertex} to the associated {@link BlockVertex} vertex in the
+     * database identified by the given {@link MethodVertex} and AST order of the block.
+     *
+     * @param rootMethod the {@link MethodVertex} which is the root of the search.
+     * @param control    the {@link ControlStructureVertex} to associate with the block.
+     * @param blockOrder the AST order under which this block occurs.
+     */
+    void assignToBlock(MethodVertex rootMethod, ControlStructureVertex control, int blockOrder);
+
 }

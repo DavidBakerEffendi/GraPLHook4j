@@ -380,6 +380,21 @@ public class TinkerGraphHookTest {
                     .has(LocalVertex.LABEL.toString(), "name", TEST_ID)
                     .hasNext());
         }
+
+        @Test
+        public void testAssignControlToBlock() {
+            ControlStructureVertex lv = new ControlStructureVertex(TEST_ID, 2, 2, 1);
+            this.hook.assignToBlock(m, lv, 1);
+            this.hook.exportCurrentGraph();
+
+            GraphTraversalSource g = testGraph.traversal();
+            g.io(testGraphML).read().iterate();
+
+            assertTrue(g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+                    .out(EdgeLabels.AST.toString())
+                    .has(ControlStructureVertex.LABEL.toString(), "name", TEST_ID)
+                    .hasNext());
+        }
     }
 
     @Nested
