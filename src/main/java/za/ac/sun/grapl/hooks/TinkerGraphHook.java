@@ -1,10 +1,13 @@
 package za.ac.sun.grapl.hooks;
 
+import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
+import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import za.ac.sun.grapl.domain.enums.EdgeLabels;
@@ -14,6 +17,7 @@ import za.ac.sun.grapl.domain.models.vertices.*;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.UUID;
 
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 
@@ -25,24 +29,11 @@ public class TinkerGraphHook implements IHook {
     private final String dir;
 
     private TinkerGraphHook(TinkerGraphHookBuilder builder) {
-        if (builder.createNewGraph) {
-            this.graph = TinkerGraph.open();
-        } else {
-            this.graph = TinkerGraphHook.importGraph(builder.graphDir);
-        }
+        BaseConfiguration conf = new BaseConfiguration();
+        conf.setProperty("gremlin.graph", "org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph");
+        this.graph = TinkerGraph.open(conf);
+        if (!builder.createNewGraph) graph.traversal().io(builder.graphDir).read().iterate();
         this.dir = builder.graphDir;
-    }
-
-    /**
-     * Imports an existing TinkerGraph from the specified directory. Supported formats are GraphML, GraphSON, and Gryo.
-     *
-     * @param dir the path to the existing TinkerGraph.
-     * @return the deserialized {@link Graph} object.
-     */
-    private static Graph importGraph(String dir) {
-        TinkerGraph g = TinkerGraph.open();
-        g.traversal().io(dir).read().iterate();
-        return g;
     }
 
     /**
@@ -88,7 +79,8 @@ public class TinkerGraphHook implements IHook {
      */
     private boolean vertexNotPresent(NamespaceBlockVertex v) {
         GraphTraversalSource g = graph.traversal();
-        return !g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", v.fullName).hasNext();
+        return !g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", v.fullName)
+                .has("name", v.name).hasNext();
     }
 
     /**
@@ -110,24 +102,28 @@ public class TinkerGraphHook implements IHook {
 
     @Override
     public void createAndAddToMethod(MethodVertex from, MethodParameterInVertex to) {
-        findVertex(from).addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(to));
+        createTinkerGraphEdge(findVertex(from), EdgeLabels.AST, createTinkerGraphVertex(to));
     }
 
     @Override
     public void createAndAddToMethod(MethodVertex from, MethodReturnVertex to) {
-        findVertex(from).addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(to));
+        createTinkerGraphEdge(findVertex(from), EdgeLabels.AST, createTinkerGraphVertex(to));
     }
 
     @Override
     public void createAndAddToMethod(MethodVertex from, ModifierVertex to) {
-        findVertex(from).addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(to));
+        createTinkerGraphEdge(findVertex(from), EdgeLabels.AST, createTinkerGraphVertex(to));
     }
 
     @Override
     public void joinFileVertexTo(FileVertex to, NamespaceBlockVertex from) {
-        if (vertexNotPresent(from)) createTinkerGraphVertex(from);
-        if (vertexNotPresent(to)) createTinkerGraphVertex(to);
-        findVertex(from).addEdge(EdgeLabels.AST.toString(), findVertex(to));
+        if (vertexNotPresent(from)) {
+            createTinkerGraphVertex(from);
+        }
+        if (vertexNotPresent(to)) {
+            createTinkerGraphVertex(to);
+        }
+        createTinkerGraphEdge(findVertex(from), EdgeLabels.AST, findVertex(to));
     }
 
     @Override
@@ -140,7 +136,7 @@ public class TinkerGraphHook implements IHook {
                 .hasNext()) {
             createTinkerGraphVertex(to);
         }
-        findVertex(from).addEdge(EdgeLabels.AST.toString(), findVertex(to));
+        createTinkerGraphEdge(findVertex(from), EdgeLabels.AST, findVertex(to));
     }
 
     @Override
@@ -149,32 +145,33 @@ public class TinkerGraphHook implements IHook {
         if (vertexNotPresent(to)) createTinkerGraphVertex(to);
         Vertex n1 = findVertex(from);
         Vertex n2 = findVertex(to);
-        if (!graph.traversal().V(n1).outE(EdgeLabels.AST.toString()).filter(inV().is(n2)).hasNext())
-            n1.addEdge(EdgeLabels.AST.toString(), n2);
+        if (!graph.traversal().V(n1).outE(EdgeLabels.AST.toString()).filter(inV().is(n2)).hasNext()) {
+            createTinkerGraphEdge(n1, EdgeLabels.AST, n2);
+        }
     }
 
     @Override
     public void assignToBlock(MethodVertex rootMethod, LocalVertex local, int blockOrder) {
-        findBlock(rootMethod, blockOrder).addEdge("AST", createTinkerGraphVertex(local));
+        createTinkerGraphEdge(findBlock(rootMethod, blockOrder), EdgeLabels.AST, createTinkerGraphVertex(local));
     }
 
     @Override
     public void assignToBlock(MethodVertex rootMethod, LiteralVertex literal, int blockOrder) {
-        findBlock(rootMethod, blockOrder).addEdge("AST", createTinkerGraphVertex(literal));
+        createTinkerGraphEdge(findBlock(rootMethod, blockOrder), EdgeLabels.AST, createTinkerGraphVertex(literal));
     }
 
     @Override
     public void assignToBlock(MethodVertex rootMethod, BlockVertex block, int blockOrder) {
         if (blockOrder == 0) {
-            findVertex(rootMethod).addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(block));
+            createTinkerGraphEdge(findVertex(rootMethod), EdgeLabels.AST, createTinkerGraphVertex(block));
         } else {
-            findBlock(rootMethod, blockOrder).addEdge(EdgeLabels.AST.toString(), createTinkerGraphVertex(block));
+            createTinkerGraphEdge(findBlock(rootMethod, blockOrder), EdgeLabels.AST, createTinkerGraphVertex(block));
         }
     }
 
     @Override
     public void assignToBlock(MethodVertex rootMethod, ControlStructureVertex control, int blockOrder) {
-        findBlock(rootMethod, blockOrder).addEdge("AST", createTinkerGraphVertex(control));
+        createTinkerGraphEdge(findBlock(rootMethod, blockOrder), EdgeLabels.AST, createTinkerGraphVertex(control));
     }
 
     /**
@@ -210,7 +207,7 @@ public class TinkerGraphHook implements IHook {
         } catch (NoSuchFieldException | IllegalAccessException ignored) {
         }
         // Get the implementing classes fields and values
-        final Vertex v = this.graph.addVertex(label);
+        final Vertex v = this.graph.addVertex(T.label, label, T.id, UUID.randomUUID());
         Arrays.stream(fields).forEach(f -> {
             try {
                 v.property(f.getName(), f.get(gv).toString());
@@ -219,6 +216,19 @@ public class TinkerGraphHook implements IHook {
             }
         });
         return v;
+    }
+
+    /**
+     * Wrapper method for creating an edge between two vertices. This wrapper method assigns a random UUID as the ID
+     * for the edge.
+     *
+     * @param v1        the from {@link Vertex}.
+     * @param edgeLabel the CPG edge label.
+     * @param v2        the to {@link Vertex}.
+     * @return the newly created {@link Edge}.
+     */
+    private Edge createTinkerGraphEdge(Vertex v1, EdgeLabels edgeLabel, Vertex v2) {
+        return v1.addEdge(edgeLabel.toString(), v2, T.id, UUID.randomUUID());
     }
 
     /**

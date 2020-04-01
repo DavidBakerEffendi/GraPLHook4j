@@ -21,9 +21,9 @@ public class TinkerGraphHookTest {
 
     final static Logger logger = LogManager.getLogger();
 
-    private static final String testGraphML = "/tmp/grapl/testGraph.xml";
-    private static final String testGraphSON = "/tmp/grapl/testGraph.json";
-    private static final String testGryo = "/tmp/grapl/testGraph.kryo";
+    private static final String testGraphML = "/tmp/grapl/graplhook4j_test.xml";
+    private static final String testGraphSON = "/tmp/grapl/graplhook4j_test.json";
+    private static final String testGryo = "/tmp/grapl/graplhook4j_test.kryo";
 
     @AfterAll
     static void tearDownAll() {
