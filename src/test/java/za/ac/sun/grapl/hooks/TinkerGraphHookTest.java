@@ -1,5 +1,7 @@
 package za.ac.sun.grapl.hooks;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.jupiter.api.*;
@@ -9,6 +11,7 @@ import za.ac.sun.grapl.domain.models.vertices.*;
 import za.ac.sun.grapl.hooks.TinkerGraphHook.TinkerGraphHookBuilder;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.EnumSet;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,23 +19,29 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TinkerGraphHookTest {
 
-    private static final String testGraphML = "/tmp/grapl/testGraph.xml";
-    private static final String testGraphJSON = "/tmp/grapl/testGraph.json";
-    private static final String testGryo = "/tmp/grapl/testGraph.kryo";
+    final static Logger logger = LogManager.getLogger();
+
+    private static final String testGraphML = "/tmp/grapl/graplhook4j_test.xml";
+    private static final String testGraphSON = "/tmp/grapl/graplhook4j_test.json";
+    private static final String testGryo = "/tmp/grapl/graplhook4j_test.kryo";
 
     @AfterAll
     static void tearDownAll() {
-        File f = new File(testGraphML);
-        if (f.exists()) f.delete();
-        f = new File(testGraphJSON);
-        if (f.exists()) f.delete();
-        f = new File(testGryo);
-        if (f.exists()) f.delete();
+        File[] testFiles = new File[]{new File(testGraphML), new File(testGraphSON), new File(testGryo)};
+        Arrays.stream(testFiles).forEach(file -> {
+            try {
+                if (!file.delete())
+                    logger.warn("Could not clear " + TinkerGraphHookTest.class.getName() + "'s test resources.");
+            } catch (Exception e) {
+                logger.warn("Could not clear " + TinkerGraphHookTest.class.getName() + "'s test resources.", e);
+            }
+        });
     }
 
     @Nested
     @DisplayName("TinkerGraph: Graph import file types")
     class ValidateGraphImportFileTypes {
+
         private TinkerGraphHook hook;
         private TinkerGraph testGraph;
 
@@ -44,8 +53,8 @@ public class TinkerGraphHookTest {
         @Test
         public void testImportingGraphML() {
             hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).build();
-            hook.createVertex(new FileVertex("Test1", 0));
-            hook.createVertex(new FileVertex("Test2", 1));
+            hook.addFileVertex(new FileVertex("Test1", 0));
+            hook.addFileVertex(new FileVertex("Test2", 1));
             hook.exportCurrentGraph();
 
             assertDoesNotThrow(new TinkerGraphHookBuilder(testGraphML).createNewGraph(false)::build);
@@ -58,15 +67,15 @@ public class TinkerGraphHookTest {
 
         @Test
         public void testImportingGraphJSON() {
-            hook = new TinkerGraphHookBuilder(testGraphJSON).createNewGraph(true).build();
-            hook.createVertex(new FileVertex("Test1", 0));
-            hook.createVertex(new FileVertex("Test2", 1));
+            hook = new TinkerGraphHookBuilder(testGraphSON).createNewGraph(true).build();
+            hook.addFileVertex(new FileVertex("Test1", 0));
+            hook.addFileVertex(new FileVertex("Test2", 1));
             hook.exportCurrentGraph();
 
-            assertDoesNotThrow(new TinkerGraphHookBuilder(testGraphJSON).createNewGraph(false)::build);
+            assertDoesNotThrow(new TinkerGraphHookBuilder(testGraphSON).createNewGraph(false)::build);
 
             GraphTraversalSource g = testGraph.traversal();
-            g.io(testGraphJSON).read().iterate();
+            g.io(testGraphSON).read().iterate();
             assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test1").hasNext());
             assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test2").hasNext());
         }
@@ -74,8 +83,8 @@ public class TinkerGraphHookTest {
         @Test
         public void testImportingGryo() {
             hook = new TinkerGraphHookBuilder(testGryo).createNewGraph(true).build();
-            hook.createVertex(new FileVertex("Test1", 0));
-            hook.createVertex(new FileVertex("Test2", 1));
+            hook.addFileVertex(new FileVertex("Test1", 0));
+            hook.addFileVertex(new FileVertex("Test2", 1));
             hook.exportCurrentGraph();
 
             assertDoesNotThrow(new TinkerGraphHookBuilder(testGryo).createNewGraph(false)::build);
@@ -102,41 +111,32 @@ public class TinkerGraphHookTest {
     @Nested
     @DisplayName("TinkerGraph: Graph export file types")
     class ValidateGraphExportFileTypes {
-        private TinkerGraphHook hook;
 
-        @BeforeEach
-        public void setUp() {
-            File f = new File(testGraphML);
-            if (f.exists()) f.delete();
-            f = new File(testGraphJSON);
-            if (f.exists()) f.delete();
-            f = new File(testGryo);
-            if (f.exists()) f.delete();
-        }
+        private TinkerGraphHook hook;
 
         @Test
         public void testExportingGraphML() {
             this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).build();
-            hook.createVertex(new FileVertex("Test1", 0));
-            hook.createVertex(new FileVertex("Test2", 1));
+            hook.addFileVertex(new FileVertex("Test1", 0));
+            hook.addFileVertex(new FileVertex("Test2", 1));
             hook.exportCurrentGraph();
             assertTrue(new File(testGraphML).exists());
         }
 
         @Test
         public void testExportingGraphJSON() {
-            this.hook = new TinkerGraphHookBuilder(testGraphJSON).createNewGraph(true).build();
-            hook.createVertex(new FileVertex("Test1", 0));
-            hook.createVertex(new FileVertex("Test2", 1));
+            this.hook = new TinkerGraphHookBuilder(testGraphSON).createNewGraph(true).build();
+            hook.addFileVertex(new FileVertex("Test1", 0));
+            hook.addFileVertex(new FileVertex("Test2", 1));
             hook.exportCurrentGraph();
-            assertTrue(new File(testGraphJSON).exists());
+            assertTrue(new File(testGraphSON).exists());
         }
 
         @Test
         public void testExportingGryo() {
             this.hook = new TinkerGraphHookBuilder(testGryo).createNewGraph(true).build();
-            hook.createVertex(new FileVertex("Test1", 0));
-            hook.createVertex(new FileVertex("Test2", 1));
+            hook.addFileVertex(new FileVertex("Test1", 0));
+            hook.addFileVertex(new FileVertex("Test2", 1));
             hook.exportCurrentGraph();
             assertTrue(new File(testGryo).exists());
         }
@@ -144,15 +144,7 @@ public class TinkerGraphHookTest {
 
     @Nested
     @DisplayName("TinkerGraph: Graph export methods")
-    class ValidateGraphExport {
-        private TinkerGraphHook hook;
-
-        @BeforeEach
-        public void setUp() {
-            File f = new File(testGraphML);
-            if (f.exists()) f.delete();
-            this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).build();
-        }
+    class ValidateGraphDomain {
 
         @Test
         public void testInterfaceDefaults() {
@@ -161,34 +153,32 @@ public class TinkerGraphHookTest {
         }
 
         @Test
-        public void testTinkerGraphCanHandleAllVertexTypes() {
-            hook.createVertex(new ArrayInitializerVertex());
-            hook.createVertex(new BindingVertex("n", "s"));
-            hook.createVertex(new BlockVertex("c", 0, 0, "t", 0));
-            hook.createVertex(new CallVertex("c", "n", 0, "m", "m",
-                    1, DispatchTypes.STATIC_DISPATCH, "s", "t", 0));
-            hook.createVertex(new ControlStructureVertex("c", 0, 0, 0));
-            hook.createVertex(new FieldIdentifier("c", "c", 0, 0, 0));
-            hook.createVertex(new FileVertex("n", 1));
-            hook.createVertex(new IdentifierVertex("c", "n", 0, 0, "t", 0));
-            hook.createVertex(new LiteralVertex("c", 0, 0, "t", 0));
-            hook.createVertex(new LocalVertex("c", "n", "t", 0, 0));
-            hook.createVertex(new MemberVertex("c", "n", "t", 0));
-            hook.createVertex(new MetaDataVertex("Java", "1.8"));
-            hook.createVertex(new MethodParameterInVertex("c", "n", EvaluationStrategies.BY_REFERENCE, "t", 0, 0));
-            hook.createVertex(new MethodRefVertex("c", 0, 0, "m", "m", 0));
-            hook.createVertex(new MethodReturnVertex("c", "t", EvaluationStrategies.BY_REFERENCE, 0, 0));
-            hook.createVertex(new MethodVertex("n", "f", "s", 0, 0));
-            hook.createVertex(new ModifierVertex(ModifierTypes.PUBLIC, 0));
-            hook.createVertex(new NamespaceBlockVertex("n", "f", 0));
-            hook.createVertex(new ReturnVertex(0, 0, 0, "c"));
-            hook.createVertex(new TypeArgumentVertex(0));
-            hook.createVertex(new TypeDeclVertex("n", "f", "t"));
-            hook.createVertex(new TypeParameterVertex("n", 0));
-            hook.createVertex(new TypeVertex("n", "f", "t"));
-            hook.createVertex(new UnknownVertex("c", 0, 0, 0, "t"));
-            hook.exportCurrentGraph();
-            assertTrue(new File(testGraphML).exists());
+        public void testTinkerGraphCreateAllVertexTypes() {
+            new ArrayInitializerVertex();
+            new BindingVertex("n", "s");
+            new BlockVertex("c", 0, 0, "t", 0);
+            new CallVertex("c", "n", 0, "m", "m",
+                    1, DispatchTypes.STATIC_DISPATCH, "s", "t", 0);
+            new ControlStructureVertex("c", 0, 0, 0);
+            new FieldIdentifier("c", "c", 0, 0, 0);
+            new FileVertex("n", 1);
+            new IdentifierVertex("c", "n", 0, 0, "t", 0);
+            new LiteralVertex("c", 0, 0, "t", 0);
+            new LocalVertex("c", "n", "t", 0, 0);
+            new MemberVertex("c", "n", "t", 0);
+            new MetaDataVertex("Java", "1.8");
+            new MethodParameterInVertex("c", "n", EvaluationStrategies.BY_REFERENCE, "t", 0, 0);
+            new MethodRefVertex("c", 0, 0, "m", "m", 0);
+            new MethodReturnVertex("c", "t", EvaluationStrategies.BY_REFERENCE, 0, 0);
+            new MethodVertex("n", "f", "s", 0, 0);
+            new ModifierVertex(ModifierTypes.PUBLIC, 0);
+            new NamespaceBlockVertex("n", "f", 0);
+            new ReturnVertex(0, 0, 0, "c");
+            new TypeArgumentVertex(0);
+            new TypeDeclVertex("n", "f", "t");
+            new TypeParameterVertex("n", 0);
+            new TypeVertex("n", "f", "t");
+            new UnknownVertex("c", 0, 0, 0, "t");
         }
 
     }
@@ -196,6 +186,7 @@ public class TinkerGraphHookTest {
     @Nested
     @DisplayName("TinkerGraph: Join method vertex to method related vertices")
     class MethodJoinInteraction {
+
         private TinkerGraphHook hook;
         private TinkerGraph testGraph;
         private MethodVertex m;
@@ -204,8 +195,9 @@ public class TinkerGraphHookTest {
         public void setUp() {
             this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).build();
             this.testGraph = TinkerGraph.open();
-            this.m = new MethodVertex("test", "io.grapl.Test.run", "(I)", 0, 0);
-            this.hook.createVertex(m);
+            FileVertex f = new FileVertex("Test", 0);
+            this.m = new MethodVertex("run", "io.grapl.Test.run", "(I)", 0, 1);
+            this.hook.joinFileVertexTo(f, m);
         }
 
         @Test
@@ -257,6 +249,7 @@ public class TinkerGraphHookTest {
     @Nested
     @DisplayName("TinkerGraph: Join file vertex to file related vertices")
     class FileJoinInteraction {
+
         private TinkerGraphHook hook;
         private TinkerGraph testGraph;
         private FileVertex f;
@@ -265,14 +258,13 @@ public class TinkerGraphHookTest {
         public void setUp() {
             this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).build();
             this.testGraph = TinkerGraph.open();
-            this.f = new FileVertex("io.grapl.Test", 0);
-            this.hook.createVertex(f);
+            this.f = new FileVertex("Test", 1);
+            this.hook.addFileVertex(f);
         }
 
         @Test
         public void testJoinFile2NamespaceBlock() {
             NamespaceBlockVertex nbv = new NamespaceBlockVertex("grapl", "io.grapl", 0);
-            this.hook.createVertex(nbv);
             this.hook.joinFileVertexTo(f, nbv);
             this.hook.exportCurrentGraph();
 
@@ -289,7 +281,6 @@ public class TinkerGraphHookTest {
         @Test
         public void testJoinFile2Method() {
             MethodVertex mv = new MethodVertex("test", "io.grapl.Test.run", "(I)", 0, 0);
-            this.hook.createVertex(mv);
             this.hook.joinFileVertexTo(f, mv);
             this.hook.exportCurrentGraph();
 
@@ -307,6 +298,7 @@ public class TinkerGraphHookTest {
     @Nested
     @DisplayName("TinkerGraph: Join file vertex to file related vertices")
     class BlockJoinInteraction {
+
         private static final String ROOT_METHOD = "root";
         private static final String FIRST_BLOCK = "firstBlock";
         private static final String TEST_ID = "test";
@@ -318,8 +310,9 @@ public class TinkerGraphHookTest {
         public void setUp() {
             this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).build();
             this.testGraph = TinkerGraph.open();
+            FileVertex f = new FileVertex("Test", 0);
             this.m = new MethodVertex(ROOT_METHOD, "io.grapl.Test.run", "(I)", 0, 0);
-            this.hook.createVertex(m);
+            this.hook.joinFileVertexTo(f, m);
             this.hook.assignToBlock(m, new BlockVertex(FIRST_BLOCK, 1, 1, "INTEGER", 5), 0);
         }
 
@@ -400,6 +393,7 @@ public class TinkerGraphHookTest {
     @Nested
     @DisplayName("TinkerGraph: Join namespace block related vertices")
     class NamespaceBlockJoinInteraction {
+
         private static final String ROOT_NAME = "za";
         private static final String FIRST_BLOCK = "ac";
         private static final String SECOND_BLOCK = "sun";
@@ -412,7 +406,6 @@ public class TinkerGraphHookTest {
             this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).build();
             this.testGraph = TinkerGraph.open();
             this.root = new NamespaceBlockVertex(ROOT_NAME, ROOT_NAME, 0);
-            this.hook.createVertex(root);
         }
 
         @Test

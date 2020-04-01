@@ -1,17 +1,16 @@
 package za.ac.sun.grapl.hooks;
 
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-import za.ac.sun.grapl.domain.models.GraPLVertex;
 import za.ac.sun.grapl.domain.models.vertices.*;
 
 public interface IHook {
 
     /**
-     * Creates a {@link Vertex} from a given {@link GraPLVertex}.
+     * Creates a {@link Vertex} from a given {@link FileVertex}.
      *
-     * @param v the {@link GraPLVertex} to translate into a {@link Vertex}.
+     * @param v the {@link FileVertex} to translate into a {@link Vertex}.
      */
-    void createVertex(GraPLVertex v);
+    void addFileVertex(FileVertex v);
 
     /**
      * Creates the given {@link MethodParameterInVertex} in the database and joins it to the vertex associated with the
@@ -42,7 +41,7 @@ public interface IHook {
 
     /**
      * Joins the vertex associated with the given {@link FileVertex} in the database and the vertex associated with the
-     * given {@link NamespaceBlockVertex}.
+     * given {@link NamespaceBlockVertex}. If there is no associated vertices then they will be created.
      *
      * @param to   the {@link FileVertex} in the database.
      * @param from the {@link NamespaceBlockVertex} in the database.
@@ -51,7 +50,7 @@ public interface IHook {
 
     /**
      * Joins the vertex associated with the given {@link FileVertex} in the database and the vertex associated with the
-     * given {@link MethodVertex}.
+     * given {@link MethodVertex}. If there is no associated vertices then they will be created.
      *
      * @param from the {@link FileVertex} in the database.
      * @param to   the {@link MethodVertex} in the database.
