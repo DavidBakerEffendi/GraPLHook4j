@@ -65,7 +65,8 @@ public class TinkerGraphHook implements IHook {
      */
     private Vertex findVertex(FileVertex from) {
         GraphTraversalSource g = graph.traversal();
-        return g.V().has(FileVertex.LABEL.toString(), "name", from.name).next();
+        return g.V().has(FileVertex.LABEL.toString(), "name", from.name)
+                .has("order", String.valueOf(from.order)).next();
     }
 
     /**
@@ -83,15 +84,27 @@ public class TinkerGraphHook implements IHook {
      * Checks if there is an associated {@link Vertex} with the given {@link NamespaceBlockVertex}.
      *
      * @param v the {@link NamespaceBlockVertex} to look up.
-     * @return true if there is an associated vertex, false if otherwise.
+     * @return false if there is an associated vertex, true if otherwise.
      */
-    private boolean isVertexPresent(NamespaceBlockVertex v) {
+    private boolean vertexNotPresent(NamespaceBlockVertex v) {
         GraphTraversalSource g = graph.traversal();
-        return g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", v.fullName).hasNext();
+        return !g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", v.fullName).hasNext();
+    }
+
+    /**
+     * Checks if there is an associated {@link Vertex} with the given {@link FileVertex}.
+     *
+     * @param v the {@link FileVertex} to look up.
+     * @return false if there is an associated vertex, true if otherwise.
+     */
+    private boolean vertexNotPresent(FileVertex v) {
+        GraphTraversalSource g = graph.traversal();
+        return !g.V().has(FileVertex.LABEL.toString(), "name", v.name)
+                .has("order", String.valueOf(v.order)).hasNext();
     }
 
     @Override
-    public void createVertex(GraPLVertex v) {
+    public void addFileVertex(FileVertex v) {
         createTinkerGraphVertex(v);
     }
 
@@ -112,18 +125,28 @@ public class TinkerGraphHook implements IHook {
 
     @Override
     public void joinFileVertexTo(FileVertex to, NamespaceBlockVertex from) {
+        if (vertexNotPresent(from)) createTinkerGraphVertex(from);
+        if (vertexNotPresent(to)) createTinkerGraphVertex(to);
         findVertex(from).addEdge(EdgeLabels.AST.toString(), findVertex(to));
     }
 
     @Override
     public void joinFileVertexTo(FileVertex from, MethodVertex to) {
+        if (vertexNotPresent(from)) createTinkerGraphVertex(from);
+        if (!graph.traversal().V(findVertex(from))
+                .out(EdgeLabels.AST.toString())
+                .has("fullName", to.fullName)
+                .has("signature", to.signature)
+                .hasNext()) {
+            createTinkerGraphVertex(to);
+        }
         findVertex(from).addEdge(EdgeLabels.AST.toString(), findVertex(to));
     }
 
     @Override
     public void joinNamespaceBlocks(NamespaceBlockVertex from, NamespaceBlockVertex to) {
-        if (!isVertexPresent(from)) createVertex(from);
-        if (!isVertexPresent(to)) createVertex(to);
+        if (vertexNotPresent(from)) createTinkerGraphVertex(from);
+        if (vertexNotPresent(to)) createTinkerGraphVertex(to);
         Vertex n1 = findVertex(from);
         Vertex n2 = findVertex(to);
         if (!graph.traversal().V(n1).outE(EdgeLabels.AST.toString()).filter(inV().is(n2)).hasNext())
