@@ -59,10 +59,22 @@ public class GraPLDemo {
 ```
 This exported file can then be visualized using tools such as [Cytoscape](https://cytoscape.org/).
 
-## Graph Databases
-### Implemented
+## Support
+
+### Java Support
+
+The following versions of Java are officially supported:
+* OpenJDK 8
+* OpenJDK 9
+* OpenJDK 10
+* OpenJDK 11
+
+### Graph Database Support
+
+Databases supported:
 * TinkerGraph
-### Planned
+
+Planned to support in the near future:
 * TigerGraph
 * Neo4j
 * JanusGraph
