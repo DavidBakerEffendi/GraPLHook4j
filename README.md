@@ -21,6 +21,64 @@ GraPL is currently under development. It has the following capabilities:
   - If-else bodies
 * Can export an in-memory graph database to GraphML, GraphSON, and Gryo.
 
+## Building from Source
+
+In order to use GraPLHook4j one will need to build from source. This will be the case until the GraPL project can be 
+hosted on a Maven repository or similar.
+
+```shell script
+git clone https://github.com/DavidBakerEffendi/GraPLHook4j.git
+cd GraPLHook4j
+mvn package
+```
+This will build `target/GraPLHook4j-X.X.X[-jar-with-dependencies].jar` which can then be imported into your local 
+project. E.g.
+```mxml
+<dependency>
+  <groupId>za.ac.sun.grapl</groupId>
+  <artifactId>GraPLHook4j</artifactId>
+  <version>X.X.X</version>
+  <scope>system</scope>
+  <systemPath>${project.basedir}/lib/GraPLHook4j-X.X.X.jar</systemPath>
+</dependency>
+``` 
+
+## Dependencies
+
+### Packages
+
+The following packages are used by GraPLHook4j:
+
+* `org.apache.logging.log4j:log4j-core:2.8.2`
+* `org.apache.logging.log4j:log4j-slf4j-impl:2.8.2`
+* `org.apache.tinkerpop:gremlin-core:3.4.5`
+
+Dependencies per graph database technology being connected to:
+
+* _TinkerGraph_ `org.apache.tinkerpop:tinkergraph-gremlin:3.4.5`
+
+It is not recommended to use the fat jar in your project if using a build tool such as Ant, Maven, Gradle, etc. Rather
+use the main artifact and add the dependencies manually (in your `pom.xml`, `build.gradle`, etc.). Note that if you are
+connecting to Neo4j, for example, you would not need the TinkerGraph, TigerGraph, etc. dependencies. 
+
+### Java Support
+
+The following versions of Java are officially supported:
+* OpenJDK 8
+* OpenJDK 9
+* OpenJDK 10
+* OpenJDK 11
+
+### Graph Database Support
+
+Databases supported:
+* TinkerGraph
+
+Planned to support in the near future:
+* TigerGraph
+* Neo4j
+* JanusGraph
+
 ## Basic Process
 
 GraPLHook4j works through immutable domain objects and a high level API in order to construct and analyse a 
@@ -59,22 +117,7 @@ public class GraPLDemo {
 ```
 This exported file can then be visualized using tools such as [Cytoscape](https://cytoscape.org/).
 
-## Support
+## Logging
 
-### Java Support
-
-The following versions of Java are officially supported:
-* OpenJDK 8
-* OpenJDK 9
-* OpenJDK 10
-* OpenJDK 11
-
-### Graph Database Support
-
-Databases supported:
-* TinkerGraph
-
-Planned to support in the near future:
-* TigerGraph
-* Neo4j
-* JanusGraph
+All logging can be configured under `src/main/resources/log4j2.properties`. By default, all logs can be found under 
+`/tmp/grapl`.
