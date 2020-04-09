@@ -107,4 +107,11 @@ public interface IHook {
      */
     void assignToBlock(MethodVertex rootMethod, ControlStructureVertex control, int blockOrder);
 
+    /**
+     * Traverses the AST nodes to search for the largest order value.
+     *
+     * @return the largest order property.
+     */
+    int maxOrder();
+
 }

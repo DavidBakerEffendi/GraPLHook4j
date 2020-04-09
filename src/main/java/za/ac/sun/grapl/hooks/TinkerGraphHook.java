@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.UUID;
 
+import static org.apache.tinkerpop.gremlin.process.traversal.Order.desc;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 
 public class TinkerGraphHook implements IHook {
@@ -172,6 +173,15 @@ public class TinkerGraphHook implements IHook {
     @Override
     public void assignToBlock(MethodVertex rootMethod, ControlStructureVertex control, int blockOrder) {
         createTinkerGraphEdge(findBlock(rootMethod, blockOrder), EdgeLabels.AST, createTinkerGraphVertex(control));
+    }
+
+    @Override
+    public int maxOrder() {
+        final GraphTraversalSource g = graph.traversal();
+        if (g.V().has("order").hasNext())
+            return Integer.parseInt(g.V().order().by("order", desc).limit(1).values("order").next().toString());
+        else
+            return 0;
     }
 
     /**

@@ -455,4 +455,42 @@ public class TinkerGraphHookTest {
                     .out(EdgeLabels.AST.toString()).count().next());
         }
     }
+
+    @Nested
+    @DisplayName("TinkerGraph: Aggregate queries")
+    class TinkerGraphAggregateQueries {
+
+        private TinkerGraphHook hook;
+        private TinkerGraph testGraph;
+
+        @BeforeEach
+        public void setUp() {
+            this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).build();
+            this.testGraph = TinkerGraph.open();
+        }
+
+        @Test
+        public void testEmptyGraph() {
+            assertEquals(0, this.hook.maxOrder());
+        }
+
+        @Test
+        public void testNonEmptyGraphWithASTVertices() {
+            FileVertex f = new FileVertex("Test", 0);
+            MethodVertex m = new MethodVertex("root", "io.grapl.Test.run", "(I)", 0, 0);
+            this.hook.joinFileVertexTo(f, m);
+            this.hook.assignToBlock(m, new BlockVertex("firstBlock", 1, 1, "INTEGER", 5), 0);
+            this.hook.assignToBlock(m, new BlockVertex("secondBlock", 2, 1, "INTEGER", 6), 0);
+            assertEquals(2, this.hook.maxOrder());
+        }
+
+        @Test
+        public void testNonEmptyGraphWithoutASTVertices() {
+            testGraph.addVertex("EmptyVertex");
+            testGraph.traversal().io(testGraphML).write().iterate();
+            this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(false).build();
+
+            assertEquals(0, this.hook.maxOrder());
+        }
+    }
 }
