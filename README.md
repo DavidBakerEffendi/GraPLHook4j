@@ -81,7 +81,7 @@ Planned to support in the near future:
 
 ## Basic Process
 
-GraPLHook4j works through immutable domain objects and a high level API in order to construct and analyse a 
+GraPLHook4j works through immutable domain objects, and a high level API in order to construct and analyse a
 code-property graph. [Java ASM5](https://asm.ow2.io/) notation is used for method signatures and representing arrays and
 types. An example of this is:
 ```java
