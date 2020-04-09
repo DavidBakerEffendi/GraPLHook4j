@@ -3,12 +3,12 @@
 [![Build Status](https://travis-ci.org/DavidBakerEffendi/GraPLHook4j.svg?branch=develop)](https://travis-ci.org/DavidBakerEffendi/GraPLHook4j)
 [![codecov](https://codecov.io/gh/DavidBakerEffendi/GraPLHook4j/branch/develop/graph/badge.svg)](https://codecov.io/gh/DavidBakerEffendi/GraPLHook4j)
 
-A Java driver for the GraPL project to provide an interface for connecting and writing to various graph databases based 
+A Java driver for the GraPL project to provide an interface for connecting and writing to various graph databases based
 on the [code-property graph schema](https://github.com/ShiftLeftSecurity/codepropertygraph/blob/master/codepropertygraph/src/main/resources/schemas/base.json).
 
 This CPG schema has been slightly adjusted to work with a graph database agnostic project. The models and enums can be
-found under `za.ac.sun.grapl.domain`. Extensive documentation will be released with the first major release of the GraPL
-project.
+found under `za.ac.sun.grapl.domain`. The extensive documentation will be released with the first major release of the
+GraPL project.
 
 ## Features
 
@@ -29,9 +29,10 @@ hosted on a Maven repository or similar.
 ```shell script
 git clone https://github.com/DavidBakerEffendi/GraPLHook4j.git
 cd GraPLHook4j
-mvn package
+./gradlew jar # For main artifact only
+./gradlew fatJar # For fat jar with dependencies
 ```
-This will build `target/GraPLHook4j-X.X.X[-jar-with-dependencies].jar` which can then be imported into your local 
+This will build `target/GraPLHook4j-X.X.X[-all].jar` which can then be imported into your local
 project. E.g.
 ```mxml
 <dependency>
@@ -42,6 +43,18 @@ project. E.g.
   <systemPath>${project.basedir}/lib/GraPLHook4j-X.X.X.jar</systemPath>
 </dependency>
 ``` 
+```groovy
+repositories {
+    // ...
+    flatDir {
+        dirs 'lib'
+    }
+}
+dependencies {
+    // ...
+    implementation name: 'GraPLHook4j-X.X.X'
+}
+```
 
 ## Dependencies
 
@@ -89,6 +102,7 @@ import za.ac.sun.grapl.domain.enums.EvaluationStrategies;
 import za.ac.sun.grapl.domain.models.vertices.BlockVertex;
 import za.ac.sun.grapl.domain.models.vertices.FileVertex;
 import za.ac.sun.grapl.domain.models.vertices.MethodVertex;
+import za.ac.sun.grapl.domain.models.vertices.MethodReturnVertex;
 import za.ac.sun.grapl.hooks.TinkerGraphHook;
 
 public class GraPLDemo {
@@ -96,26 +110,35 @@ public class GraPLDemo {
     public static void main(String[] args) {
         int order = 0;
         int lineNumber = 1;
-        TinkerGraphHook hook = new TinkerGraphHook.TinkerGraphHookBuilder("/tmp/grapl/j2grapl_demo.xml")
-                                                .createNewGraph(true)
-                                                .build();
+        TinkerGraphHook hook = new TinkerGraphHook.TinkerGraphHookBuilder("./GraPLHook4j_demo.xml")
+                .createNewGraph(true)
+                .build();
         FileVertex fileVertex = new FileVertex("GraPLTest", order++);
-        hook.createVertex(fileVertex);
         MethodVertex methodVertex = new MethodVertex("add", "GraPLTest.add", "II", lineNumber, order++);
-        hook.createVertex(methodVertex);
+        // Since the associated file and method vertices aren't already in the database, they will automatically
+        // be created in the following method:
         hook.joinFileVertexTo(fileVertex, methodVertex);
         hook.createAndAddToMethod(
-                this.methodVertex,
+                methodVertex,
                 new MethodReturnVertex("VOID", "V", EvaluationStrategies.BY_VALUE, lineNumber, order++)
         );
         // ...
         // etc.
         hook.exportCurrentGraph();
-    }   
+    }
 
 }
 ```
-This exported file can then be visualized using tools such as [Cytoscape](https://cytoscape.org/).
+Given that this class is in this directory and GraPLHook4j has been packaged using the `./gradlew fatJar` command, we
+can compile and execute this code using the following:
+```shell script
+javac -cp ".:build/libs/GraPLHook4j-0.0.1-all.jar:" GraPLDemo.java
+java -cp ".:build/libs/GraPLHook4j-0.0.1-all.jar:" GraPLDemo 
+```
+This will export a file named `GraPLHook4j_demo.xml` which can be visualized using tools such as
+[Cytoscape](https://cytoscape.org/). Using Cytoscape and the tree layout, the graph should look something like this:
+
+![GraPLDemo.java Graph](https://github.com/DavidBakerEffendi/GraPLHook4j/blob/media/graphs/GraPLDemo.png?raw=true)
 
 ## Logging
 
