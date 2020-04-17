@@ -493,4 +493,49 @@ public class TinkerGraphHookTest {
             assertEquals(0, this.hook.maxOrder());
         }
     }
+
+    @Nested
+    @DisplayName("TinkerGraph: Simple boolean checks")
+    class TinkerGraphBooleanChecks {
+
+        private TinkerGraphHook hook;
+        private TinkerGraph testGraph;
+
+        @BeforeEach
+        public void setUp() {
+            this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).build();
+            this.testGraph = TinkerGraph.open();
+        }
+
+        @Test
+        public void testEmptyGraph() {
+            assertFalse(this.hook.isBlock(0));
+        }
+
+        @Test
+        public void testNonEmptyGraphWithBlockVertices() {
+            FileVertex f = new FileVertex("Test", 0);
+            MethodVertex m = new MethodVertex("root", "io.grapl.Test.run", "(I)", 0, 1);
+            this.hook.joinFileVertexTo(f, m);
+            this.hook.assignToBlock(m, new BlockVertex("firstBlock", 2, 1, "INTEGER", 5), 0);
+            this.hook.assignToBlock(m, new BlockVertex("secondBlock", 3, 1, "INTEGER", 6), 0);
+            assertFalse(this.hook.isBlock(0));
+            assertFalse(this.hook.isBlock(1));
+            assertTrue(this.hook.isBlock(2));
+            assertTrue(this.hook.isBlock(3));
+        }
+
+        @Test
+        public void testNonEmptyGraphWithoutBlockVertices() {
+            testGraph.addVertex("EmptyVertex");
+            FileVertex f = new FileVertex("Test", 0);
+            MethodVertex m = new MethodVertex("root", "io.grapl.Test.run", "(I)", 0, 1);
+            this.hook.joinFileVertexTo(f, m);
+            testGraph.traversal().io(testGraphML).write().iterate();
+            this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(false).build();
+
+            assertFalse(this.hook.isBlock(0));
+            assertFalse(this.hook.isBlock(1));
+        }
+    }
 }

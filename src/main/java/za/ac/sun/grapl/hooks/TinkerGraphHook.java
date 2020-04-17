@@ -184,6 +184,12 @@ public class TinkerGraphHook implements IHook {
             return 0;
     }
 
+    @Override
+    public boolean isBlock(int blockOrder) {
+        final GraphTraversalSource g = graph.traversal();
+        return g.V().has(BlockVertex.LABEL.toString(), "order", String.valueOf(blockOrder)).hasNext();
+    }
+
     /**
      * Finds the associated {@link Vertex} in the graph to the block based on the {@link MethodVertex} and the AST order
      * under which this block occurs under this {@link MethodVertex}.
@@ -251,7 +257,7 @@ public class TinkerGraphHook implements IHook {
 
     public static class TinkerGraphHookBuilder {
         private boolean createNewGraph;
-        private String graphDir;
+        private final String graphDir;
 
         public TinkerGraphHookBuilder(String graphDir) {
             this.createNewGraph = false;
