@@ -114,4 +114,12 @@ public interface IHook {
      */
     int maxOrder();
 
+    /**
+     * Searches for a {@link BlockVertex} associated with this order.
+     *
+     * @param blockOrder the {@link BlockVertex} order.
+     * @return true if there is a {@link BlockVertex} with this order value, false if otherwise.
+     */
+    boolean isBlock(int blockOrder);
+
 }
