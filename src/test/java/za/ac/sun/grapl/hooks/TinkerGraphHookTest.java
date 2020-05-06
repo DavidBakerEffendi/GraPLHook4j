@@ -1,5 +1,6 @@
 package za.ac.sun.grapl.hooks;
 
+import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -52,7 +53,9 @@ public class TinkerGraphHookTest {
 
         @Test
         public void testImportingGraphML() {
-            hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).build();
+            BaseConfiguration conf = new BaseConfiguration();
+            conf.setProperty("gremlin.graph", "org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph");
+            hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(true).conf(conf).build();
             hook.addFileVertex(new FileVertex("Test1", 0));
             hook.addFileVertex(new FileVertex("Test2", 1));
             hook.exportCurrentGraph();
@@ -67,7 +70,9 @@ public class TinkerGraphHookTest {
 
         @Test
         public void testImportingGraphJSON() {
-            hook = new TinkerGraphHookBuilder(testGraphSON).createNewGraph(true).build();
+            BaseConfiguration conf = new BaseConfiguration();
+            conf.setProperty("gremlin.graph", "org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph");
+            hook = new TinkerGraphHookBuilder(testGraphSON).createNewGraph(true).conf(conf).build();
             hook.addFileVertex(new FileVertex("Test1", 0));
             hook.addFileVertex(new FileVertex("Test2", 1));
             hook.exportCurrentGraph();
@@ -82,7 +87,9 @@ public class TinkerGraphHookTest {
 
         @Test
         public void testImportingGryo() {
-            hook = new TinkerGraphHookBuilder(testGryo).createNewGraph(true).build();
+            BaseConfiguration conf = new BaseConfiguration();
+            conf.setProperty("gremlin.graph", "org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph");
+            hook = new TinkerGraphHookBuilder(testGryo).createNewGraph(true).conf(conf).build();
             hook.addFileVertex(new FileVertex("Test1", 0));
             hook.addFileVertex(new FileVertex("Test2", 1));
             hook.exportCurrentGraph();
@@ -489,7 +496,6 @@ public class TinkerGraphHookTest {
             testGraph.addVertex("EmptyVertex");
             testGraph.traversal().io(testGraphML).write().iterate();
             this.hook = new TinkerGraphHookBuilder(testGraphML).createNewGraph(false).build();
-
             assertEquals(0, this.hook.maxOrder());
         }
     }

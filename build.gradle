@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'maven-publish'
     id 'jacoco'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
 }
 
 repositories {
@@ -9,6 +10,7 @@ repositories {
     maven {
         url = uri('https://repo.maven.apache.org/maven2')
     }
+    mavenCentral()
 }
 
 dependencies {
@@ -16,6 +18,8 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.8.2'
     implementation 'org.apache.tinkerpop:gremlin-core:3.4.5'
     implementation 'org.apache.tinkerpop:tinkergraph-gremlin:3.4.5'
+    implementation 'org.janusgraph:janusgraph-core:0.5.1'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.4.0'
 }
 
@@ -40,12 +44,12 @@ check.dependsOn jacocoTestCoverageVerification
 jacocoTestCoverageVerification.dependsOn jacocoTestReport
 
 group = 'za.ac.sun.grapl'
-version = '0.0.3'
+version = '0.0.4'
 description = 'GraPLHook4j'
 sourceCompatibility = '8'
 
 task fatJar(type: Jar) {
-    classifier = 'all'
+    archiveClassifier.set('all')
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
@@ -71,4 +75,14 @@ publishing {
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
