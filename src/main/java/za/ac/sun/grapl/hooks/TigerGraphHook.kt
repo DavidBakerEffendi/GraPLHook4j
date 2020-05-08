@@ -11,7 +11,9 @@ import za.ac.sun.grapl.domain.models.vertices.MethodVertex
 import za.ac.sun.grapl.domain.models.vertices.ModifierVertex
 import za.ac.sun.grapl.domain.models.vertices.NamespaceBlockVertex
 
-class TigerGraphHook private constructor(builder: TigerGraphHookBuilder) : IHook {
+class TigerGraphHook private constructor(
+//        builder: TigerGraphHookBuilder
+) : IHook {
 
     val hostname: String? = "127.0.0.1"
 
@@ -20,6 +22,10 @@ class TigerGraphHook private constructor(builder: TigerGraphHookBuilder) : IHook
     }
 
     override fun isBlock(blockOrder: Int): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun exportCurrentGraph(exportDir: String?) {
         TODO("Not yet implemented")
     }
 
@@ -97,7 +103,7 @@ class TigerGraphHook private constructor(builder: TigerGraphHookBuilder) : IHook
 
         fun graphName(graphName: String?) = apply { this.graphName = graphName }
 
-        fun build() = TigerGraphHook(this)
+        fun build() = TigerGraphHook()
 
     }
 

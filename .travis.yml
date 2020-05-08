@@ -1,6 +1,8 @@
 language: java
-
 os: linux
+
+services:
+  - docker
 
 jdk:
   - openjdk8
@@ -19,6 +21,7 @@ cache:
 
 script:
   - ./gradlew test
+  - ./gradlew integrationTest
   - ./gradlew jacocoTestReport
 
 after_success:

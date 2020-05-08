@@ -1,6 +1,5 @@
 package za.ac.sun.grapl.hooks;
 
-import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -26,6 +25,10 @@ public abstract class GremlinHookTest {
     static final String testGraphSON = tempDir + "/grapl/graplhook4j_test.json";
     static final String testGryo = tempDir + "/grapl/graplhook4j_test.kryo";
 
+    private Class<?> getTestClass() {
+        return this.getClass();
+    }
+
     @AfterAll
     static void tearDownAll() {
         File[] testFiles = new File[]{new File(testGraphML), new File(testGraphSON), new File(testGryo)};
@@ -40,19 +43,15 @@ public abstract class GremlinHookTest {
     }
 
     public IHook provideHook() {
-        return new TinkerGraphHook.TinkerGraphHookBuilder().conf(provideConfig()).build();
+        return new TinkerGraphHook.TinkerGraphHookBuilder().build();
     }
 
     public IHook provideHook(String existingGraph) {
-        return new TinkerGraphHook.TinkerGraphHookBuilder().useExistingGraph(existingGraph).conf(provideConfig()).build();
-    }
-
-    public BaseConfiguration provideConfig() {
-        return new BaseConfiguration();
+        return new TinkerGraphHook.TinkerGraphHookBuilder().useExistingGraph(existingGraph).build();
     }
 
     @Nested
-    @DisplayName("TinkerGraph: Graph import file types")
+    @DisplayName("Graph import file types")
     class ValidateGraphImportFileTypes {
 
         private IHook hook;
@@ -83,14 +82,19 @@ public abstract class GremlinHookTest {
             hook = provideHook();
             hook.addFileVertex(new FileVertex("Test1", 0));
             hook.addFileVertex(new FileVertex("Test2", 1));
-            hook.exportCurrentGraph(testGraphSON);
 
-            assertDoesNotThrow(() -> provideHook(testGraphSON));
+            if (getTestClass().equals(JanusGraphHookIntTest.class)) {
+                assertThrows(UnsupportedOperationException.class, () -> hook.exportCurrentGraph(testGraphSON));
+            } else {
+                hook.exportCurrentGraph(testGraphSON);
 
-            GraphTraversalSource g = testGraph.traversal();
-            g.io(testGraphSON).read().iterate();
-            assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test1").hasNext());
-            assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test2").hasNext());
+                assertDoesNotThrow(() -> provideHook(testGraphSON));
+
+                GraphTraversalSource g = testGraph.traversal();
+                g.io(testGraphSON).read().iterate();
+                assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test1").hasNext());
+                assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test2").hasNext());
+            }
         }
 
         @Test
@@ -98,14 +102,19 @@ public abstract class GremlinHookTest {
             hook = provideHook();
             hook.addFileVertex(new FileVertex("Test1", 0));
             hook.addFileVertex(new FileVertex("Test2", 1));
-            hook.exportCurrentGraph(testGryo);
 
-            assertDoesNotThrow(() -> provideHook(testGryo));
+            if (getTestClass().equals(JanusGraphHookIntTest.class)) {
+                assertThrows(UnsupportedOperationException.class, () -> hook.exportCurrentGraph(testGraphSON));
+            } else {
+                hook.exportCurrentGraph(testGryo);
 
-            GraphTraversalSource g = testGraph.traversal();
-            g.io(testGryo).read().iterate();
-            assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test1").hasNext());
-            assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test2").hasNext());
+                assertDoesNotThrow(() -> provideHook(testGryo));
+
+                GraphTraversalSource g = testGraph.traversal();
+                g.io(testGryo).read().iterate();
+                assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test1").hasNext());
+                assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test2").hasNext());
+            }
         }
 
         @Test
@@ -122,7 +131,7 @@ public abstract class GremlinHookTest {
     }
 
     @Nested
-    @DisplayName("TinkerGraph: Graph export file types")
+    @DisplayName("Graph export file types")
     class ValidateGraphExportFileTypes {
 
         private IHook hook;
@@ -141,8 +150,12 @@ public abstract class GremlinHookTest {
             this.hook = provideHook();
             hook.addFileVertex(new FileVertex("Test1", 0));
             hook.addFileVertex(new FileVertex("Test2", 1));
-            hook.exportCurrentGraph(testGraphSON);
-            assertTrue(new File(testGraphSON).exists());
+            if (getTestClass().equals(JanusGraphHookIntTest.class)) {
+                assertThrows(UnsupportedOperationException.class, () -> hook.exportCurrentGraph(testGraphSON));
+            } else {
+                hook.exportCurrentGraph(testGraphSON);
+                assertTrue(new File(testGraphSON).exists());
+            }
         }
 
         @Test
@@ -150,13 +163,17 @@ public abstract class GremlinHookTest {
             this.hook = provideHook();
             hook.addFileVertex(new FileVertex("Test1", 0));
             hook.addFileVertex(new FileVertex("Test2", 1));
-            hook.exportCurrentGraph(testGryo);
-            assertTrue(new File(testGryo).exists());
+            if (getTestClass().equals(JanusGraphHookIntTest.class)) {
+                assertThrows(UnsupportedOperationException.class, () -> hook.exportCurrentGraph(testGryo));
+            } else {
+                hook.exportCurrentGraph(testGryo);
+                assertTrue(new File(testGryo).exists());
+            }
         }
     }
 
     @Nested
-    @DisplayName("TinkerGraph: Graph export methods")
+    @DisplayName("Graph export methods")
     class ValidateGraphDomain {
 
         @Test
@@ -197,7 +214,7 @@ public abstract class GremlinHookTest {
     }
 
     @Nested
-    @DisplayName("TinkerGraph: Join method vertex to method related vertices")
+    @DisplayName("Join method vertex to method related vertices")
     class MethodJoinInteraction {
 
         private IHook hook;
@@ -260,7 +277,7 @@ public abstract class GremlinHookTest {
     }
 
     @Nested
-    @DisplayName("TinkerGraph: Join file vertex to file related vertices")
+    @DisplayName("Join file vertex to file related vertices")
     class FileJoinInteraction {
 
         private IHook hook;
@@ -308,7 +325,7 @@ public abstract class GremlinHookTest {
     }
 
     @Nested
-    @DisplayName("TinkerGraph: Join file vertex to file related vertices")
+    @DisplayName("Join file vertex to file related vertices")
     class BlockJoinInteraction {
 
         private static final String ROOT_METHOD = "root";
@@ -403,7 +420,7 @@ public abstract class GremlinHookTest {
     }
 
     @Nested
-    @DisplayName("TinkerGraph: Join namespace block related vertices")
+    @DisplayName("Join namespace block related vertices")
     class NamespaceBlockJoinInteraction {
 
         private static final String ROOT_NAME = "za";
@@ -469,8 +486,8 @@ public abstract class GremlinHookTest {
     }
 
     @Nested
-    @DisplayName("TinkerGraph: Aggregate queries")
-    class TinkerGraphAggregateQueries {
+    @DisplayName("Aggregate queries")
+    class GremlinAggregateQueries {
 
         private IHook hook;
         private TinkerGraph testGraph;
@@ -479,6 +496,9 @@ public abstract class GremlinHookTest {
         public void setUp() {
             this.hook = provideHook();
             this.testGraph = TinkerGraph.open();
+            if (getTestClass().equals(JanusGraphHookIntTest.class)) {
+                ((JanusGraphHook) this.hook).clearGraph();
+            }
         }
 
         @Test
@@ -506,8 +526,8 @@ public abstract class GremlinHookTest {
     }
 
     @Nested
-    @DisplayName("TinkerGraph: Simple boolean checks")
-    class TinkerGraphBooleanChecks {
+    @DisplayName("Simple boolean checks")
+    class GremlinBooleanChecks {
 
         private IHook hook;
         private TinkerGraph testGraph;

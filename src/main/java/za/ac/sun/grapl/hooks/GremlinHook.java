@@ -22,7 +22,7 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 
 public abstract class GremlinHook implements IHook {
 
-    private static Logger log = LogManager.getLogger();
+    private static final Logger log = LogManager.getLogger();
     final Graph graph;
     private GraphTraversalSource g;
 
@@ -49,10 +49,6 @@ public abstract class GremlinHook implements IHook {
         } else return false;
     }
 
-    protected Graph getGraph() {
-        return graph;
-    }
-
     /**
      * Finds the associated {@link Vertex} in the graph based on the given {@link MethodVertex}.
      *
@@ -60,11 +56,8 @@ public abstract class GremlinHook implements IHook {
      * @return the associated {@link Vertex}.
      */
     private Vertex findVertex(final MethodVertex from) {
-        startTransaction();
-        final Vertex result = g.V().has(MethodVertex.LABEL.toString(), "fullName", from.fullName)
+        return g.V().has(MethodVertex.LABEL.toString(), "fullName", from.fullName)
                 .has("signature", from.signature).next();
-        endTransaction();
-        return result;
     }
 
     /**
@@ -74,11 +67,8 @@ public abstract class GremlinHook implements IHook {
      * @return the associated {@link Vertex}.
      */
     private Vertex findVertex(final FileVertex from) {
-        startTransaction();
-        final Vertex result = g.V().has(FileVertex.LABEL.toString(), "name", from.name)
+        return g.V().has(FileVertex.LABEL.toString(), "name", from.name)
                 .has("order", String.valueOf(from.order)).next();
-        endTransaction();
-        return result;
     }
 
     /**
@@ -88,10 +78,7 @@ public abstract class GremlinHook implements IHook {
      * @return the associated {@link Vertex}.
      */
     private Vertex findVertex(final NamespaceBlockVertex from) {
-        startTransaction();
-        final Vertex result = g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", from.fullName).next();
-        endTransaction();
-        return result;
+        return g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", from.fullName).next();
     }
 
     /**
@@ -101,11 +88,8 @@ public abstract class GremlinHook implements IHook {
      * @return false if there is an associated vertex, true if otherwise.
      */
     private boolean vertexNotPresent(final NamespaceBlockVertex v) {
-        startTransaction();
-        final boolean result = !g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", v.fullName)
+        return !g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", v.fullName)
                 .has("name", v.name).hasNext();
-        endTransaction();
-        return result;
     }
 
     /**
@@ -115,11 +99,8 @@ public abstract class GremlinHook implements IHook {
      * @return false if there is an associated vertex, true if otherwise.
      */
     private boolean vertexNotPresent(final FileVertex v) {
-        startTransaction();
-        final boolean result = !g.V().has(FileVertex.LABEL.toString(), "name", v.name)
+        return !g.V().has(FileVertex.LABEL.toString(), "name", v.name)
                 .has("order", String.valueOf(v.order)).hasNext();
-        endTransaction();
-        return result;
     }
 
     @Override
@@ -167,7 +148,7 @@ public abstract class GremlinHook implements IHook {
     public void joinFileVertexTo(final FileVertex from, final MethodVertex to) {
         startTransaction();
         if (vertexNotPresent(from)) createTinkerGraphVertex(from);
-        if (!graph.traversal().V(findVertex(from))
+        if (!g.V(findVertex(from))
                 .out(EdgeLabels.AST.toString())
                 .has("fullName", to.fullName)
                 .has("signature", to.signature)
@@ -185,7 +166,7 @@ public abstract class GremlinHook implements IHook {
         if (vertexNotPresent(to)) createTinkerGraphVertex(to);
         Vertex n1 = findVertex(from);
         Vertex n2 = findVertex(to);
-        if (!graph.traversal().V(n1).outE(EdgeLabels.AST.toString()).filter(inV().is(n2)).hasNext()) {
+        if (!g.V(n1).outE(EdgeLabels.AST.toString()).filter(inV().is(n2)).hasNext()) {
             createTinkerGraphEdge(n1, EdgeLabels.AST, n2);
         }
         endTransaction();
@@ -251,7 +232,9 @@ public abstract class GremlinHook implements IHook {
             throw new IllegalArgumentException("Unsupported graph extension! Supported types are GraphML," +
                     " GraphSON, and Gryo.");
         }
-        this.graph.traversal().io(exportDir).write().iterate();
+        startTransaction();
+        this.g.io(exportDir).write().iterate();
+        endTransaction();
     }
 
     /**
@@ -263,7 +246,6 @@ public abstract class GremlinHook implements IHook {
      * @return the {@link Vertex} associated with the AST block.
      */
     private Vertex findBlock(final MethodVertex root, final int blockOrder) {
-        startTransaction();
         return g.V(findVertex(root)).repeat(__.out("AST")).emit()
                 .has("order", String.valueOf(blockOrder)).next();
     }
@@ -289,9 +271,9 @@ public abstract class GremlinHook implements IHook {
         // Get the implementing classes fields and values
         Vertex v;
         if (this instanceof JanusGraphHook) {
-            v = getGraph().addVertex(T.label, label);
+            v = g.getGraph().addVertex(T.label, label);
         } else {
-            v = getGraph().addVertex(T.label, label, T.id, UUID.randomUUID());
+            v = g.getGraph().addVertex(T.label, label, T.id, UUID.randomUUID());
         }
         Arrays.stream(fields).forEach(f -> {
             try {
@@ -313,7 +295,11 @@ public abstract class GremlinHook implements IHook {
      * @return the newly created {@link Edge}.
      */
     private Edge createTinkerGraphEdge(final Vertex v1, final EdgeLabels edgeLabel, final Vertex v2) {
-        return v1.addEdge(edgeLabel.toString(), v2, T.id, UUID.randomUUID());
+        if (this instanceof JanusGraphHook) {
+            return v1.addEdge(edgeLabel.toString(), v2);
+        } else {
+            return v1.addEdge(edgeLabel.toString(), v2, T.id, UUID.randomUUID());
+        }
     }
 
 }

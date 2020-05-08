@@ -13,7 +13,7 @@ public class TinkerGraphHook extends GremlinHook {
     }
 
     public static class TinkerGraphHookBuilder {
-        private final String graphDir;
+        private String graphDir;
         private BaseConfiguration conf;
 
         public TinkerGraphHookBuilder() {
@@ -29,6 +29,7 @@ public class TinkerGraphHook extends GremlinHook {
             } else if (!new File(graphDir).exists()) {
                 throw new IllegalArgumentException("No existing serialized graph file was found at " + graphDir);
             }
+            this.graphDir = graphDir;
             return this;
         }
 
