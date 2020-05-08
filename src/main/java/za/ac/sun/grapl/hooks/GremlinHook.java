@@ -42,6 +42,13 @@ public abstract class GremlinHook implements IHook {
         }
     }
 
+    public static boolean isValidExportPath(String exportDir) {
+        if (exportDir != null) {
+            final String ext = exportDir.substring(exportDir.lastIndexOf('.') + 1).toLowerCase();
+            return ("xml".equals(ext) || "json".equals(ext) || "kryo".equals(ext));
+        } else return false;
+    }
+
     protected Graph getGraph() {
         return graph;
     }
@@ -234,6 +241,19 @@ public abstract class GremlinHook implements IHook {
         return result;
     }
 
+    protected void setTraversalSource(final GraphTraversalSource g) {
+        this.g = g;
+    }
+
+    @Override
+    public void exportCurrentGraph(String exportDir) {
+        if (!isValidExportPath(exportDir)) {
+            throw new IllegalArgumentException("Unsupported graph extension! Supported types are GraphML," +
+                    " GraphSON, and Gryo.");
+        }
+        this.graph.traversal().io(exportDir).write().iterate();
+    }
+
     /**
      * Finds the associated {@link Vertex} in the graph to the block based on the {@link MethodVertex} and the AST order
      * under which this block occurs under this {@link MethodVertex}.
@@ -267,7 +287,12 @@ public abstract class GremlinHook implements IHook {
         } catch (NoSuchFieldException | IllegalAccessException ignored) {
         }
         // Get the implementing classes fields and values
-        final Vertex v = getGraph().addVertex(T.label, label, T.id, UUID.randomUUID());
+        Vertex v;
+        if (this instanceof JanusGraphHook) {
+            v = getGraph().addVertex(T.label, label);
+        } else {
+            v = getGraph().addVertex(T.label, label, T.id, UUID.randomUUID());
+        }
         Arrays.stream(fields).forEach(f -> {
             try {
                 v.property(f.getName(), f.get(gv).toString());

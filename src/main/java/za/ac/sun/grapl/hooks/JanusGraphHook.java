@@ -20,45 +20,55 @@ public class JanusGraphHook extends GremlinHook {
     private static Logger log = LogManager.getLogger();
 
     private final JanusGraph graph;
+    private final boolean supportsTransactions;
     private JanusGraphTransaction tx;
 
     private JanusGraphHook(JanusGraphHookBuilder builder) throws BackendException {
         super(JanusGraphFactory.open(builder.conf));
-        graph = (JanusGraph) super.graph;
+        this.graph = (JanusGraph) super.graph;
+        this.supportsTransactions = graph.features().graph().supportsTransactions();
         if (builder.createNewGraph) clearAndSetSchema();
     }
 
     @Override
     protected void startTransaction() {
-        tx = graph.newTransaction();
-        tx.traversal();
+        if (supportsTransactions) {
+            tx = graph.newTransaction();
+            super.setTraversalSource(tx.traversal());
+        } else {
+            super.setTraversalSource(graph.traversal());
+        }
     }
 
     @Override
     protected void endTransaction() {
-        boolean success = false;
-        int failures = 0;
-        final int waitTime = 5000;
-        do {
-            try {
-                if (tx == null) return;
-                if (tx.isClosed()) return;
-                tx.commit();
-                success = true;
-            } catch (JanusGraphException | IllegalStateException e) {
-                failures++;
-                if (failures > 3) {
-                    log.error("Failed to commit transaction " + failures + " time(s). Aborting...");
-                    return;
-                } else {
-                    log.warn("Failed to commit transaction " + failures + " time(s). Backing off and retrying...");
-                    try {
-                        Thread.sleep(waitTime);
-                    } catch (Exception ignored) {
+        if (supportsTransactions) {
+            boolean success = false;
+            int failures = 0;
+            final int waitTime = 5000;
+            do {
+                try {
+                    if (tx == null) return;
+                    if (tx.isClosed()) return;
+                    tx.commit();
+                    success = true;
+                } catch (JanusGraphException | IllegalStateException e) {
+                    failures++;
+                    if (failures > 3) {
+                        log.error("Failed to commit transaction " + failures + " time(s). Aborting...");
+                        return;
+                    } else {
+                        log.warn("Failed to commit transaction " + failures + " time(s). Backing off and retrying...");
+                        try {
+                            Thread.sleep(waitTime);
+                        } catch (Exception ignored) {
+                        }
                     }
                 }
-            }
-        } while (!success);
+            } while (!success);
+        } else {
+            super.endTransaction();
+        }
     }
 
     @Override
@@ -68,7 +78,10 @@ public class JanusGraphHook extends GremlinHook {
 
     private void clearAndSetSchema() throws BackendException {
         log.info("Dropping existing graph data.");
-        JanusGraphFactory.drop(graph);
+//        JanusGraphFactory.drop(graph);
+        startTransaction();
+        tx.traversal().V().drop().iterate();
+        endTransaction();
         log.info("Creating CPG schema.");
         final JanusGraphManagement mgmt = graph.openManagement();
         Arrays.stream(VertexLabels.values()).forEach(label -> mgmt.makeVertexLabel(label.toString()).make());

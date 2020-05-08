@@ -122,4 +122,12 @@ public interface IHook {
      */
     boolean isBlock(int blockOrder);
 
+
+    /**
+     * Exports the current graph to the serialized format specified by the extension in exportDir
+     * path, to the path specified under exportDir.
+     *
+     * @param exportDir The file to export the graph to.
+     */
+    void exportCurrentGraph(String exportDir);
 }
