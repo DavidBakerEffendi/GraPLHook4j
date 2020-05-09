@@ -63,6 +63,7 @@ jacocoTestReport {
         html.enabled false
         csv.enabled false
     }
+    executionData test, integrationTest
 }
 
 check.dependsOn jacocoTestCoverageVerification
