@@ -48,7 +48,7 @@ task integrationTest(type: Test) {
 }
 
 dockerCompose {
-    useComposeFiles = ['src/test/resources/docker-compose.yml']
+    useComposeFiles = ['src/test/resources/docker/docker-compose.yml']
     isRequiredBy(project.tasks.integrationTest)
 }
 
