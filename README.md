@@ -69,6 +69,7 @@ The following packages are used by GraPLHook4j:
 Dependencies per graph database technology being connected to:
 
 * _TinkerGraph_ `org.apache.tinkerpop:tinkergraph-gremlin:3.4.5`
+* _JanusGraph_ `org.janusgraph:janusgraph-core:0.5.1` (plus dependencies for the back-end/search engine used if any)
 
 It is not recommended to use the fat jar in your project if using a build tool such as Ant, Maven, Gradle, etc. Rather
 use the main artifact and add the dependencies manually (in your `pom.xml`, `build.gradle`, etc.). Note that if you are
@@ -86,11 +87,12 @@ The following versions of Java are officially supported:
 
 Databases supported:
 * TinkerGraph
+* JanusGraph
 
 Planned to support in the near future:
 * TigerGraph
 * Neo4j
-* JanusGraph
+* Amazon Neptune
 
 ## Basic Process
 
