@@ -23,8 +23,8 @@ GraPL is currently under development. It has the following capabilities:
 
 ## Building from Source
 
-In order to use GraPLHook4j one will need to build from source. This will be the case until the GraPL project can be 
-hosted on a Maven repository or similar.
+In order to use GraPLHook4j one will need to build from the source code. This will be the case until the GraPL project 
+can be hosted on a Maven repository or similar.
 
 ```shell script
 git clone https://github.com/DavidBakerEffendi/GraPLHook4j.git
@@ -32,8 +32,7 @@ cd GraPLHook4j
 ./gradlew jar # For main artifact only
 ./gradlew fatJar # For fat jar with dependencies
 ```
-This will build `target/GraPLHook4j-X.X.X[-all].jar` which can then be imported into your local
-project. E.g.
+This will build `target/GraPLHook4j-X.X.X[-all].jar` which is imported into your local project. E.g.
 ```mxml
 <dependency>
   <groupId>za.ac.sun.grapl</groupId>
@@ -60,24 +59,24 @@ dependencies {
 
 ### Packages
 
-The following packages are used by GraPLHook4j:
+The following packages used by GraPLHook4j are:
 
 * `org.apache.logging.log4j:log4j-core:2.8.2`
 * `org.apache.logging.log4j:log4j-slf4j-impl:2.8.2`
 * `org.apache.tinkerpop:gremlin-core:3.4.5`
 
-Dependencies per graph database technology being connected to:
+Dependencies per graph database technology connected to:
 
 * _TinkerGraph_ `org.apache.tinkerpop:tinkergraph-gremlin:3.4.5`
 * _JanusGraph_ `org.janusgraph:janusgraph-core:0.5.1` (plus dependencies for the back-end/search engine used if any)
 
-It is not recommended to use the fat jar in your project if using a build tool such as Ant, Maven, Gradle, etc. Rather
+It is not recommended using the fat jar in your project if using a build tool such as Ant, Maven, Gradle, etc. Rather,
 use the main artifact and add the dependencies manually (in your `pom.xml`, `build.gradle`, etc.). Note that if you are
 connecting to Neo4j, for example, you would not need the TinkerGraph, TigerGraph, etc. dependencies. 
 
 ### Java Support
 
-The following versions of Java are officially supported:
+The officially supported versions of Java are the following:
 * OpenJDK 8
 * OpenJDK 9
 * OpenJDK 10
@@ -97,8 +96,8 @@ Planned to support in the near future:
 ## Basic Process
 
 GraPLHook4j works through immutable domain objects, and a high level API in order to construct and analyse a
-code-property graph. [Java ASM5](https://asm.ow2.io/) notation is used for method signatures and representing arrays and
-types. An example of this is:
+code-property graph. The notation used is from the [Java ASM5](https://asm.ow2.io/) library. Method signatures, arrays 
+and types all follow this representation. An example of using the driver API is:
 ```java
 import za.ac.sun.grapl.domain.enums.EvaluationStrategies;
 import za.ac.sun.grapl.domain.models.vertices.BlockVertex;
@@ -134,8 +133,8 @@ public class GraPLDemo {
 Given that this class is in this directory and GraPLHook4j has been packaged using the `./gradlew fatJar` command, we
 can compile and execute this code using the following:
 ```shell script
-javac -cp ".:build/libs/GraPLHook4j-0.0.1-all.jar:" GraPLDemo.java
-java -cp ".:build/libs/GraPLHook4j-0.0.1-all.jar:" GraPLDemo 
+javac -cp ".:build/libs/GraPLHook4j-x.x.x-all.jar:" GraPLDemo.java
+java -cp ".:build/libs/GraPLHook4j-x.x.x-all.jar:" GraPLDemo 
 ```
 This will export a file named `GraPLHook4j_demo.xml` which can be visualized using tools such as
 [Cytoscape](https://cytoscape.org/). Using Cytoscape and the tree layout, the graph should look something like this:
