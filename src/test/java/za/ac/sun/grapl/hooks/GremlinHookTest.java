@@ -42,12 +42,34 @@ public abstract class GremlinHookTest {
         });
     }
 
+    /**
+     * Provides a hook to a new database hook. Default is a new {@link TinkerGraphHook}.
+     *
+     * @return a built hook.
+     */
     public IHook provideHook() {
         return new TinkerGraphHook.TinkerGraphHookBuilder().build();
     }
 
+    /**
+     * Provides a hook with the contents of a serialized graph to populate the graph with.
+     * Default is a {@link TinkerGraphHook}.
+     *
+     * @param existingGraph the path to a GraphML, GraphSON, or Gryo graph.
+     * @return a hook connected to a graph database populated with the contents of the file at the given path.
+     */
     public IHook provideHook(String existingGraph) {
         return new TinkerGraphHook.TinkerGraphHookBuilder().useExistingGraph(existingGraph).build();
+    }
+
+    /**
+     * Provides a hook builder to continue to configure.
+     * Default is a {@link za.ac.sun.grapl.hooks.TinkerGraphHook.TinkerGraphHookBuilder}.
+     *
+     * @return an {@link IHookBuilder} to build with.
+     */
+    public IHookBuilder provideBuilder() {
+        return new TinkerGraphHook.TinkerGraphHookBuilder();
     }
 
     @Nested
@@ -119,14 +141,12 @@ public abstract class GremlinHookTest {
 
         @Test
         public void testImportingGraphThatDNE() {
-            assertThrows(IllegalArgumentException.class,
-                    () -> new TinkerGraphHook.TinkerGraphHookBuilder().useExistingGraph("/tmp/grapl/DNE.kryo").build());
+            assertThrows(IllegalArgumentException.class, () -> provideBuilder().useExistingGraph("/tmp/grapl/DNE.kryo").build());
         }
 
         @Test
         public void testImportingInvalidExtension() {
-            assertThrows(IllegalArgumentException.class,
-                    () -> new TinkerGraphHook.TinkerGraphHookBuilder().useExistingGraph("/tmp/grapl/invalid.txt").build());
+            assertThrows(IllegalArgumentException.class, () -> provideBuilder().useExistingGraph("/tmp/grapl/invalid.txt").build());
         }
     }
 
@@ -169,6 +189,14 @@ public abstract class GremlinHookTest {
                 hook.exportCurrentGraph(testGryo);
                 assertTrue(new File(testGryo).exists());
             }
+        }
+
+        @Test
+        public void testExportingInvalidFileType() {
+            this.hook = provideHook();
+            hook.addFileVertex(new FileVertex("Test1", 0));
+            hook.addFileVertex(new FileVertex("Test2", 1));
+            assertThrows(IllegalArgumentException.class, () -> hook.exportCurrentGraph("/tmp/grapl/invalid.txt"));
         }
     }
 

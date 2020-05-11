@@ -12,7 +12,7 @@ public class TinkerGraphHook extends GremlinHook {
         if (builder.graphDir != null) super.graph.traversal().io(builder.graphDir).read().iterate();
     }
 
-    public static class TinkerGraphHookBuilder {
+    public static class TinkerGraphHookBuilder implements IHookBuilder {
         private String graphDir;
         private BaseConfiguration conf;
 
@@ -26,7 +26,8 @@ public class TinkerGraphHook extends GremlinHook {
             if (!isValidExportPath(graphDir)) {
                 throw new IllegalArgumentException("Unsupported graph extension! Supported types are GraphML," +
                         " GraphSON, and Gryo.");
-            } else if (!new File(graphDir).exists()) {
+            }
+            if (!new File(graphDir).exists()) {
                 throw new IllegalArgumentException("No existing serialized graph file was found at " + graphDir);
             }
             this.graphDir = graphDir;

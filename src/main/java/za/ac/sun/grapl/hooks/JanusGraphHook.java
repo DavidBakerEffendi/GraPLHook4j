@@ -27,6 +27,11 @@ public class JanusGraphHook extends GremlinHook {
         this.graph = (JanusGraph) super.graph;
         if (builder.graphDir != null) super.graph.traversal().io(builder.graphDir).read().iterate();
         this.supportsTransactions = graph.features().graph().supportsTransactions();
+        try {
+            if (builder.clearGraph) clearGraph();
+        } catch (Exception e) {
+            log.warn("Unable to clear graph!", e);
+        }
     }
 
     @Override
@@ -104,20 +109,27 @@ public class JanusGraphHook extends GremlinHook {
         endTransaction();
     }
 
-    public static class JanusGraphHookBuilder {
+    public static class JanusGraphHookBuilder implements IHookBuilder {
         private String graphDir;
-        private boolean createNewGraph;
+        private boolean clearGraph;
+        private boolean setSchema;
         private String conf;
 
         public JanusGraphHookBuilder() {
-            this.createNewGraph = true;
+            this.clearGraph = true;
+            this.setSchema = false;
             BaseConfiguration conf = new BaseConfiguration();
             conf.setProperty("gremlin.graph", "org.janusgraph.core.JanusGraphFactory");
             conf.setProperty("storage.backend", "inmemory");
         }
 
-        public JanusGraphHookBuilder clearDatabase(final boolean createNewGraph) {
-            this.createNewGraph = createNewGraph;
+        public JanusGraphHookBuilder clearDatabase(final boolean clearDatabase) {
+            this.clearGraph = clearDatabase;
+            return this;
+        }
+
+        public JanusGraphHookBuilder setSchema(final boolean setSchema) {
+            this.setSchema = setSchema;
             return this;
         }
 
@@ -137,14 +149,16 @@ public class JanusGraphHook extends GremlinHook {
             return this;
         }
 
-        public JanusGraphHook build() throws Exception {
-            if (this.createNewGraph) clearAndSetSchema();
+        public JanusGraphHook build() {
+            try {
+                if (this.setSchema) setSchema();
+            } catch (Exception e) {
+                log.warn("Unable to set graph schema!", e);
+            }
             return new JanusGraphHook(this);
         }
 
-        private void clearAndSetSchema() throws Exception {
-            log.info("Dropping existing graph data.");
-            JanusGraphFactory.drop(JanusGraphFactory.open(this.conf));
+        private void setSchema() throws Exception {
             log.info("Creating CPG schema.");
             final JanusGraph graph = JanusGraphFactory.open(this.conf);
             final JanusGraphManagement mgmt = graph.openManagement();
