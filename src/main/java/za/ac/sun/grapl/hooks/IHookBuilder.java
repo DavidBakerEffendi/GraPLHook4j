@@ -4,6 +4,6 @@ public interface IHookBuilder {
 
     IHookBuilder useExistingGraph(final String graphDir);
 
-    IHook build();
+    IHook build() throws Exception;
 
 }

@@ -3,28 +3,26 @@ package za.ac.sun.grapl.hooks;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.janusgraph.core.*;
-import org.janusgraph.core.schema.JanusGraphManagement;
-import za.ac.sun.grapl.domain.enums.EdgeLabels;
-import za.ac.sun.grapl.domain.enums.VertexLabels;
-import za.ac.sun.grapl.domain.models.vertices.*;
+import org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource;
+import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.Transaction;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashSet;
 
-public class JanusGraphHook extends GremlinHook {
+public final class JanusGraphHook extends GremlinHook {
 
     private static final Logger log = LogManager.getLogger();
 
-    private final JanusGraph graph;
+    private final Graph graph;
     private final boolean supportsTransactions;
-    private JanusGraphTransaction tx;
+    private final String conf;
+    private Transaction tx;
 
     private JanusGraphHook(JanusGraphHookBuilder builder) {
-        super(JanusGraphFactory.open(builder.conf));
-        this.graph = (JanusGraph) super.graph;
+        super(builder.graph);
+        this.conf = builder.conf;
+        this.graph = super.graph;
         if (builder.graphDir != null) super.graph.traversal().io(builder.graphDir).read().iterate();
         this.supportsTransactions = graph.features().graph().supportsTransactions();
         try {
@@ -38,13 +36,21 @@ public class JanusGraphHook extends GremlinHook {
     protected void startTransaction() {
         if (supportsTransactions) {
             log.debug("Supports tx");
-            if (tx == null || tx.isClosed()) {
+            if (tx == null || !tx.isOpen()) {
                 log.debug("Created new tx");
-                tx = graph.newTransaction();
+                try {
+                    tx = AnonymousTraversalSource.traversal().withRemote(conf).tx();
+                } catch (Exception e) {
+                    log.error("Unable to create transaction!");
+                }
             }
-            super.setTraversalSource(tx.traversal());
         } else {
-            super.setTraversalSource(graph.traversal());
+            log.debug("Does not support tx");
+        }
+        try {
+            super.setTraversalSource(AnonymousTraversalSource.traversal().withRemote(conf));
+        } catch (Exception e) {
+            log.error("Unable to create transaction!");
         }
     }
 
@@ -57,10 +63,10 @@ public class JanusGraphHook extends GremlinHook {
             do {
                 try {
                     if (tx == null) return;
-                    if (tx.isClosed()) return;
+                    if (!tx.isOpen()) return;
                     tx.commit();
                     success = true;
-                } catch (JanusGraphException | IllegalStateException e) {
+                } catch (IllegalStateException e) {
                     failures++;
                     if (failures > 3) {
                         log.error("Failed to commit transaction " + failures + " time(s). Aborting...");
@@ -79,16 +85,6 @@ public class JanusGraphHook extends GremlinHook {
         }
     }
 
-    public void clearGraph() {
-        startTransaction();
-        this.tx.traversal().V().drop().iterate();
-        endTransaction();
-    }
-
-    public void close() {
-        this.graph.close();
-    }
-
     @Override
     public void exportCurrentGraph(String exportDir) {
         if (!isValidExportPath(exportDir)) {
@@ -102,9 +98,9 @@ public class JanusGraphHook extends GremlinHook {
             case ("json"):
                 throw new UnsupportedOperationException("Export to Kryo and JSON currently not supported using the JanusGraphHook.");
             case ("xml"):
-                tx.traversal().io(exportDir).write().iterate();
+                final TinkerGraph graph = (TinkerGraph) super.g.V().subgraph("sg").cap("sg").next();
+                graph.traversal().io(exportDir).write().iterate();
                 break;
-
         }
         endTransaction();
     }
@@ -112,12 +108,11 @@ public class JanusGraphHook extends GremlinHook {
     public static class JanusGraphHookBuilder implements IHookBuilder {
         private String graphDir;
         private boolean clearGraph;
-        private boolean setSchema;
         private String conf;
+        private Graph graph;
 
         public JanusGraphHookBuilder() {
             this.clearGraph = true;
-            this.setSchema = false;
             BaseConfiguration conf = new BaseConfiguration();
             conf.setProperty("gremlin.graph", "org.janusgraph.core.JanusGraphFactory");
             conf.setProperty("storage.backend", "inmemory");
@@ -125,11 +120,6 @@ public class JanusGraphHook extends GremlinHook {
 
         public JanusGraphHookBuilder clearDatabase(final boolean clearDatabase) {
             this.clearGraph = clearDatabase;
-            return this;
-        }
-
-        public JanusGraphHookBuilder setSchema(final boolean setSchema) {
-            this.setSchema = setSchema;
             return this;
         }
 
@@ -149,63 +139,11 @@ public class JanusGraphHook extends GremlinHook {
             return this;
         }
 
-        public JanusGraphHook build() {
-            try {
-                if (this.setSchema) setSchema();
-            } catch (Exception e) {
-                log.warn("Unable to set graph schema!", e);
-            }
+        public JanusGraphHook build() throws Exception {
+            graph = AnonymousTraversalSource.traversal().withRemote(conf).getGraph();
             return new JanusGraphHook(this);
         }
 
-        private void setSchema() throws Exception {
-            log.info("Creating CPG schema.");
-            final JanusGraph graph = JanusGraphFactory.open(this.conf);
-            final JanusGraphManagement mgmt = graph.openManagement();
-            Arrays.stream(VertexLabels.values()).forEach(label -> mgmt.makeVertexLabel(label.toString()).make());
-            Arrays.stream(EdgeLabels.values()).forEach(label -> mgmt.makeVertexLabel(label.toString()).make());
-            // Collect all possible properties
-            HashSet<String> graphProperties = new HashSet<>();
-            Arrays.stream(ArrayInitializerVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(BindingVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(BlockVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(CallVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(ControlStructureVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(FieldIdentifier.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(FileVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(IdentifierVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(LiteralVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(LocalVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(MemberVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(MetaDataVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(MethodParameterInVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(MethodRefVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(MethodReturnVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(MethodVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(ModifierVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(NamespaceBlockVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(ReturnVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(TypeArgumentVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(TypeDeclVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(TypeParameterVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(TypeVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            Arrays.stream(UnknownVertex.class.getFields()).forEach(e -> graphProperties.add(e.getName()));
-            // Add all unique properties to the schema
-            graphProperties.parallelStream()
-                    .filter((field -> !"LABEL".equals(field) && !"TRAITS".equals(field)))
-                    .forEach(field -> mgmt.makePropertyKey(field)
-                            .dataType(String.class).cardinality(Cardinality.SINGLE).make());
-            // Create indexes
-            mgmt.buildIndex("byASTOrder", Vertex.class)
-                    .addKey(mgmt.getPropertyKey("order"))
-                    .buildCompositeIndex();
-            mgmt.buildIndex("byFullName", Vertex.class)
-                    .addKey(mgmt.getPropertyKey("fullName"))
-                    .buildCompositeIndex();
-            // Commit and close for now
-            mgmt.commit();
-            JanusGraphFactory.close(graph);
-        }
     }
 
 }

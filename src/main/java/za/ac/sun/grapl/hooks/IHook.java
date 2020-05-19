@@ -122,6 +122,15 @@ public interface IHook {
      */
     boolean isBlock(int blockOrder);
 
+    /**
+     * Clears the current loaded graph of all vertices and edges.
+     */
+    void clearGraph();
+
+    /**
+     * Closes the connection to the graph database.
+     */
+    void close();
 
     /**
      * Exports the current graph to the serialized format specified by the extension in exportDir

@@ -3,7 +3,7 @@ version: "3.4"
 services:
   janusgraph:
     image: janusgraph/janusgraph:latest
-    container_name: janusgraph-default
+    container_name: janusgraph-grapl
     ports:
       - "8182:8182"
     healthcheck:
@@ -12,3 +12,5 @@ services:
       timeout: 15s
       retries: 3
       start_period: 10s
+    volumes:
+      - "./janusgraph_schema.groovy:/docker-entrypoint-initdb.d/schema.groovy"
