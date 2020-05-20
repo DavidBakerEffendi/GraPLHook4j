@@ -6,7 +6,7 @@ services:
     container_name: janusgraph-grapl
     environment:
       JANUS_PROPS_TEMPLATE: cql-es
-      JANUS_SERVER_TIMEOUT: 120
+      gremlinserver.scriptEvaluationTimeout: 180000
       janusgraph.storage.backend: cql
       janusgraph.storage.hostname: scylla-grapl
       janusgraph.index.search.hostname: elastic-grapl
