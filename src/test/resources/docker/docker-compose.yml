@@ -10,8 +10,8 @@ services:
       janusgraph.storage.backend: cql
       janusgraph.storage.hostname: scylla-grapl
       janusgraph.index.search.hostname: elastic-grapl
-    #    ports:
-    #      - "8182:8182"
+    ports:
+      - "8182:8182"
     healthcheck:
       test: ["CMD-SHELL", "bin/gremlin.sh", "-e", "scripts/remote-connect.groovy"]
       interval: 5s
@@ -21,28 +21,17 @@ services:
       - "./janusgraph_schema.groovy:/docker-entrypoint-initdb.d/schema.groovy"
     networks:
       - jg-grapl-network
-    depends_on:
-      - scylla
-      - elasticsearch
     mem_limit: 400m
+
   scylla:
     image: scylladb/scylla:4.0.0
     container_name: scylla-grapl
-    command:
-      - "--smp"
-      - "2"
-      #    ports:
-      # CQL ports (native_transport_port)
-      #      - "9042:9042"
-      # Thrift (rpc_port)
-      #      - "9160:9160"
+    command: "--smp 2"
     healthcheck:
       test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
       interval: 30s
       timeout: 10s
       retries: 5
-    volumes:
-      - "jg-grapl-scylla:/var/lib/scylla"
     networks:
       - jg-grapl-network
     mem_limit: 500m
@@ -50,9 +39,6 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
     container_name: elastic-grapl
-    #    ports:
-    #      - "9200:9200"
-    #      - "9300:9300"
     environment:
       - discovery.type=single-node
       - http.host=0.0.0.0
@@ -63,14 +49,9 @@ services:
       timeout: 30s
       retries: 30
     user: "1000"
-    volumes:
-      - "jg-grapl-es:/usr/share/elasticsearch/data"
     networks:
       - jg-grapl-network
-    mem_limit: 1000m
+    mem_limit: 1300m
 
 networks:
   jg-grapl-network:
-volumes:
-  jg-grapl-scylla:
-  jg-grapl-es:
