@@ -1,4 +1,4 @@
-graph = JanusGraphFactory.open('conf/janusgraph-berkeleyje-lucene.properties')
+graph = JanusGraphFactory.open('/etc/opt/janusgraph/janusgraph.properties')
 
 mgmt = graph.openManagement()
 // Vertex labels

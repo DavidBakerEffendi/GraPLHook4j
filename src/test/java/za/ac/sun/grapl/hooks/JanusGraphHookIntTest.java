@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
-public class JanusGraphHookIntTest extends GremlinHookTest {
+public final class JanusGraphHookIntTest extends GremlinHookTest {
 
     private static final Logger log = LogManager.getLogger();
     private static JanusGraphHook hook;
