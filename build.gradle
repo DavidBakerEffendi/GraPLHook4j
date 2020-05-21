@@ -68,7 +68,7 @@ check.dependsOn jacocoTestCoverageVerification
 jacocoTestCoverageVerification.dependsOn jacocoTestReport
 
 group = 'za.ac.sun.grapl'
-version = '0.0.x'
+version = 'X.X.X'
 description = 'GraPLHook4j'
 sourceCompatibility = '8'
 
