@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Transaction;
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 import java.io.File;
 
@@ -96,11 +95,8 @@ public final class JanusGraphHook extends GremlinHook {
         switch (ext) {
             case ("kryo"):
             case ("json"):
-                throw new UnsupportedOperationException("Export to Kryo and JSON currently not supported using the JanusGraphHook.");
             case ("xml"):
-                final TinkerGraph graph = (TinkerGraph) super.g.V().subgraph("sg").cap("sg").next();
-                graph.traversal().io(exportDir).write().iterate();
-                break;
+                throw new UnsupportedOperationException("Export to Kryo, XML, and JSON currently not supported using the JanusGraphHook.");
         }
         endTransaction();
     }
