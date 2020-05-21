@@ -2,6 +2,7 @@ package za.ac.sun.grapl.hooks;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Edge;
@@ -23,8 +24,8 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 public abstract class GremlinHook implements IHook {
 
     private static final Logger log = LogManager.getLogger();
-    final Graph graph;
-    private GraphTraversalSource g;
+    protected final Graph graph;
+    protected GraphTraversalSource g;
 
     public GremlinHook(final Graph graph) {
         this.graph = graph;
@@ -36,9 +37,17 @@ public abstract class GremlinHook implements IHook {
 
     protected void endTransaction() {
         try {
-            g.close();
+            this.g.close();
         } catch (Exception e) {
             log.warn("Unable to close existing transaction! Object will be orphaned and a new traversal will continue.");
+        }
+    }
+
+    public void close() {
+        try {
+            this.graph.close();
+        } catch (Exception e) {
+            log.warn("Exception thrown while attempting to close graph.", e);
         }
     }
 
@@ -227,6 +236,13 @@ public abstract class GremlinHook implements IHook {
     }
 
     @Override
+    public void clearGraph() {
+        startTransaction();
+        g.V().drop().iterate();
+        endTransaction();
+    }
+
+    @Override
     public void exportCurrentGraph(String exportDir) {
         if (!isValidExportPath(exportDir)) {
             throw new IllegalArgumentException("Unsupported graph extension! Supported types are GraphML," +
@@ -270,18 +286,27 @@ public abstract class GremlinHook implements IHook {
         }
         // Get the implementing classes fields and values
         Vertex v;
-        if (this instanceof JanusGraphHook) {
-            v = g.getGraph().addVertex(T.label, label);
-        } else {
+        if (this instanceof TinkerGraphHook) {
             v = g.getGraph().addVertex(T.label, label, T.id, UUID.randomUUID());
-        }
-        Arrays.stream(fields).forEach(f -> {
-            try {
-                v.property(f.getName(), f.get(gv).toString());
-            } catch (IllegalAccessException e) {
-                log.error("Illegal field access when adding properties to '" + gv.LABEL.name() + "'.", e);
+            Arrays.stream(fields).forEach(f -> {
+                try {
+                    v.property(f.getName(), f.get(gv).toString());
+                } catch (IllegalAccessException e) {
+                    log.error("Illegal field access when adding properties to '" + gv.LABEL.name() + "'.", e);
+                }
+            });
+        } else {
+            GraphTraversal<Vertex, Vertex> traversalPointer = g.addV(label);
+            for (Field f : fields) {
+                try {
+                    traversalPointer = traversalPointer.property(f.getName(), f.get(gv).toString());
+                } catch (IllegalAccessException e) {
+                    log.error("Illegal field access when adding properties to '" + gv.LABEL.name() + "'.", e);
+                }
             }
-        });
+            v = traversalPointer.next();
+        }
+
         return v;
     }
 
@@ -295,10 +320,11 @@ public abstract class GremlinHook implements IHook {
      * @return the newly created {@link Edge}.
      */
     private Edge createTinkerGraphEdge(final Vertex v1, final EdgeLabels edgeLabel, final Vertex v2) {
-        if (this instanceof JanusGraphHook) {
-            return v1.addEdge(edgeLabel.toString(), v2);
-        } else {
+
+        if (this instanceof TinkerGraphHook) {
             return v1.addEdge(edgeLabel.toString(), v2, T.id, UUID.randomUUID());
+        } else {
+            return g.V(v1.id()).addE(edgeLabel.toString()).to(g.V(v2.id())).next();
         }
     }
 

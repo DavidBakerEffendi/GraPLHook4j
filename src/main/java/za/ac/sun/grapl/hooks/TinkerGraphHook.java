@@ -5,7 +5,7 @@ import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 import java.io.File;
 
-public class TinkerGraphHook extends GremlinHook {
+public final class TinkerGraphHook extends GremlinHook {
 
     private TinkerGraphHook(TinkerGraphHookBuilder builder) {
         super(TinkerGraph.open(builder.conf));

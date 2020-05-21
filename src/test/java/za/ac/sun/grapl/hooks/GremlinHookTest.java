@@ -2,9 +2,6 @@ package za.ac.sun.grapl.hooks;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
-import org.apache.tinkerpop.gremlin.structure.Graph;
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.junit.jupiter.api.*;
 import za.ac.sun.grapl.domain.enums.*;
 import za.ac.sun.grapl.domain.models.GraPLVertex;
@@ -20,14 +17,10 @@ public abstract class GremlinHookTest {
 
     final static Logger logger = LogManager.getLogger();
 
-    static final String tempDir = System.getProperty("java.io.tmpdir");
-    static final String testGraphML = tempDir + "/grapl/graplhook4j_test.xml";
-    static final String testGraphSON = tempDir + "/grapl/graplhook4j_test.json";
-    static final String testGryo = tempDir + "/grapl/graplhook4j_test.kryo";
-
-    private Class<?> getTestClass() {
-        return this.getClass();
-    }
+    final static String tempDir = System.getProperty("java.io.tmpdir");
+    final static String testGraphML = tempDir + "/grapl/graplhook4j_test.xml";
+    final static String testGraphSON = tempDir + "/grapl/graplhook4j_test.json";
+    final static String testGryo = tempDir + "/grapl/graplhook4j_test.kryo";
 
     @AfterAll
     static void tearDownAll() {
@@ -47,7 +40,7 @@ public abstract class GremlinHookTest {
      *
      * @return a built hook.
      */
-    public IHook provideHook() {
+    public GremlinHook provideHook() {
         return new TinkerGraphHook.TinkerGraphHookBuilder().build();
     }
 
@@ -58,7 +51,7 @@ public abstract class GremlinHookTest {
      * @param existingGraph the path to a GraphML, GraphSON, or Gryo graph.
      * @return a hook connected to a graph database populated with the contents of the file at the given path.
      */
-    public IHook provideHook(String existingGraph) {
+    public GremlinHook provideHook(String existingGraph) {
         return new TinkerGraphHook.TinkerGraphHookBuilder().useExistingGraph(existingGraph).build();
     }
 
@@ -73,135 +66,7 @@ public abstract class GremlinHookTest {
     }
 
     @Nested
-    @DisplayName("Graph import file types")
-    class ValidateGraphImportFileTypes {
-
-        private IHook hook;
-        private Graph testGraph;
-
-        @BeforeEach
-        public void setUp() {
-            this.testGraph = TinkerGraph.open();
-        }
-
-        @Test
-        public void testImportingGraphML() {
-            hook = provideHook();
-            hook.addFileVertex(new FileVertex("Test1", 0));
-            hook.addFileVertex(new FileVertex("Test2", 1));
-            hook.exportCurrentGraph(testGraphML);
-
-            assertDoesNotThrow(() -> provideHook(testGraphML));
-
-            GraphTraversalSource g = testGraph.traversal();
-            g.io(testGraphML).read().iterate();
-            assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test1").hasNext());
-            assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test2").hasNext());
-        }
-
-        @Test
-        public void testImportingGraphJSON() {
-            hook = provideHook();
-            hook.addFileVertex(new FileVertex("Test1", 0));
-            hook.addFileVertex(new FileVertex("Test2", 1));
-
-            if (getTestClass().equals(JanusGraphHookIntTest.class)) {
-                assertThrows(UnsupportedOperationException.class, () -> hook.exportCurrentGraph(testGraphSON));
-            } else {
-                hook.exportCurrentGraph(testGraphSON);
-
-                assertDoesNotThrow(() -> provideHook(testGraphSON));
-
-                GraphTraversalSource g = testGraph.traversal();
-                g.io(testGraphSON).read().iterate();
-                assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test1").hasNext());
-                assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test2").hasNext());
-            }
-        }
-
-        @Test
-        public void testImportingGryo() {
-            hook = provideHook();
-            hook.addFileVertex(new FileVertex("Test1", 0));
-            hook.addFileVertex(new FileVertex("Test2", 1));
-
-            if (getTestClass().equals(JanusGraphHookIntTest.class)) {
-                assertThrows(UnsupportedOperationException.class, () -> hook.exportCurrentGraph(testGraphSON));
-            } else {
-                hook.exportCurrentGraph(testGryo);
-
-                assertDoesNotThrow(() -> provideHook(testGryo));
-
-                GraphTraversalSource g = testGraph.traversal();
-                g.io(testGryo).read().iterate();
-                assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test1").hasNext());
-                assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test2").hasNext());
-            }
-        }
-
-        @Test
-        public void testImportingGraphThatDNE() {
-            assertThrows(IllegalArgumentException.class, () -> provideBuilder().useExistingGraph("/tmp/grapl/DNE.kryo").build());
-        }
-
-        @Test
-        public void testImportingInvalidExtension() {
-            assertThrows(IllegalArgumentException.class, () -> provideBuilder().useExistingGraph("/tmp/grapl/invalid.txt").build());
-        }
-    }
-
-    @Nested
-    @DisplayName("Graph export file types")
-    class ValidateGraphExportFileTypes {
-
-        private IHook hook;
-
-        @Test
-        public void testExportingGraphML() {
-            this.hook = provideHook();
-            hook.addFileVertex(new FileVertex("Test1", 0));
-            hook.addFileVertex(new FileVertex("Test2", 1));
-            hook.exportCurrentGraph(testGraphML);
-            assertTrue(new File(testGraphML).exists());
-        }
-
-        @Test
-        public void testExportingGraphJSON() {
-            this.hook = provideHook();
-            hook.addFileVertex(new FileVertex("Test1", 0));
-            hook.addFileVertex(new FileVertex("Test2", 1));
-            if (getTestClass().equals(JanusGraphHookIntTest.class)) {
-                assertThrows(UnsupportedOperationException.class, () -> hook.exportCurrentGraph(testGraphSON));
-            } else {
-                hook.exportCurrentGraph(testGraphSON);
-                assertTrue(new File(testGraphSON).exists());
-            }
-        }
-
-        @Test
-        public void testExportingGryo() {
-            this.hook = provideHook();
-            hook.addFileVertex(new FileVertex("Test1", 0));
-            hook.addFileVertex(new FileVertex("Test2", 1));
-            if (getTestClass().equals(JanusGraphHookIntTest.class)) {
-                assertThrows(UnsupportedOperationException.class, () -> hook.exportCurrentGraph(testGryo));
-            } else {
-                hook.exportCurrentGraph(testGryo);
-                assertTrue(new File(testGryo).exists());
-            }
-        }
-
-        @Test
-        public void testExportingInvalidFileType() {
-            this.hook = provideHook();
-            hook.addFileVertex(new FileVertex("Test1", 0));
-            hook.addFileVertex(new FileVertex("Test2", 1));
-            assertThrows(IllegalArgumentException.class, () -> hook.exportCurrentGraph("/tmp/grapl/invalid.txt"));
-        }
-    }
-
-    @Nested
-    @DisplayName("Graph export methods")
+    @DisplayName("Graph domain")
     class ValidateGraphDomain {
 
         @Test
@@ -245,62 +110,59 @@ public abstract class GremlinHookTest {
     @DisplayName("Join method vertex to method related vertices")
     class MethodJoinInteraction {
 
-        private IHook hook;
-        private TinkerGraph testGraph;
+        private GremlinHook hook;
         private MethodVertex m;
 
         @BeforeEach
         public void setUp() {
             this.hook = provideHook();
-            this.testGraph = TinkerGraph.open();
             FileVertex f = new FileVertex("Test", 0);
             this.m = new MethodVertex("run", "io.grapl.Test.run", "(I)", 0, 1);
             this.hook.joinFileVertexTo(f, m);
         }
 
+        @AfterEach
+        public void tearDown() {
+            this.hook.clearGraph();
+        }
+
         @Test
         public void testJoinMethod2MethodParamIn() {
             this.hook.createAndAddToMethod(m, new MethodParameterInVertex("test", "I", EvaluationStrategies.BY_VALUE, "I", 1, 1));
-            this.hook.exportCurrentGraph(testGraphML);
 
-            GraphTraversalSource g = testGraph.traversal();
-            g.io(testGraphML).read().iterate();
-
-            assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
-            assertTrue(g.V().hasLabel(MethodVertex.LABEL.toString())
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
+            assertTrue(this.hook.g.V().hasLabel(MethodVertex.LABEL.toString())
                     .out(EdgeLabels.AST.toString())
                     .has(MethodParameterInVertex.LABEL.toString(), "code", "test")
                     .hasNext());
+            this.hook.endTransaction();
         }
 
         @Test
         public void testJoinMethod2MethodReturn() {
             this.hook.createAndAddToMethod(m, new MethodReturnVertex("INTEGER", "I", EvaluationStrategies.BY_VALUE, 0, 0));
-            this.hook.exportCurrentGraph(testGraphML);
 
-            GraphTraversalSource g = testGraph.traversal();
-            g.io(testGraphML).read().iterate();
-
-            assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
-            assertTrue(g.V().hasLabel(MethodVertex.LABEL.toString())
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
+            assertTrue(this.hook.g.V().hasLabel(MethodVertex.LABEL.toString())
                     .out(EdgeLabels.AST.toString())
                     .has(MethodReturnVertex.LABEL.toString(), "name", "INTEGER")
                     .hasNext());
+            this.hook.endTransaction();
         }
 
         @Test
         public void testJoinMethod2Modifier() {
             this.hook.createAndAddToMethod(m, new ModifierVertex(ModifierTypes.PUBLIC, 0));
-            this.hook.exportCurrentGraph(testGraphML);
 
-            GraphTraversalSource g = testGraph.traversal();
-            g.io(testGraphML).read().iterate();
-
-            assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
-            assertTrue(g.V().hasLabel(MethodVertex.LABEL.toString())
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
+            assertTrue(this.hook.g.V().hasLabel(MethodVertex.LABEL.toString())
                     .out(EdgeLabels.AST.toString())
                     .has(ModifierVertex.LABEL.toString(), "name", ModifierTypes.PUBLIC.toString())
                     .hasNext());
+            this.hook.endTransaction();
         }
     }
 
@@ -308,47 +170,47 @@ public abstract class GremlinHookTest {
     @DisplayName("Join file vertex to file related vertices")
     class FileJoinInteraction {
 
-        private IHook hook;
-        private TinkerGraph testGraph;
+        private GremlinHook hook;
         private FileVertex f;
 
         @BeforeEach
         public void setUp() {
             this.hook = provideHook();
-            this.testGraph = TinkerGraph.open();
             this.f = new FileVertex("Test", 1);
             this.hook.addFileVertex(f);
         }
 
+        @AfterEach
+        public void tearDown() {
+            this.hook.clearGraph();
+        }
+
         @Test
         public void testJoinFile2NamespaceBlock() {
-            NamespaceBlockVertex nbv = new NamespaceBlockVertex("grapl", "io.grapl", 0);
+            final NamespaceBlockVertex nbv = new NamespaceBlockVertex("grapl", "io.grapl", 0);
             this.hook.joinFileVertexTo(f, nbv);
-            this.hook.exportCurrentGraph(testGraphML);
-            GraphTraversalSource g = testGraph.traversal();
-            g.io(testGraphML).read().iterate();
 
-            assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
-            assertTrue(g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", "io.grapl")
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
+            assertTrue(this.hook.g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", "io.grapl")
                     .out(EdgeLabels.AST.toString())
                     .hasLabel(FileVertex.LABEL.toString())
                     .hasNext());
+            this.hook.endTransaction();
         }
 
         @Test
         public void testJoinFile2Method() {
             MethodVertex mv = new MethodVertex("test", "io.grapl.Test.run", "(I)", 0, 0);
             this.hook.joinFileVertexTo(f, mv);
-            this.hook.exportCurrentGraph(testGraphML);
 
-            GraphTraversalSource g = testGraph.traversal();
-            g.io(testGraphML).read().iterate();
-
-            assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
-            assertTrue(g.V().hasLabel(FileVertex.LABEL.toString())
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
+            assertTrue(this.hook.g.V().hasLabel(FileVertex.LABEL.toString())
                     .out(EdgeLabels.AST.toString())
                     .has(MethodVertex.LABEL.toString(), "fullName", "io.grapl.Test.run")
                     .hasNext());
+            this.hook.endTransaction();
         }
     }
 
@@ -359,91 +221,84 @@ public abstract class GremlinHookTest {
         private static final String ROOT_METHOD = "root";
         private static final String FIRST_BLOCK = "firstBlock";
         private static final String TEST_ID = "test";
-        private IHook hook;
-        private TinkerGraph testGraph;
+        private GremlinHook hook;
         private MethodVertex m;
 
         @BeforeEach
         public void setUp() {
             this.hook = provideHook();
-            this.testGraph = TinkerGraph.open();
-            FileVertex f = new FileVertex("Test", 0);
+            final FileVertex f = new FileVertex("Test", 0);
             this.m = new MethodVertex(ROOT_METHOD, "io.grapl.Test.run", "(I)", 0, 0);
             this.hook.joinFileVertexTo(f, m);
             this.hook.assignToBlock(m, new BlockVertex(FIRST_BLOCK, 1, 1, "INTEGER", 5), 0);
         }
 
+        @AfterEach
+        public void tearDown() {
+            this.hook.clearGraph();
+        }
+
         @Test
         public void testMethodJoinBlockTest() {
-            this.hook.exportCurrentGraph(testGraphML);
-
-            GraphTraversalSource g = testGraph.traversal();
-            g.io(testGraphML).read().iterate();
-            assertTrue(g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
-            assertTrue(g.V().hasLabel(MethodVertex.LABEL.toString())
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
+            assertTrue(this.hook.g.V().hasLabel(MethodVertex.LABEL.toString())
                     .out(EdgeLabels.AST.toString())
                     .has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
                     .hasNext());
+            this.hook.endTransaction();
         }
 
         @Test
         public void testBlockJoinBlockTest() {
-            BlockVertex bv2 = new BlockVertex(TEST_ID, 2, 1, "INTEGER", 6);
+            final BlockVertex bv2 = new BlockVertex(TEST_ID, 2, 1, "INTEGER", 6);
             this.hook.assignToBlock(m, bv2, 1);
-            this.hook.exportCurrentGraph(testGraphML);
 
-            GraphTraversalSource g = testGraph.traversal();
-            g.io(testGraphML).read().iterate();
-
-            assertTrue(g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
                     .out(EdgeLabels.AST.toString())
                     .has(BlockVertex.LABEL.toString(), "name", TEST_ID)
                     .hasNext());
+            this.hook.endTransaction();
         }
 
         @Test
         public void testAssignLiteralToBlock() {
-            LiteralVertex lv = new LiteralVertex(TEST_ID, 2, 1, "INTEGER", 5);
+            final LiteralVertex lv = new LiteralVertex(TEST_ID, 2, 1, "INTEGER", 5);
             this.hook.assignToBlock(m, lv, 1);
-            this.hook.exportCurrentGraph(testGraphML);
 
-            GraphTraversalSource g = testGraph.traversal();
-            g.io(testGraphML).read().iterate();
-
-            assertTrue(g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
                     .out(EdgeLabels.AST.toString())
                     .has(LiteralVertex.LABEL.toString(), "name", TEST_ID)
                     .hasNext());
+            this.hook.endTransaction();
         }
 
         @Test
         public void testAssignLocalToBlock() {
-            LocalVertex lv = new LocalVertex("1", TEST_ID, "INTEGER", 5, 2);
+            final LocalVertex lv = new LocalVertex("1", TEST_ID, "INTEGER", 5, 2);
             this.hook.assignToBlock(m, lv, 1);
-            this.hook.exportCurrentGraph(testGraphML);
 
-            GraphTraversalSource g = testGraph.traversal();
-            g.io(testGraphML).read().iterate();
-
-            assertTrue(g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
                     .out(EdgeLabels.AST.toString())
                     .has(LocalVertex.LABEL.toString(), "name", TEST_ID)
                     .hasNext());
+            this.hook.endTransaction();
         }
 
         @Test
         public void testAssignControlToBlock() {
-            ControlStructureVertex lv = new ControlStructureVertex(TEST_ID, 2, 2, 1);
+            final ControlStructureVertex lv = new ControlStructureVertex(TEST_ID, 2, 2, 1);
             this.hook.assignToBlock(m, lv, 1);
-            this.hook.exportCurrentGraph(testGraphML);
 
-            GraphTraversalSource g = testGraph.traversal();
-            g.io(testGraphML).read().iterate();
-
-            assertTrue(g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
                     .out(EdgeLabels.AST.toString())
                     .has(ControlStructureVertex.LABEL.toString(), "name", TEST_ID)
                     .hasNext());
+            this.hook.endTransaction();
         }
     }
 
@@ -454,62 +309,59 @@ public abstract class GremlinHookTest {
         private static final String ROOT_NAME = "za";
         private static final String FIRST_BLOCK = "ac";
         private static final String SECOND_BLOCK = "sun";
-        private IHook hook;
-        private TinkerGraph testGraph;
+        private GremlinHook hook;
         private NamespaceBlockVertex root;
 
         @BeforeEach
         public void setUp() {
             this.hook = provideHook();
-            this.testGraph = TinkerGraph.open();
             this.root = new NamespaceBlockVertex(ROOT_NAME, ROOT_NAME, 0);
+        }
+
+        @AfterEach
+        public void tearDown() {
+            this.hook.clearGraph();
         }
 
         @Test
         public void joinTwoNamespaceBlocks() {
-            NamespaceBlockVertex n1 = new NamespaceBlockVertex(FIRST_BLOCK, ROOT_NAME.concat(".").concat(FIRST_BLOCK), 1);
+            final NamespaceBlockVertex n1 = new NamespaceBlockVertex(FIRST_BLOCK, ROOT_NAME.concat(".").concat(FIRST_BLOCK), 1);
             this.hook.joinNamespaceBlocks(root, n1);
-            this.hook.exportCurrentGraph(testGraphML);
 
-            GraphTraversalSource g = testGraph.traversal();
-            g.io(testGraphML).read().iterate();
-
-            assertTrue(g.V().has(NamespaceBlockVertex.LABEL.toString(), "name", ROOT_NAME)
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.V().has(NamespaceBlockVertex.LABEL.toString(), "name", ROOT_NAME)
                     .out(EdgeLabels.AST.toString())
                     .has(NamespaceBlockVertex.LABEL.toString(), "name", FIRST_BLOCK).hasNext());
+            this.hook.endTransaction();
         }
 
         @Test
         public void joinThreeNamespaceBlocks() {
-            NamespaceBlockVertex n1 = new NamespaceBlockVertex(FIRST_BLOCK, ROOT_NAME.concat(".").concat(FIRST_BLOCK), 1);
-            NamespaceBlockVertex n2 = new NamespaceBlockVertex(SECOND_BLOCK, ROOT_NAME.concat(".").concat(SECOND_BLOCK), 1);
+            final NamespaceBlockVertex n1 = new NamespaceBlockVertex(FIRST_BLOCK, ROOT_NAME.concat(".").concat(FIRST_BLOCK), 1);
+            final NamespaceBlockVertex n2 = new NamespaceBlockVertex(SECOND_BLOCK, ROOT_NAME.concat(".").concat(SECOND_BLOCK), 1);
             this.hook.joinNamespaceBlocks(root, n1);
             this.hook.joinNamespaceBlocks(n1, n2);
-            this.hook.exportCurrentGraph(testGraphML);
 
-            GraphTraversalSource g = testGraph.traversal();
-            g.io(testGraphML).read().iterate();
-
-            assertTrue(g.V().has(NamespaceBlockVertex.LABEL.toString(), "name", ROOT_NAME)
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.V().has(NamespaceBlockVertex.LABEL.toString(), "name", ROOT_NAME)
                     .out(EdgeLabels.AST.toString())
                     .has(NamespaceBlockVertex.LABEL.toString(), "name", FIRST_BLOCK).hasNext());
-            assertTrue(g.V().has(NamespaceBlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+            assertTrue(this.hook.g.V().has(NamespaceBlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
                     .out(EdgeLabels.AST.toString())
                     .has(NamespaceBlockVertex.LABEL.toString(), "name", SECOND_BLOCK).hasNext());
+            this.hook.endTransaction();
         }
 
         @Test
         public void joinExistingConnection() {
-            NamespaceBlockVertex n1 = new NamespaceBlockVertex(FIRST_BLOCK, ROOT_NAME.concat(".").concat(FIRST_BLOCK), 1);
+            final NamespaceBlockVertex n1 = new NamespaceBlockVertex(FIRST_BLOCK, ROOT_NAME.concat(".").concat(FIRST_BLOCK), 1);
             this.hook.joinNamespaceBlocks(root, n1);
             this.hook.joinNamespaceBlocks(root, n1);
-            this.hook.exportCurrentGraph(testGraphML);
 
-            GraphTraversalSource g = testGraph.traversal();
-            g.io(testGraphML).read().iterate();
-
-            assertEquals(1, g.V().has(NamespaceBlockVertex.LABEL.toString(), "name", ROOT_NAME)
+            this.hook.startTransaction();
+            assertEquals(1, this.hook.g.V().has(NamespaceBlockVertex.LABEL.toString(), "name", ROOT_NAME)
                     .out(EdgeLabels.AST.toString()).count().next());
+            this.hook.endTransaction();
         }
     }
 
@@ -517,16 +369,16 @@ public abstract class GremlinHookTest {
     @DisplayName("Aggregate queries")
     class GremlinAggregateQueries {
 
-        private IHook hook;
-        private TinkerGraph testGraph;
+        private GremlinHook hook;
 
         @BeforeEach
         public void setUp() {
             this.hook = provideHook();
-            this.testGraph = TinkerGraph.open();
-            if (getTestClass().equals(JanusGraphHookIntTest.class)) {
-                ((JanusGraphHook) this.hook).clearGraph();
-            }
+        }
+
+        @AfterEach
+        public void tearDown() {
+            this.hook.clearGraph();
         }
 
         @Test
@@ -546,9 +398,6 @@ public abstract class GremlinHookTest {
 
         @Test
         public void testNonEmptyGraphWithoutASTVertices() {
-            testGraph.addVertex("EmptyVertex");
-            testGraph.traversal().io(testGraphML).write().iterate();
-            this.hook = provideHook(testGraphML);
             assertEquals(0, this.hook.maxOrder());
         }
     }
@@ -557,13 +406,16 @@ public abstract class GremlinHookTest {
     @DisplayName("Simple boolean checks")
     class GremlinBooleanChecks {
 
-        private IHook hook;
-        private TinkerGraph testGraph;
+        private GremlinHook hook;
 
         @BeforeEach
         public void setUp() {
             this.hook = provideHook();
-            this.testGraph = TinkerGraph.open();
+        }
+
+        @AfterEach
+        public void tearDown() {
+            this.hook.clearGraph();
         }
 
         @Test
@@ -573,8 +425,8 @@ public abstract class GremlinHookTest {
 
         @Test
         public void testNonEmptyGraphWithBlockVertices() {
-            FileVertex f = new FileVertex("Test", 0);
-            MethodVertex m = new MethodVertex("root", "io.grapl.Test.run", "(I)", 0, 1);
+            final FileVertex f = new FileVertex("Test", 0);
+            final MethodVertex m = new MethodVertex("root", "io.grapl.Test.run", "(I)", 0, 1);
             this.hook.joinFileVertexTo(f, m);
             this.hook.assignToBlock(m, new BlockVertex("firstBlock", 2, 1, "INTEGER", 5), 0);
             this.hook.assignToBlock(m, new BlockVertex("secondBlock", 3, 1, "INTEGER", 6), 0);
@@ -586,12 +438,9 @@ public abstract class GremlinHookTest {
 
         @Test
         public void testNonEmptyGraphWithoutBlockVertices() {
-            testGraph.addVertex("EmptyVertex");
-            FileVertex f = new FileVertex("Test", 0);
-            MethodVertex m = new MethodVertex("root", "io.grapl.Test.run", "(I)", 0, 1);
+            final FileVertex f = new FileVertex("Test", 0);
+            final MethodVertex m = new MethodVertex("root", "io.grapl.Test.run", "(I)", 0, 1);
             this.hook.joinFileVertexTo(f, m);
-            testGraph.traversal().io(testGraphML).write().iterate();
-            this.hook = provideHook(testGraphML);
 
             assertFalse(this.hook.isBlock(0));
             assertFalse(this.hook.isBlock(1));
