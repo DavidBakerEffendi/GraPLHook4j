@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
 import za.ac.sun.grapl.domain.models.vertices.FileVertex;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public final class JanusGraphHookIntTest extends GremlinHookTest {
@@ -15,8 +16,7 @@ public final class JanusGraphHookIntTest extends GremlinHookTest {
     @BeforeAll
     static void setUpAll() throws Exception {
         // Setup schema and build test database
-        hook = new JanusGraphHook.JanusGraphHookBuilder()
-                .conf("src/test/resources/conf/remote.properties")
+        hook = new JanusGraphHook.JanusGraphHookBuilder("src/test/resources/conf/remote.properties")
                 .clearDatabase(true)
                 .build();
     }
@@ -29,13 +29,13 @@ public final class JanusGraphHookIntTest extends GremlinHookTest {
 
     @Override
     public IHookBuilder provideBuilder() {
-        return new JanusGraphHook.JanusGraphHookBuilder().conf("src/test/resources/conf/remote.properties");
+        return new JanusGraphHook.JanusGraphHookBuilder("src/test/resources/conf/remote.properties");
     }
 
     @Override
     public GremlinHook provideHook() {
         try {
-            return new JanusGraphHook.JanusGraphHookBuilder().conf("src/test/resources/conf/remote.properties").build();
+            return new JanusGraphHook.JanusGraphHookBuilder("src/test/resources/conf/remote.properties").build();
         } catch (Exception e) {
             log.error("Unable to build JanusGraphHook!", e);
             return null;
@@ -46,8 +46,7 @@ public final class JanusGraphHookIntTest extends GremlinHookTest {
     public GremlinHook provideHook(String existingGraph) {
         try {
             return new JanusGraphHook
-                    .JanusGraphHookBuilder()
-                    .conf("src/test/resources/conf/remote.properties")
+                    .JanusGraphHookBuilder("src/test/resources/conf/remote.properties")
                     .build();
         } catch (Exception e) {
             log.error("Unable to build JanusGraphHook!", e);
@@ -64,6 +63,7 @@ public final class JanusGraphHookIntTest extends GremlinHookTest {
         @Test
         public void testExportingGraphML() {
             this.hook = provideHook();
+            assertNotNull(this.hook);
             hook.addFileVertex(new FileVertex("Test1", 0));
             hook.addFileVertex(new FileVertex("Test2", 1));
             assertThrows(UnsupportedOperationException.class, () -> hook.exportCurrentGraph(testGraphML));
@@ -72,6 +72,7 @@ public final class JanusGraphHookIntTest extends GremlinHookTest {
         @Test
         public void testExportingGraphJSON() {
             this.hook = provideHook();
+            assertNotNull(this.hook);
             hook.addFileVertex(new FileVertex("Test1", 0));
             hook.addFileVertex(new FileVertex("Test2", 1));
             assertThrows(UnsupportedOperationException.class, () -> hook.exportCurrentGraph(testGraphSON));
@@ -80,6 +81,7 @@ public final class JanusGraphHookIntTest extends GremlinHookTest {
         @Test
         public void testExportingGryo() {
             this.hook = provideHook();
+            assertNotNull(this.hook);
             hook.addFileVertex(new FileVertex("Test1", 0));
             hook.addFileVertex(new FileVertex("Test2", 1));
             assertThrows(UnsupportedOperationException.class, () -> hook.exportCurrentGraph(testGryo));
@@ -88,6 +90,7 @@ public final class JanusGraphHookIntTest extends GremlinHookTest {
         @Test
         public void testExportingInvalidFileType() {
             this.hook = provideHook();
+            assertNotNull(this.hook);
             hook.addFileVertex(new FileVertex("Test1", 0));
             hook.addFileVertex(new FileVertex("Test2", 1));
             assertThrows(IllegalArgumentException.class, () -> hook.exportCurrentGraph("/tmp/grapl/invalid.txt"));

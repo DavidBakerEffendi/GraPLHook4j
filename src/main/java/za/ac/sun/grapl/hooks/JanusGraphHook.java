@@ -1,6 +1,5 @@
 package za.ac.sun.grapl.hooks;
 
-import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource;
@@ -104,14 +103,13 @@ public final class JanusGraphHook extends GremlinHook {
     public static class JanusGraphHookBuilder implements IHookBuilder {
         private String graphDir;
         private boolean clearGraph;
-        private String conf;
+        private final String conf;
         private Graph graph;
 
-        public JanusGraphHookBuilder() {
-            this.clearGraph = true;
-            BaseConfiguration conf = new BaseConfiguration();
-            conf.setProperty("gremlin.graph", "org.janusgraph.core.JanusGraphFactory");
-            conf.setProperty("storage.backend", "inmemory");
+        public JanusGraphHookBuilder(final String pathToConf) {
+            if (pathToConf == null) throw new AssertionError("Config path may not be null! See " +
+                    "https://docs.janusgraph.org/connecting/java/ for how to configure JanusGraph remote connections.");
+            this.conf = pathToConf;
         }
 
         public JanusGraphHookBuilder clearDatabase(final boolean clearDatabase) {
@@ -119,7 +117,7 @@ public final class JanusGraphHook extends GremlinHook {
             return this;
         }
 
-        public JanusGraphHook.JanusGraphHookBuilder useExistingGraph(final String graphDir) {
+        public JanusGraphHookBuilder useExistingGraph(final String graphDir) {
             if (!isValidExportPath(graphDir)) {
                 throw new IllegalArgumentException("Unsupported graph extension! Supported types are GraphML," +
                         " GraphSON, and Gryo.");
@@ -127,11 +125,6 @@ public final class JanusGraphHook extends GremlinHook {
                 throw new IllegalArgumentException("No existing serialized graph file was found at " + graphDir);
             }
             this.graphDir = graphDir;
-            return this;
-        }
-
-        public JanusGraphHookBuilder conf(final String conf) {
-            this.conf = conf;
             return this;
         }
 

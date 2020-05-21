@@ -54,7 +54,7 @@ public abstract class GremlinHook implements IHook {
     public static boolean isValidExportPath(String exportDir) {
         if (exportDir != null) {
             final String ext = exportDir.substring(exportDir.lastIndexOf('.') + 1).toLowerCase();
-            return ("xml" .equals(ext) || "json" .equals(ext) || "kryo" .equals(ext));
+            return ("xml".equals(ext) || "json".equals(ext) || "kryo".equals(ext));
         } else return false;
     }
 
@@ -276,7 +276,7 @@ public abstract class GremlinHook implements IHook {
     private Vertex createTinkerGraphVertex(final GraPLVertex gv) {
         final Field[] fields = Arrays
                 .stream(gv.getClass().getFields())
-                .filter((field -> !"LABEL" .equals(field.getName()) && !"TRAITS" .equals(field.getName())))
+                .filter((field -> !"LABEL".equals(field.getName()) && !"TRAITS".equals(field.getName())))
                 .toArray(Field[]::new);
         // Get the implementing class label parameter
         String label = "UNKNOWN";
