@@ -46,7 +46,7 @@ task integrationTest(type: Test) {
 }
 
 dockerCompose {
-    useComposeFiles = ['src/test/resources/docker/docker-compose.yml']
+    useComposeFiles = ['src/test/resources/docker/janus-berkeleyje-lucene.yml']
     isRequiredBy(project.tasks.integrationTest)
 }
 
@@ -68,7 +68,7 @@ check.dependsOn jacocoTestCoverageVerification
 jacocoTestCoverageVerification.dependsOn jacocoTestReport
 
 group = 'za.ac.sun.grapl'
-version = '0.0.5'
+version = '0.0.x'
 description = 'GraPLHook4j'
 sourceCompatibility = '8'
 

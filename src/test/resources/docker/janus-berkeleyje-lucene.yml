@@ -4,5 +4,7 @@ services:
   janusgraph:
     image: janusgraph/janusgraph:latest
     container_name: janusgraph-grapl
+    environment:
+      gremlinserver.threadPoolWorker: 2
     ports:
       - "8182:8182"
