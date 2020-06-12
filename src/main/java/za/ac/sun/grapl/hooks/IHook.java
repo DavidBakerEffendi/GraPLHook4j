@@ -108,6 +108,17 @@ public interface IHook {
     void assignToBlock(MethodVertex rootMethod, ControlStructureVertex control, int blockOrder);
 
     /**
+     * Updates a key-value pair on a {@link BlockVertex} in the database identified by the given {@link MethodVertex}
+     * and AST order of the block.
+     *
+     * @param rootMethod the {@link MethodVertex} which is the root of the search.
+     * @param blockOrder the AST order under which this block occurs.
+     * @param key        the key of the property to upsert.
+     * @param value      the value to upsert the key with.
+     */
+    void updateBlockProperty(MethodVertex rootMethod, int blockOrder, String key, String value);
+
+    /**
      * Traverses the AST nodes to search for the largest order value.
      *
      * @return the largest order property.
