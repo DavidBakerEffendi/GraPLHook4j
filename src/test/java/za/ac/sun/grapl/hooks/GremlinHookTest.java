@@ -13,7 +13,7 @@ import java.util.EnumSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public abstract class GremlinHookTest {
+public class GremlinHookTest {
 
     final static Logger logger = LogManager.getLogger();
 
@@ -444,6 +444,39 @@ public abstract class GremlinHookTest {
 
             assertFalse(this.hook.isBlock(0));
             assertFalse(this.hook.isBlock(1));
+        }
+    }
+
+    @Nested
+    @DisplayName("Upsert Checks")
+    class GremlinUpdateChecks {
+
+        private GremlinHook hook;
+
+        @BeforeEach
+        public void setUp() {
+            this.hook = provideHook();
+        }
+
+        @AfterEach
+        public void tearDown() {
+            this.hook.clearGraph();
+        }
+
+        @Test
+        public void testUpdateOnOneBlockPropertyThatExists() {
+            final String keyToTest = "typeFullName";
+            final String initValue = "INTEGER";
+            final String updatedValue = "VOID";
+            assertNotEquals(initValue, updatedValue);
+
+            final FileVertex f = new FileVertex("Test", 0);
+            final MethodVertex m = new MethodVertex("root", "io.grapl.Test.run", "(I)", 0, 1);
+            this.hook.joinFileVertexTo(f, m);
+            this.hook.assignToBlock(m, new BlockVertex("firstBlock", 1, 1, initValue, 5), 0);
+            assertTrue(this.hook.g.V().hasLabel(BlockVertex.LABEL.toString()).has(keyToTest, initValue).hasNext());
+            this.hook.upsertBlockProperty(m, 1, keyToTest, updatedValue);
+            assertTrue(this.hook.g.V().hasLabel(BlockVertex.LABEL.toString()).has(keyToTest, updatedValue).hasNext());
         }
     }
 }
