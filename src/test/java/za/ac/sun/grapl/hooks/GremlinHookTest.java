@@ -474,9 +474,13 @@ public class GremlinHookTest {
             final MethodVertex m = new MethodVertex("root", "io.grapl.Test.run", "(I)", 0, 1);
             this.hook.joinFileVertexTo(f, m);
             this.hook.assignToBlock(m, new BlockVertex("firstBlock", 1, 1, initValue, 5), 0);
+            this.hook.startTransaction();
             assertTrue(this.hook.g.V().hasLabel(BlockVertex.LABEL.toString()).has(keyToTest, initValue).hasNext());
+            this.hook.endTransaction();
             this.hook.updateBlockProperty(m, 1, keyToTest, updatedValue);
+            this.hook.startTransaction();
             assertTrue(this.hook.g.V().hasLabel(BlockVertex.LABEL.toString()).has(keyToTest, updatedValue).hasNext());
+            this.hook.endTransaction();
         }
     }
 }
