@@ -475,7 +475,7 @@ public class GremlinHookTest {
             this.hook.joinFileVertexTo(f, m);
             this.hook.assignToBlock(m, new BlockVertex("firstBlock", 1, 1, initValue, 5), 0);
             assertTrue(this.hook.g.V().hasLabel(BlockVertex.LABEL.toString()).has(keyToTest, initValue).hasNext());
-            this.hook.upsertBlockProperty(m, 1, keyToTest, updatedValue);
+            this.hook.updateBlockProperty(m, 1, keyToTest, updatedValue);
             assertTrue(this.hook.g.V().hasLabel(BlockVertex.LABEL.toString()).has(keyToTest, updatedValue).hasNext());
         }
     }
