@@ -78,6 +78,14 @@ public interface IHook {
     void assignToBlock(MethodVertex rootMethod, LocalVertex local, int blockOrder);
 
     /**
+     * Slower version of {@link IHook#assignToBlock(MethodVertex, LocalVertex, int)}
+     *
+     * @param local      the {@link LocalVertex} to associate with the block.
+     * @param blockOrder the AST order under which this block occurs.
+     */
+    void assignToBlock(LocalVertex local, int blockOrder);
+
+    /**
      * Creates and assigns the {@link LiteralVertex} to the associated {@link BlockVertex} vertex in the database
      * identified by the given {@link MethodVertex} and AST order of the block.
      *
@@ -86,6 +94,14 @@ public interface IHook {
      * @param blockOrder the AST order under which this block occurs.
      */
     void assignToBlock(MethodVertex rootMethod, LiteralVertex literal, int blockOrder);
+
+    /**
+     * Slower version of {@link IHook#assignToBlock(MethodVertex, LiteralVertex, int)}
+     *
+     * @param literal      the {@link LiteralVertex} to associate with the block.
+     * @param blockOrder the AST order under which this block occurs.
+     */
+    void assignToBlock(LiteralVertex literal, int blockOrder);
 
     /**
      * Creates and assigns the {@link BlockVertex} to the associated {@link BlockVertex} vertex in the database
@@ -106,6 +122,14 @@ public interface IHook {
      * @param blockOrder the AST order under which this block occurs.
      */
     void assignToBlock(MethodVertex rootMethod, ControlStructureVertex control, int blockOrder);
+
+    /**
+     * Slower version of {@link IHook#assignToBlock(MethodVertex, ControlStructureVertex, int)}
+     *
+     * @param control      the {@link ControlStructureVertex} to associate with the block.
+     * @param blockOrder the AST order under which this block occurs.
+     */
+    void assignToBlock(ControlStructureVertex control, int blockOrder);
 
     /**
      * Updates a key-value pair on a {@link BlockVertex} in the database identified by the given {@link MethodVertex}
@@ -135,7 +159,8 @@ public interface IHook {
 
     /**
      * Checked if there is an edge between two {@link BlockVertex} objects.
-     *  @param blockFrom AST order of the from block.
+     *
+     * @param blockFrom AST order of the from block.
      * @param blockTo   AST order of the to block.
      * @return
      */

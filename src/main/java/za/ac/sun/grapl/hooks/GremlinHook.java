@@ -189,9 +189,23 @@ public abstract class GremlinHook implements IHook {
     }
 
     @Override
+    public void assignToBlock(final LocalVertex local, int blockOrder) {
+        startTransaction();
+        createTinkerGraphEdge(findBlock(blockOrder), EdgeLabels.AST, createTinkerGraphVertex(local));
+        endTransaction();
+    }
+
+    @Override
     public void assignToBlock(final MethodVertex rootMethod, final LiteralVertex literal, final int blockOrder) {
         startTransaction();
         createTinkerGraphEdge(findBlock(rootMethod, blockOrder), EdgeLabels.AST, createTinkerGraphVertex(literal));
+        endTransaction();
+    }
+
+    @Override
+    public void assignToBlock(final LiteralVertex literal, int blockOrder) {
+        startTransaction();
+        createTinkerGraphEdge(findBlock(blockOrder), EdgeLabels.AST, createTinkerGraphVertex(literal));
         endTransaction();
     }
 
@@ -210,6 +224,13 @@ public abstract class GremlinHook implements IHook {
     public void assignToBlock(final MethodVertex rootMethod, final ControlStructureVertex control, final int blockOrder) {
         startTransaction();
         createTinkerGraphEdge(findBlock(rootMethod, blockOrder), EdgeLabels.AST, createTinkerGraphVertex(control));
+        endTransaction();
+    }
+
+    @Override
+    public void assignToBlock(final ControlStructureVertex control, int blockOrder) {
+        startTransaction();
+        createTinkerGraphEdge(findBlock(blockOrder), EdgeLabels.AST, createTinkerGraphVertex(control));
         endTransaction();
     }
 

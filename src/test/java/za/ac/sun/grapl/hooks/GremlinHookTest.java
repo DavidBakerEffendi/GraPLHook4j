@@ -276,6 +276,19 @@ public class GremlinHookTest {
         }
 
         @Test
+        public void testAssignLiteralToBlockSlow() {
+            final LiteralVertex lv = new LiteralVertex(TEST_ID, 2, 1, "INTEGER", 5);
+            this.hook.assignToBlock(lv, 1);
+
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+                    .out(EdgeLabels.AST.toString())
+                    .has(LiteralVertex.LABEL.toString(), "name", TEST_ID)
+                    .hasNext());
+            this.hook.endTransaction();
+        }
+
+        @Test
         public void testAssignLocalToBlock() {
             final LocalVertex lv = new LocalVertex("1", TEST_ID, "INTEGER", 5, 2);
             this.hook.assignToBlock(m, lv, 1);
@@ -289,9 +302,35 @@ public class GremlinHookTest {
         }
 
         @Test
+        public void testAssignLocalToBlockSlow() {
+            final LocalVertex lv = new LocalVertex("1", TEST_ID, "INTEGER", 5, 2);
+            this.hook.assignToBlock(lv, 1);
+
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+                    .out(EdgeLabels.AST.toString())
+                    .has(LocalVertex.LABEL.toString(), "name", TEST_ID)
+                    .hasNext());
+            this.hook.endTransaction();
+        }
+
+        @Test
         public void testAssignControlToBlock() {
             final ControlStructureVertex lv = new ControlStructureVertex(TEST_ID, 2, 2, 1);
             this.hook.assignToBlock(m, lv, 1);
+
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+                    .out(EdgeLabels.AST.toString())
+                    .has(ControlStructureVertex.LABEL.toString(), "name", TEST_ID)
+                    .hasNext());
+            this.hook.endTransaction();
+        }
+
+        @Test
+        public void testAssignControlToBlockSlow() {
+            final ControlStructureVertex lv = new ControlStructureVertex(TEST_ID, 2, 2, 1);
+            this.hook.assignToBlock(lv, 1);
 
             this.hook.startTransaction();
             assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
