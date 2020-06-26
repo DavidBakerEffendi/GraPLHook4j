@@ -237,9 +237,9 @@ public abstract class GremlinHook implements IHook {
     public boolean areBlocksJoined(int blockFrom, int blockTo) {
         startTransaction();
         final Vertex a = findBlock(blockFrom);
-        final Vertex b = findBlock(blockFrom);
-        final Edge edge = g.V(a).outE(EdgeLabels.AST.toString()).filter(inV().is(b)).tryNext().orElseGet(() -> g.V(b).outE(EdgeLabels.AST.toString()).filter(inV().is(a)).tryNext().orElse(null));
-        System.out.println(edge);
+        final Vertex b = findBlock(blockTo);
+        final Edge edge = g.V(a).outE(EdgeLabels.AST.toString()).filter(inV().is(b)).tryNext()
+                .orElseGet(() -> g.V(b).outE(EdgeLabels.AST.toString()).filter(inV().is(a)).tryNext().orElse(null));
         endTransaction();
         return edge != null;
     }
