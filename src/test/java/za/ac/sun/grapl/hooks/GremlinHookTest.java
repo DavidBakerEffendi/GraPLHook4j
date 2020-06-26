@@ -276,6 +276,19 @@ public class GremlinHookTest {
         }
 
         @Test
+        public void testAssignLiteralToBlockSlow() {
+            final LiteralVertex lv = new LiteralVertex(TEST_ID, 2, 1, "INTEGER", 5);
+            this.hook.assignToBlock(lv, 1);
+
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+                    .out(EdgeLabels.AST.toString())
+                    .has(LiteralVertex.LABEL.toString(), "name", TEST_ID)
+                    .hasNext());
+            this.hook.endTransaction();
+        }
+
+        @Test
         public void testAssignLocalToBlock() {
             final LocalVertex lv = new LocalVertex("1", TEST_ID, "INTEGER", 5, 2);
             this.hook.assignToBlock(m, lv, 1);
@@ -289,9 +302,35 @@ public class GremlinHookTest {
         }
 
         @Test
+        public void testAssignLocalToBlockSlow() {
+            final LocalVertex lv = new LocalVertex("1", TEST_ID, "INTEGER", 5, 2);
+            this.hook.assignToBlock(lv, 1);
+
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+                    .out(EdgeLabels.AST.toString())
+                    .has(LocalVertex.LABEL.toString(), "name", TEST_ID)
+                    .hasNext());
+            this.hook.endTransaction();
+        }
+
+        @Test
         public void testAssignControlToBlock() {
             final ControlStructureVertex lv = new ControlStructureVertex(TEST_ID, 2, 2, 1);
             this.hook.assignToBlock(m, lv, 1);
+
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
+                    .out(EdgeLabels.AST.toString())
+                    .has(ControlStructureVertex.LABEL.toString(), "name", TEST_ID)
+                    .hasNext());
+            this.hook.endTransaction();
+        }
+
+        @Test
+        public void testAssignControlToBlockSlow() {
+            final ControlStructureVertex lv = new ControlStructureVertex(TEST_ID, 2, 2, 1);
+            this.hook.assignToBlock(lv, 1);
 
             this.hook.startTransaction();
             assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
@@ -481,6 +520,46 @@ public class GremlinHookTest {
             this.hook.startTransaction();
             assertTrue(this.hook.g.V().hasLabel(BlockVertex.LABEL.toString()).has(keyToTest, updatedValue).hasNext());
             this.hook.endTransaction();
+        }
+
+    }
+
+    @Nested()
+    @DisplayName("Block manipulation queries")
+    class GremlinBlockManipulation {
+
+        private IHook hook;
+        private final int TEST_ID_1 = 1;
+        private final int TEST_ID_2 = 2;
+        private final BlockVertex bv1 = new BlockVertex("test1", TEST_ID_1, 1, "INTEGER", 6);
+        private final BlockVertex bv2 = new BlockVertex("test2", TEST_ID_2, 1, "INTEGER", 7);
+
+        @BeforeEach
+        public void setUp() {
+            this.hook = provideHook();
+        }
+
+        @AfterEach
+        public void tearDown() {
+            this.hook.clearGraph();
+        }
+
+        @Test
+        public void testCreatingFreeBlock() {
+            assertFalse(this.hook.isBlock(TEST_ID_1));
+            this.hook.createFreeBlock(bv1);
+            assertTrue(this.hook.isBlock(TEST_ID_1));
+        }
+
+        @Test
+        public void testCreatingAndJoiningFreeBlocks() {
+            this.hook.createFreeBlock(bv1);
+            this.hook.createFreeBlock(bv2);
+            assertFalse(this.hook.areBlocksJoined(TEST_ID_1, TEST_ID_2));
+            assertFalse(this.hook.areBlocksJoined(TEST_ID_2, TEST_ID_1));
+            this.hook.joinBlocks(TEST_ID_1, TEST_ID_2);
+            assertTrue(this.hook.areBlocksJoined(TEST_ID_1, TEST_ID_2));
+            assertTrue(this.hook.areBlocksJoined(TEST_ID_2, TEST_ID_1));
         }
     }
 }
