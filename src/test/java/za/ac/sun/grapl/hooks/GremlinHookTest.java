@@ -482,5 +482,37 @@ public class GremlinHookTest {
             assertTrue(this.hook.g.V().hasLabel(BlockVertex.LABEL.toString()).has(keyToTest, updatedValue).hasNext());
             this.hook.endTransaction();
         }
+
+    }
+
+    @Nested()
+    @DisplayName("Block manipulation queries")
+    class GremlinBlockManipulation {
+
+        private IHook hook;
+        private final int TEST_ID_1 = 1;
+        private final int TEST_ID_2 = 2;
+
+        @BeforeEach
+        public void setUp() {
+            this.hook = provideHook();
+        }
+
+        @AfterEach
+        public void tearDown() {
+            this.hook.clearGraph();
+        }
+
+        @Test
+        public void testNonEmptyGraphWithBlockVertices() {
+            BlockVertex bv1 = new BlockVertex("test1", TEST_ID_1, 1, "INTEGER", 6);
+            BlockVertex bv2 = new BlockVertex("test2", TEST_ID_2, 1, "INTEGER", 6);
+            this.hook.createFreeBlock(bv1);
+            assertTrue(this.hook.isBlock(TEST_ID_1));
+            assertFalse(this.hook.isBlock(TEST_ID_2));
+            this.hook.createFreeBlock(bv2);
+            assertTrue(this.hook.isBlock(TEST_ID_2));
+            this.hook.joinBlocks(TEST_ID_1, TEST_ID_2);
+        }
     }
 }

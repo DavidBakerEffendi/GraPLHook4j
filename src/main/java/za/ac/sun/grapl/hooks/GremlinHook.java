@@ -217,7 +217,31 @@ public abstract class GremlinHook implements IHook {
     public void updateBlockProperty(final MethodVertex rootMethod, final int blockOrder, final String key, final String value) {
         startTransaction();
         g.V(findBlock(rootMethod, blockOrder)).property(key, value).iterate();
+    }
+
+    @Override
+    public void createFreeBlock(final BlockVertex block) {
+        startTransaction();
+        createTinkerGraphVertex(block);
         endTransaction();
+    }
+
+    @Override
+    public void joinBlocks(int blockFrom, int blockTo) {
+        startTransaction();
+        createTinkerGraphEdge(findBlock(blockFrom), EdgeLabels.AST, findBlock(blockTo));
+        endTransaction();
+    }
+
+    @Override
+    public boolean areBlocksJoined(int blockFrom, int blockTo) {
+        startTransaction();
+        final Vertex a = findBlock(blockFrom);
+        final Vertex b = findBlock(blockFrom);
+        final Edge edge = g.V(a).outE(EdgeLabels.AST.toString()).filter(inV().is(b)).tryNext().orElseGet(() -> g.V(b).outE(EdgeLabels.AST.toString()).filter(inV().is(a)).tryNext().orElse(null));
+        System.out.println(edge);
+        endTransaction();
+        return edge != null;
     }
 
     @Override
@@ -271,6 +295,17 @@ public abstract class GremlinHook implements IHook {
     private Vertex findBlock(final MethodVertex root, final int blockOrder) {
         return g.V(findVertex(root)).repeat(__.out("AST")).emit()
                 .has("order", String.valueOf(blockOrder)).next();
+    }
+
+    /**
+     * Finds the associated {@link Vertex} in the graph to the block based on the AST order
+     * under which this block occurs in the graph.
+     *
+     * @param blockOrder the AST order under which this block occurs.
+     * @return the {@link Vertex} associated with the AST block.
+     */
+    private Vertex findBlock(final int blockOrder) {
+        return g.V().hasLabel(BlockVertex.LABEL.toString()).has("order", String.valueOf(blockOrder)).next();
     }
 
     /**

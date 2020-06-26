@@ -119,6 +119,29 @@ public interface IHook {
     void updateBlockProperty(MethodVertex rootMethod, int blockOrder, String key, String value);
 
     /**
+     * Creates a free-floating {@link BlockVertex}
+     *
+     * @param block the {@link BlockVertex} to create.
+     */
+    void createFreeBlock(BlockVertex block);
+
+    /**
+     * Creates an edge between two {@link BlockVertex} objects.
+     *
+     * @param blockFrom AST order of the from block.
+     * @param blockTo   AST order of the to block.
+     */
+    void joinBlocks(int blockFrom, int blockTo);
+
+    /**
+     * Checked if there is an edge between two {@link BlockVertex} objects.
+     *  @param blockFrom AST order of the from block.
+     * @param blockTo   AST order of the to block.
+     * @return
+     */
+    boolean areBlocksJoined(int blockFrom, int blockTo);
+
+    /**
      * Traverses the AST nodes to search for the largest order value.
      *
      * @return the largest order property.
