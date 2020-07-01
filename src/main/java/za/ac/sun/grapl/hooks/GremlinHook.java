@@ -238,6 +238,7 @@ public abstract class GremlinHook implements IHook {
     public void updateBlockProperty(final MethodVertex rootMethod, final int blockOrder, final String key, final String value) {
         startTransaction();
         g.V(findBlock(rootMethod, blockOrder)).property(key, value).iterate();
+        endTransaction();
     }
 
     @Override
