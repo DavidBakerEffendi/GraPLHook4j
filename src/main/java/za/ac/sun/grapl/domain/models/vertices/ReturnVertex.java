@@ -24,4 +24,14 @@ public class ReturnVertex implements GraPLVertex {
         this.argumentIndex = argumentIndex;
         this.code = code;
     }
+
+    @Override
+    public String toString() {
+        return "ReturnVertex{" +
+                "lineNumber=" + lineNumber +
+                ", order=" + order +
+                ", argumentIndex=" + argumentIndex +
+                ", code='" + code + '\'' +
+                '}';
+    }
 }

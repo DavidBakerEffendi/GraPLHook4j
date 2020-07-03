@@ -12,7 +12,7 @@ import java.util.EnumSet;
  * coincide. However, suppose that two fields foo and bar are a C-style union; then CODE refers to whatever the
  * programmer wrote (obj.foo or obj.bar), but both share the same CANONICAL_NAME (e.g. GENERATED_foo_bar)
  */
-public class FieldIdentifier implements GraPLVertex {
+public class FieldIdentifierVertex implements GraPLVertex {
     public static final VertexLabels LABEL = VertexLabels.FIELD_IDENTIFIER;
     public static final EnumSet<VertexBaseTraits> TRAITS = EnumSet.of(VertexBaseTraits.EXPRESSION);
 
@@ -22,11 +22,22 @@ public class FieldIdentifier implements GraPLVertex {
     public final int argumentIndex;
     public final int lineNumber;
 
-    public FieldIdentifier(String code, String canonicalName, int order, int argumentIndex, int lineNumber) {
+    public FieldIdentifierVertex(String code, String canonicalName, int order, int argumentIndex, int lineNumber) {
         this.code = code;
         this.canonicalName = canonicalName;
         this.order = order;
         this.argumentIndex = argumentIndex;
         this.lineNumber = lineNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "FieldIdentifierVertex{" +
+                "code='" + code + '\'' +
+                ", canonicalName='" + canonicalName + '\'' +
+                ", order=" + order +
+                ", argumentIndex=" + argumentIndex +
+                ", lineNumber=" + lineNumber +
+                '}';
     }
 }

@@ -26,4 +26,14 @@ public class MemberVertex implements GraPLVertex {
         this.typeFullName = typeFullName;
         this.order = order;
     }
+
+    @Override
+    public String toString() {
+        return "MemberVertex{" +
+                "code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", typeFullName='" + typeFullName + '\'' +
+                ", order=" + order +
+                '}';
+    }
 }

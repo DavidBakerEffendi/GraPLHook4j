@@ -20,4 +20,12 @@ public class TypeParameterVertex implements GraPLVertex {
         this.name = name;
         this.order = order;
     }
+
+    @Override
+    public String toString() {
+        return "TypeParameterVertex{" +
+                "name='" + name + '\'' +
+                ", order=" + order +
+                '}';
+    }
 }

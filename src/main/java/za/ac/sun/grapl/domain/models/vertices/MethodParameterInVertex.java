@@ -32,4 +32,16 @@ public class MethodParameterInVertex implements GraPLVertex {
         this.lineNumber = lineNumber;
         this.order = order;
     }
+
+    @Override
+    public String toString() {
+        return "MethodParameterInVertex{" +
+                "code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", evaluationStrategy=" + evaluationStrategy +
+                ", typeFullName='" + typeFullName + '\'' +
+                ", lineNumber=" + lineNumber +
+                ", order=" + order +
+                '}';
+    }
 }

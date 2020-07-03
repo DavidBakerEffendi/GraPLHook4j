@@ -24,4 +24,14 @@ public class ControlStructureVertex implements GraPLVertex {
         this.order = order;
         this.argumentIndex = argumentIndex;
     }
+
+    @Override
+    public String toString() {
+        return "ControlStructureVertex{" +
+                "name='" + name + '\'' +
+                ", lineNumber=" + lineNumber +
+                ", order=" + order +
+                ", argumentIndex=" + argumentIndex +
+                '}';
+    }
 }

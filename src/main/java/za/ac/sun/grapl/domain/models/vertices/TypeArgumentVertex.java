@@ -18,4 +18,11 @@ public class TypeArgumentVertex implements GraPLVertex {
     public TypeArgumentVertex(int order) {
         this.order = order;
     }
+
+    @Override
+    public String toString() {
+        return "TypeArgumentVertex{" +
+                "order=" + order +
+                '}';
+    }
 }

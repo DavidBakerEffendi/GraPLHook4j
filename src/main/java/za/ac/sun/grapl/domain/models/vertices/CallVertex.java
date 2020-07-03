@@ -41,4 +41,20 @@ public class CallVertex implements GraPLVertex {
         this.typeFullName = typeFullName;
         this.lineNumber = lineNumber;
     }
+
+    @Override
+    public String toString() {
+        return "CallVertex{" +
+                "code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", order=" + order +
+                ", methodInstFullName='" + methodInstFullName + '\'' +
+                ", methodFullName='" + methodFullName + '\'' +
+                ", argumentIndex=" + argumentIndex +
+                ", dispatchType=" + dispatchType +
+                ", signature='" + signature + '\'' +
+                ", typeFullName='" + typeFullName + '\'' +
+                ", lineNumber=" + lineNumber +
+                '}';
+    }
 }

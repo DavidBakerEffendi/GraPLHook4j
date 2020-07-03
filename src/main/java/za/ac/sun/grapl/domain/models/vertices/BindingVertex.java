@@ -20,4 +20,12 @@ public class BindingVertex implements GraPLVertex {
         this.name = name;
         this.signature = signature;
     }
+
+    @Override
+    public String toString() {
+        return "BindingVertex{" +
+                "name='" + name + '\'' +
+                ", signature='" + signature + '\'' +
+                '}';
+    }
 }

@@ -22,4 +22,13 @@ public class NamespaceBlockVertex implements GraPLVertex {
         this.fullName = fullName;
         this.order = order;
     }
+
+    @Override
+    public String toString() {
+        return "NamespaceBlockVertex{" +
+                "name='" + name + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", order=" + order +
+                '}';
+    }
 }

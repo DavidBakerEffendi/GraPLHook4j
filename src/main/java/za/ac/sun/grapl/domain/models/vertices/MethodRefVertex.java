@@ -28,4 +28,16 @@ public class MethodRefVertex implements GraPLVertex {
         this.methodFullName = methodFullName;
         this.lineNumber = lineNumber;
     }
+
+    @Override
+    public String toString() {
+        return "MethodRefVertex{" +
+                "code='" + code + '\'' +
+                ", order=" + order +
+                ", argumentIndex=" + argumentIndex +
+                ", methodInstFullName='" + methodInstFullName + '\'' +
+                ", methodFullName='" + methodFullName + '\'' +
+                ", lineNumber=" + lineNumber +
+                '}';
+    }
 }

@@ -20,4 +20,12 @@ public class FileVertex implements GraPLVertex {
         this.name = name;
         this.order = order;
     }
+
+    @Override
+    public String toString() {
+        return "FileVertex{" +
+                "name='" + name + '\'' +
+                ", order=" + order +
+                '}';
+    }
 }

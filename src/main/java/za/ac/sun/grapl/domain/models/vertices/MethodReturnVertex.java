@@ -29,4 +29,15 @@ public class MethodReturnVertex implements GraPLVertex {
         this.lineNumber = lineNumber;
         this.order = order;
     }
+
+    @Override
+    public String toString() {
+        return "MethodReturnVertex{" +
+                "name='" + name + '\'' +
+                ", evaluationStrategy=" + evaluationStrategy +
+                ", typeFullName='" + typeFullName + '\'' +
+                ", lineNumber=" + lineNumber +
+                ", order=" + order +
+                '}';
+    }
 }
