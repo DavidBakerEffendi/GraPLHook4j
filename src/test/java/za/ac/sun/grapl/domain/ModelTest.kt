@@ -140,6 +140,12 @@ class ModelTest {
         }
 
         @Test
+        fun typeParameterVertexToString() {
+            val vertex = TypeParameterVertex("TEST", 0)
+            assertEquals("TypeParameterVertex{name='TEST', order=0}", vertex.toString())
+        }
+
+        @Test
         fun typeVertexToString() {
             val vertex = TypeVertex("TEST", "TEST", "TEST")
             assertEquals("TypeVertex{name='TEST', fullName='TEST', typeDeclFullName='TEST'}", vertex.toString())
