@@ -1,43 +1,55 @@
-package za.ac.sun.grapl.domain.models.vertices;
+package za.ac.sun.grapl.domain.models.vertices
 
-import za.ac.sun.grapl.domain.enums.VertexBaseTraits;
-import za.ac.sun.grapl.domain.enums.VertexLabels;
-import za.ac.sun.grapl.domain.models.GraPLVertex;
-
-import java.util.EnumSet;
+import za.ac.sun.grapl.domain.enums.VertexBaseTraits
+import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.GraPLVertex
+import java.util.*
 
 /**
  * A method/function/procedure
  */
-public class MethodVertex implements GraPLVertex {
-    public static final VertexLabels LABEL = VertexLabels.METHOD;
-    public static final EnumSet<VertexBaseTraits> TRAITS = EnumSet.of(
-            VertexBaseTraits.AST_NODE,
-            VertexBaseTraits.DECLARATION,
-            VertexBaseTraits.CFG_NODE);
-
-    public final String name;
-    public final String fullName;
-    public final String signature;
-    public final int lineNumber;
-    public final int order;
-
-    public MethodVertex(String name, String fullName, String signature, int lineNumber, int order) {
-        this.name = name;
-        this.fullName = fullName;
-        this.signature = signature;
-        this.lineNumber = lineNumber;
-        this.order = order;
-    }
-
-    @Override
-    public String toString() {
+class MethodVertex(val name: String, val fullName: String, val signature: String, val lineNumber: Int, val order: Int) : GraPLVertex {
+    override fun toString(): String {
         return "MethodVertex{" +
                 "name='" + name + '\'' +
                 ", fullName='" + fullName + '\'' +
                 ", signature='" + signature + '\'' +
                 ", lineNumber=" + lineNumber +
                 ", order=" + order +
-                '}';
+                '}'
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MethodVertex
+
+        if (name != other.name) return false
+        if (fullName != other.fullName) return false
+        if (signature != other.signature) return false
+        if (lineNumber != other.lineNumber) return false
+        if (order != other.order) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + fullName.hashCode()
+        result = 31 * result + signature.hashCode()
+        result = 31 * result + lineNumber
+        result = 31 * result + order
+        return result
+    }
+
+    companion object {
+        @kotlin.jvm.JvmField
+        val LABEL = VertexLabels.METHOD
+        val TRAITS: EnumSet<VertexBaseTraits> = EnumSet.of(
+                VertexBaseTraits.AST_NODE,
+                VertexBaseTraits.DECLARATION,
+                VertexBaseTraits.CFG_NODE)
+    }
+
 }

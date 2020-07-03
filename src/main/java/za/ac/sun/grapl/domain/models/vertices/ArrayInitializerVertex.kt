@@ -1,24 +1,31 @@
-package za.ac.sun.grapl.domain.models.vertices;
+package za.ac.sun.grapl.domain.models.vertices
 
-import za.ac.sun.grapl.domain.enums.VertexBaseTraits;
-import za.ac.sun.grapl.domain.enums.VertexLabels;
-import za.ac.sun.grapl.domain.models.GraPLVertex;
-
-import java.util.EnumSet;
+import za.ac.sun.grapl.domain.enums.VertexBaseTraits
+import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.GraPLVertex
+import java.util.*
 
 /**
  * Initialization construct for arrays
  */
-public class ArrayInitializerVertex implements GraPLVertex {
-
-    public static final VertexLabels LABEL = VertexLabels.ARRAY_INITIALIZER;
-    public static final EnumSet<VertexBaseTraits> TRAITS = EnumSet.of(VertexBaseTraits.AST_NODE);
-
-    public ArrayInitializerVertex() {
+class ArrayInitializerVertex : GraPLVertex {
+    override fun toString(): String {
+        return "ArrayInitializerVertex{}"
     }
 
-    @Override
-    public String toString() {
-        return "ArrayInitializerVertex{}";
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return javaClass.hashCode()
+    }
+
+    companion object {
+        @kotlin.jvm.JvmField
+        val LABEL = VertexLabels.ARRAY_INITIALIZER
+        val TRAITS: EnumSet<VertexBaseTraits> = EnumSet.of(VertexBaseTraits.AST_NODE)
     }
 }

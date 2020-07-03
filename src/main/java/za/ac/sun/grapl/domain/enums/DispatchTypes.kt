@@ -1,6 +1,5 @@
-package za.ac.sun.grapl.domain.enums;
+package za.ac.sun.grapl.domain.enums
 
-public enum DispatchTypes {
-    STATIC_DISPATCH,
-    DYNAMIC_DISPATCH
+enum class DispatchTypes {
+    STATIC_DISPATCH, DYNAMIC_DISPATCH
 }

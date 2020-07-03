@@ -1,34 +1,46 @@
-package za.ac.sun.grapl.domain.models.vertices;
+package za.ac.sun.grapl.domain.models.vertices
 
-import za.ac.sun.grapl.domain.enums.VertexBaseTraits;
-import za.ac.sun.grapl.domain.enums.VertexLabels;
-import za.ac.sun.grapl.domain.models.GraPLVertex;
-
-import java.util.EnumSet;
+import za.ac.sun.grapl.domain.enums.VertexBaseTraits
+import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.GraPLVertex
+import java.util.*
 
 /**
  * A type declaration
  */
-public class TypeDeclVertex implements GraPLVertex {
-    public static final VertexLabels LABEL = VertexLabels.TYPE_DECL;
-    public static final EnumSet<VertexBaseTraits> TRAITS = EnumSet.of(VertexBaseTraits.AST_NODE);
-
-    public final String name;
-    public final String fullName;
-    public final String typeDeclFullName;
-
-    public TypeDeclVertex(String name, String fullName, String typeDeclFullName) {
-        this.name = name;
-        this.fullName = fullName;
-        this.typeDeclFullName = typeDeclFullName;
-    }
-
-    @Override
-    public String toString() {
+class TypeDeclVertex(val name: String, val fullName: String, val typeDeclFullName: String) : GraPLVertex {
+    override fun toString(): String {
         return "TypeDeclVertex{" +
                 "name='" + name + '\'' +
                 ", fullName='" + fullName + '\'' +
                 ", typeDeclFullName='" + typeDeclFullName + '\'' +
-                '}';
+                '}'
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as TypeDeclVertex
+
+        if (name != other.name) return false
+        if (fullName != other.fullName) return false
+        if (typeDeclFullName != other.typeDeclFullName) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + fullName.hashCode()
+        result = 31 * result + typeDeclFullName.hashCode()
+        return result
+    }
+
+    companion object {
+        @kotlin.jvm.JvmField
+        val LABEL = VertexLabels.TYPE_DECL
+        val TRAITS: EnumSet<VertexBaseTraits> = EnumSet.of(VertexBaseTraits.AST_NODE)
+    }
+
 }

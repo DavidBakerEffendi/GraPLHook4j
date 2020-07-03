@@ -1,39 +1,51 @@
-package za.ac.sun.grapl.domain.models.vertices;
+package za.ac.sun.grapl.domain.models.vertices
 
-import za.ac.sun.grapl.domain.enums.VertexBaseTraits;
-import za.ac.sun.grapl.domain.enums.VertexLabels;
-import za.ac.sun.grapl.domain.models.GraPLVertex;
-
-import java.util.EnumSet;
+import za.ac.sun.grapl.domain.enums.VertexBaseTraits
+import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.GraPLVertex
+import java.util.*
 
 /**
  * Member of a class struct or union
  */
-public class MemberVertex implements GraPLVertex {
-    public static final VertexLabels LABEL = VertexLabels.MEMBER;
-    public static final EnumSet<VertexBaseTraits> TRAITS =
-            EnumSet.of(VertexBaseTraits.DECLARATION,
-                    VertexBaseTraits.AST_NODE);
-
-    public final String code;
-    public final String name;
-    public final String typeFullName;
-    public final int order;
-
-    public MemberVertex(String code, String name, String typeFullName, int order) {
-        this.code = code;
-        this.name = name;
-        this.typeFullName = typeFullName;
-        this.order = order;
-    }
-
-    @Override
-    public String toString() {
+class MemberVertex(val code: String, val name: String, val typeFullName: String, val order: Int) : GraPLVertex {
+    override fun toString(): String {
         return "MemberVertex{" +
                 "code='" + code + '\'' +
                 ", name='" + name + '\'' +
                 ", typeFullName='" + typeFullName + '\'' +
                 ", order=" + order +
-                '}';
+                '}'
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MemberVertex
+
+        if (code != other.code) return false
+        if (name != other.name) return false
+        if (typeFullName != other.typeFullName) return false
+        if (order != other.order) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = code.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + typeFullName.hashCode()
+        result = 31 * result + order
+        return result
+    }
+
+
+    companion object {
+        @kotlin.jvm.JvmField
+        val LABEL = VertexLabels.MEMBER
+        val TRAITS: EnumSet<VertexBaseTraits> = EnumSet.of(VertexBaseTraits.DECLARATION,
+                VertexBaseTraits.AST_NODE)
+    }
+
 }

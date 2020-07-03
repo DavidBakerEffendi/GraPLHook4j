@@ -1,37 +1,55 @@
-package za.ac.sun.grapl.domain.models.vertices;
+package za.ac.sun.grapl.domain.models.vertices
 
-import za.ac.sun.grapl.domain.enums.VertexBaseTraits;
-import za.ac.sun.grapl.domain.enums.VertexLabels;
-import za.ac.sun.grapl.domain.models.GraPLVertex;
-
-import java.util.EnumSet;
+import za.ac.sun.grapl.domain.enums.VertexBaseTraits
+import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.GraPLVertex
+import java.util.*
 
 /**
  * A control structure such as if, while, or for
  */
-public class ControlStructureVertex implements GraPLVertex {
-    public static final VertexLabels LABEL = VertexLabels.CONTROL_STRUCTURE;
-    public static final EnumSet<VertexBaseTraits> TRAITS = EnumSet.of(VertexBaseTraits.EXPRESSION);
-
-    public final String name;
-    public final int lineNumber;
-    public final int order;
-    public final int argumentIndex;
-
-    public ControlStructureVertex(String name, int lineNumber, int order, int argumentIndex) {
-        this.name = name;
-        this.lineNumber = lineNumber;
-        this.order = order;
-        this.argumentIndex = argumentIndex;
-    }
-
-    @Override
-    public String toString() {
+class ControlStructureVertex(
+        val name: String,
+        val lineNumber: Int,
+        val order: Int,
+        val argumentIndex: Int
+) : GraPLVertex {
+    override fun toString(): String {
         return "ControlStructureVertex{" +
                 "name='" + name + '\'' +
                 ", lineNumber=" + lineNumber +
                 ", order=" + order +
                 ", argumentIndex=" + argumentIndex +
-                '}';
+                '}'
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ControlStructureVertex
+
+        if (name != other.name) return false
+        if (lineNumber != other.lineNumber) return false
+        if (order != other.order) return false
+        if (argumentIndex != other.argumentIndex) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + lineNumber
+        result = 31 * result + order
+        result = 31 * result + argumentIndex
+        return result
+    }
+
+
+    companion object {
+        @kotlin.jvm.JvmField
+        val LABEL = VertexLabels.CONTROL_STRUCTURE
+        val TRAITS: EnumSet<VertexBaseTraits> = EnumSet.of(VertexBaseTraits.EXPRESSION)
+    }
+
 }

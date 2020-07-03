@@ -1,37 +1,49 @@
-package za.ac.sun.grapl.domain.models.vertices;
+package za.ac.sun.grapl.domain.models.vertices
 
-import za.ac.sun.grapl.domain.enums.VertexBaseTraits;
-import za.ac.sun.grapl.domain.enums.VertexLabels;
-import za.ac.sun.grapl.domain.models.GraPLVertex;
-
-import java.util.EnumSet;
+import za.ac.sun.grapl.domain.enums.VertexBaseTraits
+import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.GraPLVertex
+import java.util.*
 
 /**
  * A return instruction
  */
-public class ReturnVertex implements GraPLVertex {
-    public static final VertexLabels LABEL = VertexLabels.RETURN;
-    public static final EnumSet<VertexBaseTraits> TRAITS = EnumSet.of(VertexBaseTraits.EXPRESSION);
-
-    public final int lineNumber;
-    public final int order;
-    public final int argumentIndex;
-    public final String code;
-
-    public ReturnVertex(int lineNumber, int order, int argumentIndex, String code) {
-        this.lineNumber = lineNumber;
-        this.order = order;
-        this.argumentIndex = argumentIndex;
-        this.code = code;
-    }
-
-    @Override
-    public String toString() {
+class ReturnVertex(val lineNumber: Int, val order: Int, val argumentIndex: Int, val code: String) : GraPLVertex {
+    override fun toString(): String {
         return "ReturnVertex{" +
                 "lineNumber=" + lineNumber +
                 ", order=" + order +
                 ", argumentIndex=" + argumentIndex +
                 ", code='" + code + '\'' +
-                '}';
+                '}'
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ReturnVertex
+
+        if (lineNumber != other.lineNumber) return false
+        if (order != other.order) return false
+        if (argumentIndex != other.argumentIndex) return false
+        if (code != other.code) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = lineNumber
+        result = 31 * result + order
+        result = 31 * result + argumentIndex
+        result = 31 * result + code.hashCode()
+        return result
+    }
+
+    companion object {
+        @kotlin.jvm.JvmField
+        val LABEL = VertexLabels.RETURN
+        val TRAITS: EnumSet<VertexBaseTraits> = EnumSet.of(VertexBaseTraits.EXPRESSION)
+    }
+
 }

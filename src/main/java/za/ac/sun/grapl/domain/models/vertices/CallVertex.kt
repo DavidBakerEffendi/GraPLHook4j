@@ -1,49 +1,27 @@
-package za.ac.sun.grapl.domain.models.vertices;
+package za.ac.sun.grapl.domain.models.vertices
 
-import za.ac.sun.grapl.domain.enums.DispatchTypes;
-import za.ac.sun.grapl.domain.enums.VertexBaseTraits;
-import za.ac.sun.grapl.domain.enums.VertexLabels;
-import za.ac.sun.grapl.domain.models.GraPLVertex;
-
-import java.util.EnumSet;
+import za.ac.sun.grapl.domain.enums.DispatchTypes
+import za.ac.sun.grapl.domain.enums.VertexBaseTraits
+import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.GraPLVertex
+import java.util.*
 
 /**
  * A (method)-call
  */
-public class CallVertex implements GraPLVertex {
-    public static final VertexLabels LABEL = VertexLabels.CALL;
-    public static final EnumSet<VertexBaseTraits> TRAITS =
-            EnumSet.of(VertexBaseTraits.EXPRESSION,
-                    VertexBaseTraits.CALL_REPR);
-
-    public final String code;
-    public final String name;
-    public final int order;
-    public final String methodInstFullName;
-    public final String methodFullName;
-    public final int argumentIndex;
-    public final DispatchTypes dispatchType;
-    public final String signature;
-    public final String typeFullName;
-    public final int lineNumber;
-
-    public CallVertex(String code, String name, int order, String methodInstFullName, String methodFullName,
-                      int argumentIndex, DispatchTypes dispatchType, String signature, String typeFullName,
-                      int lineNumber) {
-        this.code = code;
-        this.name = name;
-        this.order = order;
-        this.methodInstFullName = methodInstFullName;
-        this.methodFullName = methodFullName;
-        this.argumentIndex = argumentIndex;
-        this.dispatchType = dispatchType;
-        this.signature = signature;
-        this.typeFullName = typeFullName;
-        this.lineNumber = lineNumber;
-    }
-
-    @Override
-    public String toString() {
+class CallVertex(
+        val code: String,
+        val name: String,
+        val order: Int,
+        val methodInstFullName: String,
+        val methodFullName: String,
+        val argumentIndex: Int,
+        val dispatchType: DispatchTypes,
+        val signature: String,
+        val typeFullName: String,
+        val lineNumber: Int
+) : GraPLVertex {
+    override fun toString(): String {
         return "CallVertex{" +
                 "code='" + code + '\'' +
                 ", name='" + name + '\'' +
@@ -55,6 +33,47 @@ public class CallVertex implements GraPLVertex {
                 ", signature='" + signature + '\'' +
                 ", typeFullName='" + typeFullName + '\'' +
                 ", lineNumber=" + lineNumber +
-                '}';
+                '}'
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as CallVertex
+
+        if (code != other.code) return false
+        if (name != other.name) return false
+        if (order != other.order) return false
+        if (methodInstFullName != other.methodInstFullName) return false
+        if (methodFullName != other.methodFullName) return false
+        if (argumentIndex != other.argumentIndex) return false
+        if (dispatchType != other.dispatchType) return false
+        if (signature != other.signature) return false
+        if (typeFullName != other.typeFullName) return false
+        if (lineNumber != other.lineNumber) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = code.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + order
+        result = 31 * result + methodInstFullName.hashCode()
+        result = 31 * result + methodFullName.hashCode()
+        result = 31 * result + argumentIndex
+        result = 31 * result + dispatchType.hashCode()
+        result = 31 * result + signature.hashCode()
+        result = 31 * result + typeFullName.hashCode()
+        result = 31 * result + lineNumber
+        return result
+    }
+
+    companion object {
+        @kotlin.jvm.JvmField
+        val LABEL = VertexLabels.CALL
+        val TRAITS: EnumSet<VertexBaseTraits> = EnumSet.of(VertexBaseTraits.EXPRESSION,
+                VertexBaseTraits.CALL_REPR)
     }
 }
