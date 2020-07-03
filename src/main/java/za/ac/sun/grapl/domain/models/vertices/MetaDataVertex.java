@@ -20,4 +20,12 @@ public class MetaDataVertex implements GraPLVertex {
         this.language = language;
         this.version = version;
     }
+
+    @Override
+    public String toString() {
+        return "MetaDataVertex{" +
+                "language='" + language + '\'' +
+                ", version='" + version + '\'' +
+                '}';
+    }
 }

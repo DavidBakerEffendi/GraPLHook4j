@@ -17,4 +17,8 @@ public class ArrayInitializerVertex implements GraPLVertex {
     public ArrayInitializerVertex() {
     }
 
+    @Override
+    public String toString() {
+        return "ArrayInitializerVertex{}";
+    }
 }

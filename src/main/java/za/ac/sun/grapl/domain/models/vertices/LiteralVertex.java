@@ -26,4 +26,15 @@ public class LiteralVertex implements GraPLVertex {
         this.typeFullName = typeFullName;
         this.lineNumber = lineNumber;
     }
+
+    @Override
+    public String toString() {
+        return "LiteralVertex{" +
+                "name='" + name + '\'' +
+                ", order=" + order +
+                ", argumentIndex=" + argumentIndex +
+                ", typeFullName='" + typeFullName + '\'' +
+                ", lineNumber=" + lineNumber +
+                '}';
+    }
 }

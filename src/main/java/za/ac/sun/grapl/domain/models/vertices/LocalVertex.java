@@ -29,4 +29,15 @@ public class LocalVertex implements GraPLVertex {
         this.lineNumber = lineNumber;
         this.order = order;
     }
+
+    @Override
+    public String toString() {
+        return "LocalVertex{" +
+                "code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", typeFullName='" + typeFullName + '\'' +
+                ", lineNumber=" + lineNumber +
+                ", order=" + order +
+                '}';
+    }
 }

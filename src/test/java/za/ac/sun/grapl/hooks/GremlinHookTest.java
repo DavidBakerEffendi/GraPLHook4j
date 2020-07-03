@@ -83,7 +83,7 @@ public class GremlinHookTest {
             new CallVertex("c", "n", 0, "m", "m",
                     1, DispatchTypes.STATIC_DISPATCH, "s", "t", 0);
             new ControlStructureVertex("c", 0, 0, 0);
-            new FieldIdentifier("c", "c", 0, 0, 0);
+            new FieldIdentifierVertex("c", "c", 0, 0, 0);
             new FileVertex("n", 1);
             new IdentifierVertex("c", "n", 0, 0, "t", 0);
             new LiteralVertex("c", 0, 0, "t", 0);

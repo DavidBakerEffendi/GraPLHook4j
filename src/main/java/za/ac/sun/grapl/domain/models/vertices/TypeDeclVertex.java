@@ -22,4 +22,13 @@ public class TypeDeclVertex implements GraPLVertex {
         this.fullName = fullName;
         this.typeDeclFullName = typeDeclFullName;
     }
+
+    @Override
+    public String toString() {
+        return "TypeDeclVertex{" +
+                "name='" + name + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", typeDeclFullName='" + typeDeclFullName + '\'' +
+                '}';
+    }
 }

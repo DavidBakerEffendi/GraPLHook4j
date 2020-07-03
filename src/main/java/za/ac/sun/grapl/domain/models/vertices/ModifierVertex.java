@@ -21,4 +21,12 @@ public class ModifierVertex implements GraPLVertex {
         this.name = modifierType;
         this.order = order;
     }
+
+    @Override
+    public String toString() {
+        return "ModifierVertex{" +
+                "name=" + name +
+                ", order=" + order +
+                '}';
+    }
 }

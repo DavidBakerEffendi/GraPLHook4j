@@ -26,4 +26,15 @@ public class UnknownVertex implements GraPLVertex {
         this.lineNumber = lineNumber;
         this.typeFullName = typeFullName;
     }
+
+    @Override
+    public String toString() {
+        return "UnknownVertex{" +
+                "code='" + code + '\'' +
+                ", order=" + order +
+                ", argumentIndex=" + argumentIndex +
+                ", lineNumber=" + lineNumber +
+                ", typeFullName='" + typeFullName + '\'' +
+                '}';
+    }
 }
