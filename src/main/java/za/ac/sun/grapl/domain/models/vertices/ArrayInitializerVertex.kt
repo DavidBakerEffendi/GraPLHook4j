@@ -8,19 +8,24 @@ import java.util.*
 /**
  * Initialization construct for arrays
  */
-class ArrayInitializerVertex : GraPLVertex {
+class ArrayInitializerVertex(val order: Int) : GraPLVertex {
     override fun toString(): String {
-        return "ArrayInitializerVertex{}"
+        return "ArrayInitializerVertex{order=$order}"
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
+
+        other as ArrayInitializerVertex
+
+        if (order != other.order) return false
+
         return true
     }
 
     override fun hashCode(): Int {
-        return javaClass.hashCode()
+        return order
     }
 
     companion object {

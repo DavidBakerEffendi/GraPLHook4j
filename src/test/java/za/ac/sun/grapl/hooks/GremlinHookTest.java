@@ -77,7 +77,7 @@ public class GremlinHookTest {
 
         @Test
         public void testTinkerGraphCreateAllVertexTypes() {
-            new ArrayInitializerVertex();
+            new ArrayInitializerVertex(0);
             new BindingVertex("n", "s");
             new BlockVertex("c", 0, 0, "t", 0);
             new CallVertex("c", "n", 0, "m", "m",
