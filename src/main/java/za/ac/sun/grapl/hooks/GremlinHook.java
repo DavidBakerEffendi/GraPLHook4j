@@ -339,8 +339,7 @@ public abstract class GremlinHook implements IHook {
     private Vertex createTinkerGraphVertex(final GraPLVertex gv) {
         final Map<String, String> propertyMap = VertexMapper.propertiesToMap(gv);
         // Get the implementing class label parameter
-        final String label = propertyMap.get("label");
-        propertyMap.remove("label");
+        final String label = propertyMap.remove("label");
         // Get the implementing classes fields and values
         Vertex v;
         if (this instanceof TinkerGraphHook) {
