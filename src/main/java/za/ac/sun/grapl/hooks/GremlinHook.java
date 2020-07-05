@@ -10,12 +10,11 @@ import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import za.ac.sun.grapl.domain.enums.EdgeLabels;
-import za.ac.sun.grapl.domain.enums.VertexLabels;
+import za.ac.sun.grapl.domain.mappers.VertexMapper;
 import za.ac.sun.grapl.domain.models.GraPLVertex;
 import za.ac.sun.grapl.domain.models.vertices.*;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.apache.tinkerpop.gremlin.process.traversal.Order.desc;
@@ -65,8 +64,8 @@ public abstract class GremlinHook implements IHook {
      * @return the associated {@link Vertex}.
      */
     private Vertex findVertex(final MethodVertex from) {
-        return g.V().has(MethodVertex.LABEL.toString(), "fullName", from.fullName)
-                .has("signature", from.signature).next();
+        return g.V().has(MethodVertex.LABEL.toString(), "fullName", from.getFullName())
+                .has("signature", from.getSignature()).next();
     }
 
     /**
@@ -76,8 +75,8 @@ public abstract class GremlinHook implements IHook {
      * @return the associated {@link Vertex}.
      */
     private Vertex findVertex(final FileVertex from) {
-        return g.V().has(FileVertex.LABEL.toString(), "name", from.name)
-                .has("order", String.valueOf(from.order)).next();
+        return g.V().has(FileVertex.LABEL.toString(), "name", from.getName())
+                .has("order", String.valueOf(from.getOrder())).next();
     }
 
     /**
@@ -87,7 +86,7 @@ public abstract class GremlinHook implements IHook {
      * @return the associated {@link Vertex}.
      */
     private Vertex findVertex(final NamespaceBlockVertex from) {
-        return g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", from.fullName).next();
+        return g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", from.getFullName()).next();
     }
 
     /**
@@ -97,8 +96,8 @@ public abstract class GremlinHook implements IHook {
      * @return false if there is an associated vertex, true if otherwise.
      */
     private boolean vertexNotPresent(final NamespaceBlockVertex v) {
-        return !g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", v.fullName)
-                .has("name", v.name).hasNext();
+        return !g.V().has(NamespaceBlockVertex.LABEL.toString(), "fullName", v.getFullName())
+                .has("name", v.getName()).hasNext();
     }
 
     /**
@@ -108,8 +107,8 @@ public abstract class GremlinHook implements IHook {
      * @return false if there is an associated vertex, true if otherwise.
      */
     private boolean vertexNotPresent(final FileVertex v) {
-        return !g.V().has(FileVertex.LABEL.toString(), "name", v.name)
-                .has("order", String.valueOf(v.order)).hasNext();
+        return !g.V().has(FileVertex.LABEL.toString(), "name", v.getName())
+                .has("order", String.valueOf(v.getOrder())).hasNext();
     }
 
     @Override
@@ -159,8 +158,8 @@ public abstract class GremlinHook implements IHook {
         if (vertexNotPresent(from)) createTinkerGraphVertex(from);
         if (!g.V(findVertex(from))
                 .out(EdgeLabels.AST.toString())
-                .has("fullName", to.fullName)
-                .has("signature", to.signature)
+                .has("fullName", to.getFullName())
+                .has("signature", to.getSignature())
                 .hasNext()) {
             createTinkerGraphVertex(to);
         }
@@ -338,39 +337,21 @@ public abstract class GremlinHook implements IHook {
      * @return the newly created {@link Vertex}.
      */
     private Vertex createTinkerGraphVertex(final GraPLVertex gv) {
-        final Field[] fields = Arrays
-                .stream(gv.getClass().getFields())
-                .filter((field -> !"LABEL".equals(field.getName()) && !"TRAITS".equals(field.getName())))
-                .toArray(Field[]::new);
+        final Map<String, String> propertyMap = VertexMapper.propertiesToMap(gv);
         // Get the implementing class label parameter
-        String label = "UNKNOWN";
-        try {
-            label = ((VertexLabels) gv.getClass().getField("LABEL").get("LABEL")).name();
-        } catch (NoSuchFieldException | IllegalAccessException ignored) {
-        }
+        final String label = propertyMap.remove("label");
         // Get the implementing classes fields and values
         Vertex v;
         if (this instanceof TinkerGraphHook) {
             v = g.getGraph().addVertex(T.label, label, T.id, UUID.randomUUID());
-            Arrays.stream(fields).forEach(f -> {
-                try {
-                    v.property(f.getName(), f.get(gv).toString());
-                } catch (IllegalAccessException e) {
-                    log.error("Illegal field access when adding properties to '" + gv.LABEL.name() + "'.", e);
-                }
-            });
+            propertyMap.forEach(v::property);
         } else {
             GraphTraversal<Vertex, Vertex> traversalPointer = g.addV(label);
-            for (Field f : fields) {
-                try {
-                    traversalPointer = traversalPointer.property(f.getName(), f.get(gv).toString());
-                } catch (IllegalAccessException e) {
-                    log.error("Illegal field access when adding properties to '" + gv.LABEL.name() + "'.", e);
-                }
+            for (Map.Entry<String, String> f : propertyMap.entrySet()) {
+                traversalPointer = traversalPointer.property(f.getKey(), f.getValue());
             }
             v = traversalPointer.next();
         }
-
         return v;
     }
 

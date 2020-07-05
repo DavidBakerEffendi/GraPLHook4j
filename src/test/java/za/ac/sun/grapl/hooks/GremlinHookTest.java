@@ -66,47 +66,6 @@ public class GremlinHookTest {
     }
 
     @Nested
-    @DisplayName("Graph domain")
-    class ValidateGraphDomain {
-
-        @Test
-        public void testInterfaceDefaults() {
-            assertEquals("UNKNOWN", GraPLVertex.LABEL.toString());
-            assertEquals(EnumSet.noneOf(VertexBaseTraits.class), GraPLVertex.TRAITS);
-        }
-
-        @Test
-        public void testTinkerGraphCreateAllVertexTypes() {
-            new ArrayInitializerVertex();
-            new BindingVertex("n", "s");
-            new BlockVertex("c", 0, 0, "t", 0);
-            new CallVertex("c", "n", 0, "m", "m",
-                    1, DispatchTypes.STATIC_DISPATCH, "s", "t", 0);
-            new ControlStructureVertex("c", 0, 0, 0);
-            new FieldIdentifierVertex("c", "c", 0, 0, 0);
-            new FileVertex("n", 1);
-            new IdentifierVertex("c", "n", 0, 0, "t", 0);
-            new LiteralVertex("c", 0, 0, "t", 0);
-            new LocalVertex("c", "n", "t", 0, 0);
-            new MemberVertex("c", "n", "t", 0);
-            new MetaDataVertex("Java", "1.8");
-            new MethodParameterInVertex("c", "n", EvaluationStrategies.BY_REFERENCE, "t", 0, 0);
-            new MethodRefVertex("c", 0, 0, "m", "m", 0);
-            new MethodReturnVertex("c", "t", EvaluationStrategies.BY_REFERENCE, 0, 0);
-            new MethodVertex("n", "f", "s", 0, 0);
-            new ModifierVertex(ModifierTypes.PUBLIC, 0);
-            new NamespaceBlockVertex("n", "f", 0);
-            new ReturnVertex(0, 0, 0, "c");
-            new TypeArgumentVertex(0);
-            new TypeDeclVertex("n", "f", "t");
-            new TypeParameterVertex("n", 0);
-            new TypeVertex("n", "f", "t");
-            new UnknownVertex("c", 0, 0, 0, "t");
-        }
-
-    }
-
-    @Nested
     @DisplayName("Join method vertex to method related vertices")
     class MethodJoinInteraction {
 
