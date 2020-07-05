@@ -12,151 +12,152 @@ import za.ac.sun.grapl.domain.models.GraPLVertex
 import za.ac.sun.grapl.domain.models.vertices.*
 
 class ModelTest {
+
     @Nested
     @DisplayName("Domain model ToString Tests")
     inner class DomainModelToStringTest {
         @Test
         fun arrayInitializerVertexToString() {
-            val vertex = ArrayInitializerVertex(0)
-            assertEquals("ArrayInitializerVertex{order=0}", vertex.toString())
+            val vertex = ArrayInitializerVertex(INT_1)
+            assertEquals("ArrayInitializerVertex{order=$INT_1}", vertex.toString())
         }
 
         @Test
         fun bindingVertexToString() {
-            val vertex = BindingVertex("TEST", "I")
-            assertEquals("BindingVertex{name='TEST', signature='I'}", vertex.toString())
+            val vertex = BindingVertex(STRING_1, STRING_2)
+            assertEquals("BindingVertex{name='$STRING_1', signature='$STRING_2'}", vertex.toString())
         }
 
         @Test
         fun blockVertexToString() {
-            val vertex = BlockVertex("TEST", 0, 0, "TEST", 0)
-            assertEquals("BlockVertex{name='TEST', order=0, argumentIndex=0, typeFullName='TEST', lineNumber=0}", vertex.toString())
+            val vertex = BlockVertex(STRING_1, INT_1, INT_1, STRING_1, INT_1)
+            assertEquals("BlockVertex{name='$STRING_1', order=$INT_1, argumentIndex=$INT_1, typeFullName='$STRING_1', lineNumber=$INT_1}", vertex.toString())
         }
 
         @Test
         fun callVertexToString() {
-            val vertex = CallVertex("TEST", "TEST", 0, "TEST", "TEST", 0, DispatchTypes.DYNAMIC_DISPATCH, "TEST", "TEST", 0)
-            assertEquals("CallVertex{code='TEST', name='TEST', order=0, methodInstFullName='TEST', methodFullName='TEST', argumentIndex=0, dispatchType=DYNAMIC_DISPATCH, signature='TEST', typeFullName='TEST', lineNumber=0}", vertex.toString())
+            val vertex = CallVertex(STRING_1, STRING_1, INT_1, STRING_1, STRING_1, INT_1, DISPATCH_1, STRING_1, STRING_1, INT_1)
+            assertEquals("CallVertex{code='$STRING_1', name='$STRING_1', order=$INT_1, methodInstFullName='$STRING_1', methodFullName='$STRING_1', argumentIndex=$INT_1, dispatchType=$DISPATCH_1, signature='$STRING_1', typeFullName='$STRING_1', lineNumber=$INT_1}", vertex.toString())
         }
 
         @Test
         fun controlStructureVertexToString() {
-            val vertex = ControlStructureVertex("TEST", 0, 0, 0)
-            assertEquals("ControlStructureVertex{name='TEST', lineNumber=0, order=0, argumentIndex=0}", vertex.toString())
+            val vertex = ControlStructureVertex(STRING_1, INT_1, INT_1, INT_1)
+            assertEquals("ControlStructureVertex{name='$STRING_1', lineNumber=$INT_1, order=$INT_1, argumentIndex=$INT_1}", vertex.toString())
         }
 
         @Test
         fun fieldIdentifierVertexToString() {
-            val vertex = FieldIdentifierVertex("TEST", "TEST", 0, 0, 0)
-            assertEquals("FieldIdentifierVertex{code='TEST', canonicalName='TEST', order=0, argumentIndex=0, lineNumber=0}", vertex.toString())
+            val vertex = FieldIdentifierVertex(STRING_1, STRING_1, INT_1, INT_1, INT_1)
+            assertEquals("FieldIdentifierVertex{code='$STRING_1', canonicalName='$STRING_1', order=$INT_1, argumentIndex=$INT_1, lineNumber=$INT_1}", vertex.toString())
         }
 
         @Test
         fun fileVertexToString() {
-            val vertex = FileVertex("TEST", 0)
-            assertEquals("FileVertex{name='TEST', order=0}", vertex.toString())
+            val vertex = FileVertex(STRING_1, INT_1)
+            assertEquals("FileVertex{name='$STRING_1', order=$INT_1}", vertex.toString())
         }
 
         @Test
         fun identifierVertexToString() {
-            val vertex = IdentifierVertex("TEST", "TEST", 0, 0, "TEST", 0)
-            assertEquals("IdentifierVertex{code='TEST', name='TEST', order=0, argumentIndex=0, typeFullName='TEST', lineNumber=0}", vertex.toString())
+            val vertex = IdentifierVertex(STRING_1, STRING_1, INT_1, INT_1, STRING_1, INT_1)
+            assertEquals("IdentifierVertex{code='$STRING_1', name='$STRING_1', order=$INT_1, argumentIndex=$INT_1, typeFullName='$STRING_1', lineNumber=$INT_1}", vertex.toString())
         }
 
         @Test
         fun literalVertexToString() {
-            val vertex = LiteralVertex("TEST", 0, 0, "TEST", 0)
-            assertEquals("LiteralVertex{name='TEST', order=0, argumentIndex=0, typeFullName='TEST', lineNumber=0}", vertex.toString())
+            val vertex = LiteralVertex(STRING_1, INT_1, INT_1, STRING_1, INT_1)
+            assertEquals("LiteralVertex{name='$STRING_1', order=$INT_1, argumentIndex=$INT_1, typeFullName='$STRING_1', lineNumber=$INT_1}", vertex.toString())
         }
 
         @Test
         fun localVertexToString() {
-            val vertex = LocalVertex("TEST", "TEST", "TEST", 0, 0)
-            assertEquals("LocalVertex{code='TEST', name='TEST', typeFullName='TEST', lineNumber=0, order=0}", vertex.toString())
+            val vertex = LocalVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_1)
+            assertEquals("LocalVertex{code='$STRING_1', name='$STRING_1', typeFullName='$STRING_1', lineNumber=$INT_1, order=$INT_1}", vertex.toString())
         }
 
         @Test
         fun memberVertexToString() {
-            val vertex = MemberVertex("TEST", "TEST", "TEST", 0)
-            assertEquals("MemberVertex{code='TEST', name='TEST', typeFullName='TEST', order=0}", vertex.toString())
+            val vertex = MemberVertex(STRING_1, STRING_1, STRING_1, INT_1)
+            assertEquals("MemberVertex{code='$STRING_1', name='$STRING_1', typeFullName='$STRING_1', order=$INT_1}", vertex.toString())
         }
 
         @Test
         fun metaDataVertexToString() {
-            val vertex = MetaDataVertex("TEST", "TEST")
-            assertEquals("MetaDataVertex{language='TEST', version='TEST'}", vertex.toString())
+            val vertex = MetaDataVertex(STRING_1, STRING_1)
+            assertEquals("MetaDataVertex{language='$STRING_1', version='$STRING_1'}", vertex.toString())
         }
 
         @Test
         fun methodParameterInVertexToString() {
-            val vertex = MethodParameterInVertex("TEST", "TEST", EvaluationStrategies.BY_REFERENCE, "TEST", 0, 0)
-            assertEquals("MethodParameterInVertex{code='TEST', name='TEST', evaluationStrategy=BY_REFERENCE, typeFullName='TEST', lineNumber=0, order=0}", vertex.toString())
+            val vertex = MethodParameterInVertex(STRING_1, STRING_1, EVAL_1, STRING_1, INT_1, INT_1)
+            assertEquals("MethodParameterInVertex{code='$STRING_1', name='$STRING_1', evaluationStrategy=$EVAL_1, typeFullName='$STRING_1', lineNumber=$INT_1, order=$INT_1}", vertex.toString())
         }
 
         @Test
         fun methodRefVertexToString() {
-            val vertex = MethodRefVertex("TEST", 0, 0, "TEST", "TEST", 0)
-            assertEquals("MethodRefVertex{code='TEST', order=0, argumentIndex=0, methodInstFullName='TEST', methodFullName='TEST', lineNumber=0}", vertex.toString())
+            val vertex = MethodRefVertex(STRING_1, INT_1, INT_1, STRING_1, STRING_1, INT_1)
+            assertEquals("MethodRefVertex{code='$STRING_1', order=$INT_1, argumentIndex=$INT_1, methodInstFullName='$STRING_1', methodFullName='$STRING_1', lineNumber=$INT_1}", vertex.toString())
         }
 
         @Test
         fun methodReturnVertexToString() {
-            val vertex = MethodReturnVertex("TEST", "TEST", EvaluationStrategies.BY_REFERENCE, 0, 0)
-            assertEquals("MethodReturnVertex{name='TEST', evaluationStrategy=BY_REFERENCE, typeFullName='TEST', lineNumber=0, order=0}", vertex.toString())
+            val vertex = MethodReturnVertex(STRING_1, STRING_1, EVAL_1, INT_1, INT_1)
+            assertEquals("MethodReturnVertex{name='$STRING_1', evaluationStrategy=$EVAL_1, typeFullName='$STRING_1', lineNumber=$INT_1, order=$INT_1}", vertex.toString())
         }
 
         @Test
         fun methodVertexToString() {
-            val vertex = MethodVertex("TEST", "TEST", "TEST", 0, 0)
-            assertEquals("MethodVertex{name='TEST', fullName='TEST', signature='TEST', lineNumber=0, order=0}", vertex.toString())
+            val vertex = MethodVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_1)
+            assertEquals("MethodVertex{name='$STRING_1', fullName='$STRING_1', signature='$STRING_1', lineNumber=$INT_1, order=$INT_1}", vertex.toString())
         }
 
         @Test
         fun modifierVertexToString() {
-            val vertex = ModifierVertex(ModifierTypes.ABSTRACT, 0)
-            assertEquals("ModifierVertex{name=ABSTRACT, order=0}", vertex.toString())
+            val vertex = ModifierVertex(MOD_1, INT_1)
+            assertEquals("ModifierVertex{name=$MOD_1, order=$INT_1}", vertex.toString())
         }
 
         @Test
         fun namespaceBlockVertexToString() {
-            val vertex = NamespaceBlockVertex("TEST", "TEST", 0)
-            assertEquals("NamespaceBlockVertex{name='TEST', fullName='TEST', order=0}", vertex.toString())
+            val vertex = NamespaceBlockVertex(STRING_1, STRING_1, INT_1)
+            assertEquals("NamespaceBlockVertex{name='$STRING_1', fullName='$STRING_1', order=$INT_1}", vertex.toString())
         }
 
         @Test
         fun returnVertexToString() {
-            val vertex = ReturnVertex(0, 0, 0, "TEST")
-            assertEquals("ReturnVertex{lineNumber=0, order=0, argumentIndex=0, code='TEST'}", vertex.toString())
+            val vertex = ReturnVertex(INT_1, INT_1, INT_1, STRING_1)
+            assertEquals("ReturnVertex{lineNumber=$INT_1, order=$INT_1, argumentIndex=$INT_1, code='$STRING_1'}", vertex.toString())
         }
 
         @Test
         fun typeArgumentVertexToString() {
-            val vertex = TypeArgumentVertex(0)
-            assertEquals("TypeArgumentVertex{order=0}", vertex.toString())
+            val vertex = TypeArgumentVertex(INT_1)
+            assertEquals("TypeArgumentVertex{order=$INT_1}", vertex.toString())
         }
 
         @Test
         fun typeDeclVertexToString() {
-            val vertex = TypeDeclVertex("TEST", "TEST", "TEST")
-            assertEquals("TypeDeclVertex{name='TEST', fullName='TEST', typeDeclFullName='TEST'}", vertex.toString())
+            val vertex = TypeDeclVertex(STRING_1, STRING_1, STRING_1)
+            assertEquals("TypeDeclVertex{name='$STRING_1', fullName='$STRING_1', typeDeclFullName='$STRING_1'}", vertex.toString())
         }
 
         @Test
         fun typeParameterVertexToString() {
-            val vertex = TypeParameterVertex("TEST", 0)
-            assertEquals("TypeParameterVertex{name='TEST', order=0}", vertex.toString())
+            val vertex = TypeParameterVertex(STRING_1, INT_1)
+            assertEquals("TypeParameterVertex{name='$STRING_1', order=$INT_1}", vertex.toString())
         }
 
         @Test
         fun typeVertexToString() {
-            val vertex = TypeVertex("TEST", "TEST", "TEST")
-            assertEquals("TypeVertex{name='TEST', fullName='TEST', typeDeclFullName='TEST'}", vertex.toString())
+            val vertex = TypeVertex(STRING_1, STRING_1, STRING_1)
+            assertEquals("TypeVertex{name='$STRING_1', fullName='$STRING_1', typeDeclFullName='$STRING_1'}", vertex.toString())
         }
 
         @Test
         fun unknownVertexToString() {
-            val vertex = UnknownVertex("TEST", 0, 0, 0, "TEST")
-            assertEquals("UnknownVertex{code='TEST', order=0, argumentIndex=0, lineNumber=0, typeFullName='TEST'}", vertex.toString())
+            val vertex = UnknownVertex(STRING_1, INT_1, INT_1, INT_1, STRING_1)
+            assertEquals("UnknownVertex{code='$STRING_1', order=$INT_1, argumentIndex=$INT_1, lineNumber=$INT_1, typeFullName='$STRING_1'}", vertex.toString())
         }
     }
 
@@ -165,201 +166,441 @@ class ModelTest {
     inner class DomainModelEqualTest {
 
         private fun assertVertexEquality(vertex1: GraPLVertex, vertex2: GraPLVertex, vertex3: GraPLVertex) {
+            assertEquals(vertex1, vertex1)
             assertEquals(vertex1, vertex2)
+            assertEquals(vertex1.hashCode(), vertex2.hashCode())
             assertNotEquals(vertex1, vertex3)
-            assertNotEquals(vertex1, "TEST")
+            assertNotEquals(vertex1.hashCode(), vertex3.hashCode())
+            assertNotEquals(vertex1, STRING_1)
         }
 
         @Test
-        fun arrayInitializerVertexToString() {
-            val vertex1 = ArrayInitializerVertex(0)
-            val vertex2 = ArrayInitializerVertex(0)
-            val vertex3 = ArrayInitializerVertex(1)
+        fun arrayInitializerVertexEquality() {
+            val vertex1 = ArrayInitializerVertex(INT_1)
+            val vertex2 = ArrayInitializerVertex(INT_1)
+            val vertex3 = ArrayInitializerVertex(INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
         }
 
         @Test
-        fun bindingVertexToString() {
-            val vertex1 = BindingVertex("TEST", "I")
-            val vertex2 = BindingVertex("TEST", "I")
-            val vertex3 = BindingVertex("TEST", "V")
+        fun bindingVertexEquality() {
+            val vertex1 = BindingVertex(STRING_1, STRING_1)
+            val vertex2 = BindingVertex(STRING_1, STRING_1)
+            val vertex3 = BindingVertex(STRING_1, STRING_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
         }
 
         @Test
-        fun blockVertexToString() {
-            val vertex1 = BlockVertex("TEST", 0, 0, "TEST", 0)
-            val vertex2 = BlockVertex("TEST", 0, 0, "TEST", 0)
-            val vertex3 = BlockVertex("TEST1", 0, 0, "TEST", 0)
+        fun blockVertexEquality() {
+            val vertex1 = BlockVertex(STRING_1, INT_1, INT_1, STRING_1, INT_1)
+            val vertex2 = BlockVertex(STRING_1, INT_1, INT_1, STRING_1, INT_1)
+            val vertex3 = BlockVertex(STRING_2, INT_1, INT_1, STRING_1, INT_1)
+            val vertex4 = BlockVertex(STRING_1, INT_2, INT_1, STRING_1, INT_1)
+            val vertex5 = BlockVertex(STRING_1, INT_1, INT_2, STRING_1, INT_1)
+            val vertex6 = BlockVertex(STRING_1, INT_1, INT_1, STRING_2, INT_1)
+            val vertex7 = BlockVertex(STRING_1, INT_1, INT_1, STRING_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertVertexEquality(vertex1, vertex2, vertex6)
+            assertVertexEquality(vertex1, vertex2, vertex7)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
         }
 
         @Test
-        fun callVertexToString() {
-            val vertex1 = CallVertex("TEST", "TEST", 0, "TEST", "TEST", 0, DispatchTypes.DYNAMIC_DISPATCH, "TEST", "TEST", 0)
-            val vertex2 = CallVertex("TEST", "TEST", 0, "TEST", "TEST", 0, DispatchTypes.DYNAMIC_DISPATCH, "TEST", "TEST", 0)
-            val vertex3 = CallVertex("TEST1", "TEST", 0, "TEST", "TEST", 0, DispatchTypes.DYNAMIC_DISPATCH, "TEST", "TEST", 0)
+        fun callVertexEquality() {
+            val vertex1 = CallVertex(STRING_1, STRING_1, INT_1, STRING_1, STRING_1, INT_1, DISPATCH_1, STRING_1, STRING_1, INT_1)
+            val vertex2 = CallVertex(STRING_1, STRING_1, INT_1, STRING_1, STRING_1, INT_1, DISPATCH_1, STRING_1, STRING_1, INT_1)
+            val vertex3 = CallVertex(STRING_2, STRING_1, INT_1, STRING_1, STRING_1, INT_1, DISPATCH_1, STRING_1, STRING_1, INT_1)
+            val vertex4 = CallVertex(STRING_1, STRING_2, INT_1, STRING_1, STRING_1, INT_1, DISPATCH_1, STRING_1, STRING_1, INT_1)
+            val vertex5 = CallVertex(STRING_1, STRING_1, INT_2, STRING_1, STRING_1, INT_1, DISPATCH_1, STRING_1, STRING_1, INT_1)
+            val vertex6 = CallVertex(STRING_1, STRING_1, INT_1, STRING_2, STRING_1, INT_1, DISPATCH_1, STRING_1, STRING_1, INT_1)
+            val vertex7 = CallVertex(STRING_1, STRING_1, INT_1, STRING_1, STRING_2, INT_1, DISPATCH_1, STRING_1, STRING_1, INT_1)
+            val vertex8 = CallVertex(STRING_1, STRING_1, INT_1, STRING_1, STRING_1, INT_2, DISPATCH_1, STRING_1, STRING_1, INT_1)
+            val vertex9 = CallVertex(STRING_1, STRING_1, INT_1, STRING_1, STRING_1, INT_1, DISPATCH_2, STRING_1, STRING_1, INT_1)
+            val vertex10 = CallVertex(STRING_1, STRING_1, INT_1, STRING_1, STRING_1, INT_1, DISPATCH_1, STRING_2, STRING_1, INT_1)
+            val vertex11 = CallVertex(STRING_1, STRING_1, INT_1, STRING_1, STRING_1, INT_1, DISPATCH_1, STRING_1, STRING_2, INT_1)
+            val vertex12 = CallVertex(STRING_1, STRING_1, INT_1, STRING_1, STRING_1, INT_1, DISPATCH_1, STRING_1, STRING_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertVertexEquality(vertex1, vertex2, vertex6)
+            assertVertexEquality(vertex1, vertex2, vertex7)
+            assertVertexEquality(vertex1, vertex2, vertex8)
+            assertVertexEquality(vertex1, vertex2, vertex9)
+            assertVertexEquality(vertex1, vertex2, vertex10)
+            assertVertexEquality(vertex1, vertex2, vertex11)
+            assertVertexEquality(vertex1, vertex2, vertex12)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
+            assertEquals(vertex1.dispatchType, DISPATCH_1)
+            assertEquals(vertex1.methodFullName, STRING_1)
+            assertEquals(vertex1.methodInstFullName, STRING_1)
+            assertEquals(vertex1.signature, STRING_1)
+            assertEquals(vertex1.code, STRING_1)
         }
 
         @Test
-        fun controlStructureVertexToString() {
-            val vertex1 = ControlStructureVertex("TEST", 0, 0, 0)
-            val vertex2 = ControlStructureVertex("TEST", 0, 0, 0)
-            val vertex3 = ControlStructureVertex("TEST1", 0, 0, 0)
+        fun controlStructureVertexEquality() {
+            val vertex1 = ControlStructureVertex(STRING_1, INT_1, INT_1, INT_1)
+            val vertex2 = ControlStructureVertex(STRING_1, INT_1, INT_1, INT_1)
+            val vertex3 = ControlStructureVertex(STRING_2, INT_1, INT_1, INT_1)
+            val vertex4 = ControlStructureVertex(STRING_1, INT_2, INT_1, INT_1)
+            val vertex5 = ControlStructureVertex(STRING_1, INT_1, INT_2, INT_1)
+            val vertex6 = ControlStructureVertex(STRING_1, INT_1, INT_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertVertexEquality(vertex1, vertex2, vertex6)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
         }
 
         @Test
-        fun fieldIdentifierVertexToString() {
-            val vertex1 = FieldIdentifierVertex("TEST", "TEST", 0, 0, 0)
-            val vertex2 = FieldIdentifierVertex("TEST", "TEST", 0, 0, 0)
-            val vertex3 = FieldIdentifierVertex("TEST1", "TEST", 0, 0, 0)
+        fun fieldIdentifierVertexEquality() {
+            val vertex1 = FieldIdentifierVertex(STRING_1, STRING_1, INT_1, INT_1, INT_1)
+            val vertex2 = FieldIdentifierVertex(STRING_1, STRING_1, INT_1, INT_1, INT_1)
+            val vertex3 = FieldIdentifierVertex(STRING_2, STRING_1, INT_1, INT_1, INT_1)
+            val vertex4 = FieldIdentifierVertex(STRING_1, STRING_2, INT_1, INT_1, INT_1)
+            val vertex5 = FieldIdentifierVertex(STRING_1, STRING_1, INT_2, INT_1, INT_1)
+            val vertex6 = FieldIdentifierVertex(STRING_1, STRING_1, INT_1, INT_2, INT_1)
+            val vertex7 = FieldIdentifierVertex(STRING_1, STRING_1, INT_1, INT_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertVertexEquality(vertex1, vertex2, vertex6)
+            assertVertexEquality(vertex1, vertex2, vertex7)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
+            assertEquals(vertex1.code, STRING_1)
         }
 
         @Test
-        fun fileVertexToString() {
-            val vertex1 = FileVertex("TEST", 0)
-            val vertex2 = FileVertex("TEST", 0)
-            val vertex3 = FileVertex("TEST1", 0)
+        fun fileVertexEquality() {
+            val vertex1 = FileVertex(STRING_1, INT_1)
+            val vertex2 = FileVertex(STRING_1, INT_1)
+            val vertex3 = FileVertex(STRING_2, INT_1)
+            val vertex4 = FileVertex(STRING_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
         }
 
         @Test
-        fun identifierVertexToString() {
-            val vertex1 = IdentifierVertex("TEST", "TEST", 0, 0, "TEST", 0)
-            val vertex2 = IdentifierVertex("TEST", "TEST", 0, 0, "TEST", 0)
-            val vertex3 = IdentifierVertex("TEST1", "TEST", 0, 0, "TEST", 0)
+        fun identifierVertexEquality() {
+            val vertex1 = IdentifierVertex(STRING_1, STRING_1, INT_1, INT_1, STRING_1, INT_1)
+            val vertex2 = IdentifierVertex(STRING_1, STRING_1, INT_1, INT_1, STRING_1, INT_1)
+            val vertex3 = IdentifierVertex(STRING_2, STRING_1, INT_1, INT_1, STRING_1, INT_1)
+            val vertex4 = IdentifierVertex(STRING_1, STRING_1, INT_2, INT_1, STRING_1, INT_1)
+            val vertex5 = IdentifierVertex(STRING_1, STRING_1, INT_1, INT_2, STRING_1, INT_1)
+            val vertex6 = IdentifierVertex(STRING_1, STRING_1, INT_1, INT_1, STRING_2, INT_1)
+            val vertex7 = IdentifierVertex(STRING_1, STRING_1, INT_1, INT_1, STRING_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertVertexEquality(vertex1, vertex2, vertex6)
+            assertVertexEquality(vertex1, vertex2, vertex7)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
+            assertEquals(vertex1.code, STRING_1)
         }
 
         @Test
-        fun literalVertexToString() {
-            val vertex1 = LiteralVertex("TEST", 0, 0, "TEST", 0)
-            val vertex2 = LiteralVertex("TEST", 0, 0, "TEST", 0)
-            val vertex3 = LiteralVertex("TEST1", 0, 0, "TEST", 0)
+        fun literalVertexEquality() {
+            val vertex1 = LiteralVertex(STRING_1, INT_1, INT_1, STRING_1, INT_1)
+            val vertex2 = LiteralVertex(STRING_1, INT_1, INT_1, STRING_1, INT_1)
+            val vertex3 = LiteralVertex(STRING_2, INT_1, INT_1, STRING_1, INT_1)
+            val vertex4 = LiteralVertex(STRING_1, INT_2, INT_1, STRING_1, INT_1)
+            val vertex5 = LiteralVertex(STRING_1, INT_1, INT_2, STRING_1, INT_1)
+            val vertex6 = LiteralVertex(STRING_1, INT_1, INT_1, STRING_2, INT_1)
+            val vertex7 = LiteralVertex(STRING_1, INT_1, INT_1, STRING_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertVertexEquality(vertex1, vertex2, vertex6)
+            assertVertexEquality(vertex1, vertex2, vertex7)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
         }
 
         @Test
-        fun localVertexToString() {
-            val vertex1 = LocalVertex("TEST", "TEST", "TEST", 0, 0)
-            val vertex2 = LocalVertex("TEST", "TEST", "TEST", 0, 0)
-            val vertex3 = LocalVertex("TEST1", "TEST", "TEST", 0, 0)
+        fun localVertexEquality() {
+            val vertex1 = LocalVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_1)
+            val vertex2 = LocalVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_1)
+            val vertex3 = LocalVertex(STRING_2, STRING_1, STRING_1, INT_1, INT_1)
+            val vertex4 = LocalVertex(STRING_1, STRING_2, STRING_1, INT_1, INT_1)
+            val vertex5 = LocalVertex(STRING_1, STRING_1, STRING_2, INT_1, INT_1)
+            val vertex6 = LocalVertex(STRING_1, STRING_1, STRING_1, INT_2, INT_1)
+            val vertex7 = LocalVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertVertexEquality(vertex1, vertex2, vertex6)
+            assertVertexEquality(vertex1, vertex2, vertex7)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.code, STRING_1)
         }
 
         @Test
-        fun memberVertexToString() {
-            val vertex1 = MemberVertex("TEST", "TEST", "TEST", 0)
-            val vertex2 = MemberVertex("TEST", "TEST", "TEST", 0)
-            val vertex3 = MemberVertex("TEST1", "TEST", "TEST", 0)
+        fun memberVertexEquality() {
+            val vertex1 = MemberVertex(STRING_1, STRING_1, STRING_1, INT_1)
+            val vertex2 = MemberVertex(STRING_1, STRING_1, STRING_1, INT_1)
+            val vertex3 = MemberVertex(STRING_2, STRING_1, STRING_1, INT_1)
+            val vertex4 = MemberVertex(STRING_1, STRING_2, STRING_1, INT_1)
+            val vertex5 = MemberVertex(STRING_1, STRING_1, STRING_2, INT_1)
+            val vertex6 = MemberVertex(STRING_1, STRING_1, STRING_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertVertexEquality(vertex1, vertex2, vertex6)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.code, STRING_1)
         }
 
         @Test
-        fun metaDataVertexToString() {
-            val vertex1 = MetaDataVertex("TEST", "TEST")
-            val vertex2 = MetaDataVertex("TEST", "TEST")
-            val vertex3 = MetaDataVertex("TEST1", "TEST")
+        fun metaDataVertexEquality() {
+            val vertex1 = MetaDataVertex(STRING_1, STRING_1)
+            val vertex2 = MetaDataVertex(STRING_1, STRING_1)
+            val vertex3 = MetaDataVertex(STRING_2, STRING_1)
+            val vertex4 = MetaDataVertex(STRING_1, STRING_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertEquals(vertex1.language, STRING_1)
+            assertEquals(vertex1.version, STRING_1)
         }
 
         @Test
-        fun methodParameterInVertexToString() {
-            val vertex1 = MethodParameterInVertex("TEST", "TEST", EvaluationStrategies.BY_REFERENCE, "TEST", 0, 0)
-            val vertex2 = MethodParameterInVertex("TEST", "TEST", EvaluationStrategies.BY_REFERENCE, "TEST", 0, 0)
-            val vertex3 = MethodParameterInVertex("TEST1", "TEST", EvaluationStrategies.BY_REFERENCE, "TEST", 0, 0)
+        fun methodParameterInVertexEquality() {
+            val vertex1 = MethodParameterInVertex(STRING_1, STRING_1, EVAL_1, STRING_1, INT_1, INT_1)
+            val vertex2 = MethodParameterInVertex(STRING_1, STRING_1, EVAL_1, STRING_1, INT_1, INT_1)
+            val vertex3 = MethodParameterInVertex(STRING_2, STRING_1, EVAL_1, STRING_1, INT_1, INT_1)
+            val vertex4 = MethodParameterInVertex(STRING_1, STRING_2, EVAL_1, STRING_1, INT_1, INT_1)
+            val vertex5 = MethodParameterInVertex(STRING_1, STRING_1, EVAL_2, STRING_1, INT_1, INT_1)
+            val vertex6 = MethodParameterInVertex(STRING_1, STRING_1, EVAL_1, STRING_2, INT_1, INT_1)
+            val vertex7 = MethodParameterInVertex(STRING_1, STRING_1, EVAL_1, STRING_1, INT_2, INT_1)
+            val vertex8 = MethodParameterInVertex(STRING_1, STRING_1, EVAL_1, STRING_1, INT_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertVertexEquality(vertex1, vertex2, vertex6)
+            assertVertexEquality(vertex1, vertex2, vertex7)
+            assertVertexEquality(vertex1, vertex2, vertex8)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.code, STRING_1)
         }
 
         @Test
-        fun methodRefVertexToString() {
-            val vertex1 = MethodRefVertex("TEST", 0, 0, "TEST", "TEST", 0)
-            val vertex2 = MethodRefVertex("TEST", 0, 0, "TEST", "TEST", 0)
-            val vertex3 = MethodRefVertex("TEST1", 0, 0, "TEST", "TEST", 0)
+        fun methodRefVertexEquality() {
+            val vertex1 = MethodRefVertex(STRING_1, INT_1, INT_1, STRING_1, STRING_1, INT_1)
+            val vertex2 = MethodRefVertex(STRING_1, INT_1, INT_1, STRING_1, STRING_1, INT_1)
+            val vertex3 = MethodRefVertex(STRING_2, INT_1, INT_1, STRING_1, STRING_1, INT_1)
+            val vertex4 = MethodRefVertex(STRING_1, INT_2, INT_1, STRING_1, STRING_1, INT_1)
+            val vertex5 = MethodRefVertex(STRING_1, INT_1, INT_2, STRING_1, STRING_1, INT_1)
+            val vertex6 = MethodRefVertex(STRING_1, INT_1, INT_1, STRING_2, STRING_1, INT_1)
+            val vertex7 = MethodRefVertex(STRING_1, INT_1, INT_1, STRING_1, STRING_2, INT_1)
+            val vertex8 = MethodRefVertex(STRING_1, INT_1, INT_1, STRING_1, STRING_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertVertexEquality(vertex1, vertex2, vertex6)
+            assertVertexEquality(vertex1, vertex2, vertex7)
+            assertVertexEquality(vertex1, vertex2, vertex8)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
+            assertEquals(vertex1.methodFullName, STRING_1)
+            assertEquals(vertex1.methodInstFullName, STRING_1)
+            assertEquals(vertex1.code, STRING_1)
         }
 
         @Test
-        fun methodReturnVertexToString() {
-            val vertex1 = MethodReturnVertex("TEST", "TEST", EvaluationStrategies.BY_REFERENCE, 0, 0)
-            val vertex2 = MethodReturnVertex("TEST", "TEST", EvaluationStrategies.BY_REFERENCE, 0, 0)
-            val vertex3 = MethodReturnVertex("TEST1", "TEST", EvaluationStrategies.BY_REFERENCE, 0, 0)
+        fun methodReturnVertexEquality() {
+            val vertex1 = MethodReturnVertex(STRING_1, STRING_1, EVAL_1, INT_1, INT_1)
+            val vertex2 = MethodReturnVertex(STRING_1, STRING_1, EVAL_1, INT_1, INT_1)
+            val vertex3 = MethodReturnVertex(STRING_2, STRING_1, EVAL_1, INT_1, INT_1)
+            val vertex4 = MethodReturnVertex(STRING_1, STRING_2, EVAL_1, INT_1, INT_1)
+            val vertex5 = MethodReturnVertex(STRING_1, STRING_1, EVAL_2, INT_1, INT_1)
+            val vertex6 = MethodReturnVertex(STRING_1, STRING_1, EVAL_1, INT_2, INT_1)
+            val vertex7 = MethodReturnVertex(STRING_1, STRING_1, EVAL_1, INT_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertVertexEquality(vertex1, vertex2, vertex6)
+            assertVertexEquality(vertex1, vertex2, vertex7)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.lineNumber, INT_1)
         }
 
         @Test
-        fun methodVertexToString() {
-            val vertex1 = MethodVertex("TEST", "TEST", "TEST", 0, 0)
-            val vertex2 = MethodVertex("TEST", "TEST", "TEST", 0, 0)
-            val vertex3 = MethodVertex("TEST1", "TEST", "TEST", 0, 0)
+        fun methodVertexEquality() {
+            val vertex1 = MethodVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_1)
+            val vertex2 = MethodVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_1)
+            val vertex3 = MethodVertex(STRING_2, STRING_1, STRING_1, INT_1, INT_1)
+            val vertex4 = MethodVertex(STRING_1, STRING_2, STRING_1, INT_1, INT_1)
+            val vertex5 = MethodVertex(STRING_1, STRING_1, STRING_2, INT_1, INT_1)
+            val vertex6 = MethodVertex(STRING_1, STRING_1, STRING_1, INT_2, INT_1)
+            val vertex7 = MethodVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertVertexEquality(vertex1, vertex2, vertex6)
+            assertVertexEquality(vertex1, vertex2, vertex7)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.signature, STRING_1)
         }
 
         @Test
-        fun modifierVertexToString() {
-            val vertex1 = ModifierVertex(ModifierTypes.ABSTRACT, 0)
-            val vertex2 = ModifierVertex(ModifierTypes.ABSTRACT, 0)
-            val vertex3 = ModifierVertex(ModifierTypes.ABSTRACT, 1)
+        fun modifierVertexEquality() {
+            val vertex1 = ModifierVertex(MOD_1, INT_1)
+            val vertex2 = ModifierVertex(MOD_1, INT_1)
+            val vertex3 = ModifierVertex(MOD_2, INT_1)
+            val vertex4 = ModifierVertex(MOD_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertEquals(vertex1.name, MOD_1)
+            assertEquals(vertex1.order, INT_1)
         }
 
         @Test
-        fun namespaceBlockVertexToString() {
-            val vertex1 = NamespaceBlockVertex("TEST", "TEST", 0)
-            val vertex2 = NamespaceBlockVertex("TEST", "TEST", 0)
-            val vertex3 = NamespaceBlockVertex("TEST1", "TEST", 0)
+        fun namespaceBlockVertexEquality() {
+            val vertex1 = NamespaceBlockVertex(STRING_1, STRING_1, INT_1)
+            val vertex2 = NamespaceBlockVertex(STRING_1, STRING_1, INT_1)
+            val vertex3 = NamespaceBlockVertex(STRING_2, STRING_1, INT_1)
+            val vertex4 = NamespaceBlockVertex(STRING_1, STRING_2, INT_1)
+            val vertex5 = NamespaceBlockVertex(STRING_1, STRING_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
         }
 
         @Test
-        fun returnVertexToString() {
-            val vertex1 = ReturnVertex(0, 0, 0, "TEST")
-            val vertex2 = ReturnVertex(0, 0, 0, "TEST")
-            val vertex3 = ReturnVertex(1, 0, 0, "TEST")
+        fun returnVertexEquality() {
+            val vertex1 = ReturnVertex(INT_1, INT_1, INT_1, STRING_1)
+            val vertex2 = ReturnVertex(INT_1, INT_1, INT_1, STRING_1)
+            val vertex3 = ReturnVertex(INT_2, INT_1, INT_1, STRING_1)
+            val vertex4 = ReturnVertex(INT_1, INT_2, INT_1, STRING_1)
+            val vertex5 = ReturnVertex(INT_1, INT_1, INT_2, STRING_1)
+            val vertex6 = ReturnVertex(INT_1, INT_1, INT_1, STRING_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertVertexEquality(vertex1, vertex2, vertex6)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
+            assertEquals(vertex1.code, STRING_1)
         }
 
         @Test
-        fun typeArgumentVertexToString() {
-            val vertex1 = TypeArgumentVertex(0)
-            val vertex2 = TypeArgumentVertex(0)
-            val vertex3 = TypeArgumentVertex(1)
+        fun typeArgumentVertexEquality() {
+            val vertex1 = TypeArgumentVertex(INT_1)
+            val vertex2 = TypeArgumentVertex(INT_1)
+            val vertex3 = TypeArgumentVertex(INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertEquals(vertex1.order, INT_1)
         }
 
         @Test
-        fun typeDeclVertexToString() {
-            val vertex1 = TypeDeclVertex("TEST", "TEST", "TEST")
-            val vertex2 = TypeDeclVertex("TEST", "TEST", "TEST")
-            val vertex3 = TypeDeclVertex("TEST1", "TEST", "TEST")
+        fun typeDeclVertexEquality() {
+            val vertex1 = TypeDeclVertex(STRING_1, STRING_1, STRING_1)
+            val vertex2 = TypeDeclVertex(STRING_1, STRING_1, STRING_1)
+            val vertex3 = TypeDeclVertex(STRING_2, STRING_1, STRING_1)
+            val vertex4 = TypeDeclVertex(STRING_1, STRING_2, STRING_1)
+            val vertex5 = TypeDeclVertex(STRING_1, STRING_1, STRING_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertEquals(vertex1.name, STRING_1)
         }
 
         @Test
-        fun typeParameterVertexToString() {
-            val vertex1 = TypeParameterVertex("TEST", 0)
-            val vertex2 = TypeParameterVertex("TEST", 0)
-            val vertex3 = TypeParameterVertex("TEST1", 0)
+        fun typeParameterVertexEquality() {
+            val vertex1 = TypeParameterVertex(STRING_1, INT_1)
+            val vertex2 = TypeParameterVertex(STRING_1, INT_1)
+            val vertex3 = TypeParameterVertex(STRING_2, INT_1)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
         }
 
         @Test
-        fun typeVertexToString() {
-            val vertex1 = TypeVertex("TEST", "TEST", "TEST")
-            val vertex2 = TypeVertex("TEST", "TEST", "TEST")
-            val vertex3 = TypeVertex("TEST1", "TEST", "TEST")
+        fun typeVertexEquality() {
+            val vertex1 = TypeVertex(STRING_1, STRING_1, STRING_1)
+            val vertex2 = TypeVertex(STRING_1, STRING_1, STRING_1)
+            val vertex3 = TypeVertex(STRING_2, STRING_1, STRING_1)
+            val vertex4 = TypeVertex(STRING_1, STRING_2, STRING_1)
+            val vertex5 = TypeVertex(STRING_1, STRING_1, STRING_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertEquals(vertex1.name, STRING_1)
         }
 
         @Test
-        fun unknownVertexToString() {
-            val vertex1 = UnknownVertex("TEST", 0, 0, 0, "TEST")
-            val vertex2 = UnknownVertex("TEST", 0, 0, 0, "TEST")
-            val vertex3 = UnknownVertex("TEST1", 0, 0, 0, "TEST")
+        fun unknownVertexEquality() {
+            val vertex1 = UnknownVertex(STRING_1, INT_1, INT_1, INT_1, STRING_1)
+            val vertex2 = UnknownVertex(STRING_1, INT_1, INT_1, INT_1, STRING_1)
+            val vertex3 = UnknownVertex(STRING_2, INT_1, INT_1, INT_1, STRING_1)
+            val vertex4 = UnknownVertex(STRING_1, INT_2, INT_1, INT_1, STRING_1)
+            val vertex5 = UnknownVertex(STRING_1, INT_1, INT_2, INT_1, STRING_1)
+            val vertex6 = UnknownVertex(STRING_1, INT_1, INT_1, INT_2, STRING_1)
+            val vertex7 = UnknownVertex(STRING_1, INT_1, INT_1, INT_1, STRING_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
+            assertVertexEquality(vertex1, vertex2, vertex4)
+            assertVertexEquality(vertex1, vertex2, vertex5)
+            assertVertexEquality(vertex1, vertex2, vertex6)
+            assertVertexEquality(vertex1, vertex2, vertex7)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
+            assertEquals(vertex1.code, STRING_1)
         }
+    }
+
+    companion object {
+        const val STRING_1 = "TEST1"
+        const val STRING_2 = "TEST2"
+        const val INT_1 = 0
+        const val INT_2 = 1
+        val DISPATCH_1 = DispatchTypes.DYNAMIC_DISPATCH
+        val DISPATCH_2 = DispatchTypes.STATIC_DISPATCH
+        val EVAL_1 = EvaluationStrategies.BY_REFERENCE
+        val EVAL_2 = EvaluationStrategies.BY_SHARING
+        val MOD_1 = ModifierTypes.ABSTRACT
+        val MOD_2 = ModifierTypes.CONSTRUCTOR
     }
 }
