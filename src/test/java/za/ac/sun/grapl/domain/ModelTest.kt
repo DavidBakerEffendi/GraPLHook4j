@@ -5,16 +5,15 @@ import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import za.ac.sun.grapl.domain.enums.DispatchTypes
-import za.ac.sun.grapl.domain.enums.EvaluationStrategies
-import za.ac.sun.grapl.domain.enums.ModifierTypes
+import za.ac.sun.grapl.domain.enums.*
 import za.ac.sun.grapl.domain.models.GraPLVertex
 import za.ac.sun.grapl.domain.models.vertices.*
+import java.util.*
 
 class ModelTest {
 
     @Nested
-    @DisplayName("Domain model ToString Tests")
+    @DisplayName("Domain model to string tests")
     inner class DomainModelToStringTest {
         @Test
         fun arrayInitializerVertexToString() {
@@ -162,7 +161,7 @@ class ModelTest {
     }
 
     @Nested
-    @DisplayName("Domain model Equal Tests")
+    @DisplayName("Domain model equal tests")
     inner class DomainModelEqualTest {
 
         private fun assertVertexEquality(vertex1: GraPLVertex, vertex2: GraPLVertex, vertex3: GraPLVertex) {
@@ -205,11 +204,6 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex5)
             assertVertexEquality(vertex1, vertex2, vertex6)
             assertVertexEquality(vertex1, vertex2, vertex7)
-            assertEquals(vertex1.name, STRING_1)
-            assertEquals(vertex1.order, INT_1)
-            assertEquals(vertex1.typeFullName, STRING_1)
-            assertEquals(vertex1.lineNumber, INT_1)
-            assertEquals(vertex1.argumentIndex, INT_1)
         }
 
         @Test
@@ -237,16 +231,6 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex10)
             assertVertexEquality(vertex1, vertex2, vertex11)
             assertVertexEquality(vertex1, vertex2, vertex12)
-            assertEquals(vertex1.name, STRING_1)
-            assertEquals(vertex1.order, INT_1)
-            assertEquals(vertex1.typeFullName, STRING_1)
-            assertEquals(vertex1.lineNumber, INT_1)
-            assertEquals(vertex1.argumentIndex, INT_1)
-            assertEquals(vertex1.dispatchType, DISPATCH_1)
-            assertEquals(vertex1.methodFullName, STRING_1)
-            assertEquals(vertex1.methodInstFullName, STRING_1)
-            assertEquals(vertex1.signature, STRING_1)
-            assertEquals(vertex1.code, STRING_1)
         }
 
         @Test
@@ -261,10 +245,6 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex4)
             assertVertexEquality(vertex1, vertex2, vertex5)
             assertVertexEquality(vertex1, vertex2, vertex6)
-            assertEquals(vertex1.name, STRING_1)
-            assertEquals(vertex1.order, INT_1)
-            assertEquals(vertex1.lineNumber, INT_1)
-            assertEquals(vertex1.argumentIndex, INT_1)
         }
 
         @Test
@@ -281,10 +261,6 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex5)
             assertVertexEquality(vertex1, vertex2, vertex6)
             assertVertexEquality(vertex1, vertex2, vertex7)
-            assertEquals(vertex1.order, INT_1)
-            assertEquals(vertex1.lineNumber, INT_1)
-            assertEquals(vertex1.argumentIndex, INT_1)
-            assertEquals(vertex1.code, STRING_1)
         }
 
         @Test
@@ -295,8 +271,6 @@ class ModelTest {
             val vertex4 = FileVertex(STRING_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
             assertVertexEquality(vertex1, vertex2, vertex4)
-            assertEquals(vertex1.name, STRING_1)
-            assertEquals(vertex1.order, INT_1)
         }
 
         @Test
@@ -313,12 +287,6 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex5)
             assertVertexEquality(vertex1, vertex2, vertex6)
             assertVertexEquality(vertex1, vertex2, vertex7)
-            assertEquals(vertex1.name, STRING_1)
-            assertEquals(vertex1.order, INT_1)
-            assertEquals(vertex1.typeFullName, STRING_1)
-            assertEquals(vertex1.lineNumber, INT_1)
-            assertEquals(vertex1.argumentIndex, INT_1)
-            assertEquals(vertex1.code, STRING_1)
         }
 
         @Test
@@ -335,11 +303,6 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex5)
             assertVertexEquality(vertex1, vertex2, vertex6)
             assertVertexEquality(vertex1, vertex2, vertex7)
-            assertEquals(vertex1.name, STRING_1)
-            assertEquals(vertex1.order, INT_1)
-            assertEquals(vertex1.typeFullName, STRING_1)
-            assertEquals(vertex1.lineNumber, INT_1)
-            assertEquals(vertex1.argumentIndex, INT_1)
         }
 
         @Test
@@ -356,11 +319,6 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex5)
             assertVertexEquality(vertex1, vertex2, vertex6)
             assertVertexEquality(vertex1, vertex2, vertex7)
-            assertEquals(vertex1.name, STRING_1)
-            assertEquals(vertex1.order, INT_1)
-            assertEquals(vertex1.typeFullName, STRING_1)
-            assertEquals(vertex1.lineNumber, INT_1)
-            assertEquals(vertex1.code, STRING_1)
         }
 
         @Test
@@ -375,10 +333,6 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex4)
             assertVertexEquality(vertex1, vertex2, vertex5)
             assertVertexEquality(vertex1, vertex2, vertex6)
-            assertEquals(vertex1.name, STRING_1)
-            assertEquals(vertex1.order, INT_1)
-            assertEquals(vertex1.typeFullName, STRING_1)
-            assertEquals(vertex1.code, STRING_1)
         }
 
         @Test
@@ -389,8 +343,6 @@ class ModelTest {
             val vertex4 = MetaDataVertex(STRING_1, STRING_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
             assertVertexEquality(vertex1, vertex2, vertex4)
-            assertEquals(vertex1.language, STRING_1)
-            assertEquals(vertex1.version, STRING_1)
         }
 
         @Test
@@ -409,11 +361,6 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex6)
             assertVertexEquality(vertex1, vertex2, vertex7)
             assertVertexEquality(vertex1, vertex2, vertex8)
-            assertEquals(vertex1.name, STRING_1)
-            assertEquals(vertex1.order, INT_1)
-            assertEquals(vertex1.typeFullName, STRING_1)
-            assertEquals(vertex1.lineNumber, INT_1)
-            assertEquals(vertex1.code, STRING_1)
         }
 
         @Test
@@ -432,12 +379,6 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex6)
             assertVertexEquality(vertex1, vertex2, vertex7)
             assertVertexEquality(vertex1, vertex2, vertex8)
-            assertEquals(vertex1.order, INT_1)
-            assertEquals(vertex1.lineNumber, INT_1)
-            assertEquals(vertex1.argumentIndex, INT_1)
-            assertEquals(vertex1.methodFullName, STRING_1)
-            assertEquals(vertex1.methodInstFullName, STRING_1)
-            assertEquals(vertex1.code, STRING_1)
         }
 
         @Test
@@ -454,10 +395,6 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex5)
             assertVertexEquality(vertex1, vertex2, vertex6)
             assertVertexEquality(vertex1, vertex2, vertex7)
-            assertEquals(vertex1.name, STRING_1)
-            assertEquals(vertex1.order, INT_1)
-            assertEquals(vertex1.typeFullName, STRING_1)
-            assertEquals(vertex1.lineNumber, INT_1)
         }
 
         @Test
@@ -474,10 +411,6 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex5)
             assertVertexEquality(vertex1, vertex2, vertex6)
             assertVertexEquality(vertex1, vertex2, vertex7)
-            assertEquals(vertex1.name, STRING_1)
-            assertEquals(vertex1.order, INT_1)
-            assertEquals(vertex1.lineNumber, INT_1)
-            assertEquals(vertex1.signature, STRING_1)
         }
 
         @Test
@@ -488,8 +421,6 @@ class ModelTest {
             val vertex4 = ModifierVertex(MOD_1, INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
             assertVertexEquality(vertex1, vertex2, vertex4)
-            assertEquals(vertex1.name, MOD_1)
-            assertEquals(vertex1.order, INT_1)
         }
 
         @Test
@@ -502,8 +433,6 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex3)
             assertVertexEquality(vertex1, vertex2, vertex4)
             assertVertexEquality(vertex1, vertex2, vertex5)
-            assertEquals(vertex1.name, STRING_1)
-            assertEquals(vertex1.order, INT_1)
         }
 
         @Test
@@ -518,10 +447,6 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex4)
             assertVertexEquality(vertex1, vertex2, vertex5)
             assertVertexEquality(vertex1, vertex2, vertex6)
-            assertEquals(vertex1.order, INT_1)
-            assertEquals(vertex1.lineNumber, INT_1)
-            assertEquals(vertex1.argumentIndex, INT_1)
-            assertEquals(vertex1.code, STRING_1)
         }
 
         @Test
@@ -530,7 +455,6 @@ class ModelTest {
             val vertex2 = TypeArgumentVertex(INT_1)
             val vertex3 = TypeArgumentVertex(INT_2)
             assertVertexEquality(vertex1, vertex2, vertex3)
-            assertEquals(vertex1.order, INT_1)
         }
 
         @Test
@@ -543,7 +467,6 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex3)
             assertVertexEquality(vertex1, vertex2, vertex4)
             assertVertexEquality(vertex1, vertex2, vertex5)
-            assertEquals(vertex1.name, STRING_1)
         }
 
         @Test
@@ -552,8 +475,6 @@ class ModelTest {
             val vertex2 = TypeParameterVertex(STRING_1, INT_1)
             val vertex3 = TypeParameterVertex(STRING_2, INT_1)
             assertVertexEquality(vertex1, vertex2, vertex3)
-            assertEquals(vertex1.name, STRING_1)
-            assertEquals(vertex1.order, INT_1)
         }
 
         @Test
@@ -566,7 +487,6 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex3)
             assertVertexEquality(vertex1, vertex2, vertex4)
             assertVertexEquality(vertex1, vertex2, vertex5)
-            assertEquals(vertex1.name, STRING_1)
         }
 
         @Test
@@ -583,11 +503,277 @@ class ModelTest {
             assertVertexEquality(vertex1, vertex2, vertex5)
             assertVertexEquality(vertex1, vertex2, vertex6)
             assertVertexEquality(vertex1, vertex2, vertex7)
+        }
+    }
+
+    @Nested
+    @DisplayName("Domain model property tests")
+    inner class DomainModelPropertyTest {
+        @Test
+        fun arrayInitializerVertexEquality() {
+            val vertex1 = ArrayInitializerVertex(INT_1)
+            assertEquals(VertexLabels.ARRAY_INITIALIZER, ArrayInitializerVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.AST_NODE), ArrayInitializerVertex.TRAITS)
+            assertEquals(vertex1.order, INT_1)
+        }
+
+        @Test
+        fun bindingVertexEquality() {
+            val vertex1 = BindingVertex(STRING_1, STRING_1)
+            assertEquals(VertexLabels.BINDING, BindingVertex.LABEL)
+            assertEquals(EnumSet.noneOf(VertexBaseTraits::class.java), BindingVertex.TRAITS)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.signature, STRING_1)
+        }
+
+        @Test
+        fun blockVertexEquality() {
+            val vertex1 = BlockVertex(STRING_1, INT_1, INT_1, STRING_1, INT_1)
+            assertEquals(VertexLabels.BLOCK, BlockVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.EXPRESSION), BlockVertex.TRAITS)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
+        }
+
+        @Test
+        fun callVertexEquality() {
+            val vertex1 = CallVertex(STRING_1, STRING_1, INT_1, STRING_1, STRING_1, INT_1, DISPATCH_1, STRING_1, STRING_1, INT_1)
+            assertEquals(VertexLabels.CALL, CallVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.EXPRESSION, VertexBaseTraits.CALL_REPR), CallVertex.TRAITS)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
+            assertEquals(vertex1.dispatchType, DISPATCH_1)
+            assertEquals(vertex1.methodFullName, STRING_1)
+            assertEquals(vertex1.methodInstFullName, STRING_1)
+            assertEquals(vertex1.signature, STRING_1)
+            assertEquals(vertex1.code, STRING_1)
+        }
+
+        @Test
+        fun controlStructureVertexEquality() {
+            val vertex1 = ControlStructureVertex(STRING_1, INT_1, INT_1, INT_1)
+            assertEquals(VertexLabels.CONTROL_STRUCTURE, ControlStructureVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.EXPRESSION), ControlStructureVertex.TRAITS)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
+        }
+
+        @Test
+        fun fieldIdentifierVertexEquality() {
+            val vertex1 = FieldIdentifierVertex(STRING_1, STRING_1, INT_1, INT_1, INT_1)
+            assertEquals(VertexLabels.FIELD_IDENTIFIER, FieldIdentifierVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.EXPRESSION), FieldIdentifierVertex.TRAITS)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
+            assertEquals(vertex1.code, STRING_1)
+        }
+
+        @Test
+        fun fileVertexEquality() {
+            val vertex1 = FileVertex(STRING_1, INT_1)
+            assertEquals(VertexLabels.FILE, FileVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.AST_NODE), FileVertex.TRAITS)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+        }
+
+        @Test
+        fun identifierVertexEquality() {
+            val vertex1 = IdentifierVertex(STRING_1, STRING_1, INT_1, INT_1, STRING_1, INT_1)
+            assertEquals(VertexLabels.IDENTIFIER, IdentifierVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.EXPRESSION, VertexBaseTraits.LOCAL_LIKE), IdentifierVertex.TRAITS)
+            assertEquals(vertex1.name, STRING_1)
             assertEquals(vertex1.order, INT_1)
             assertEquals(vertex1.typeFullName, STRING_1)
             assertEquals(vertex1.lineNumber, INT_1)
             assertEquals(vertex1.argumentIndex, INT_1)
             assertEquals(vertex1.code, STRING_1)
+        }
+
+        @Test
+        fun literalVertexEquality() {
+            val vertex1 = LiteralVertex(STRING_1, INT_1, INT_1, STRING_1, INT_1)
+            assertEquals(VertexLabels.LITERAL, LiteralVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.EXPRESSION), LiteralVertex.TRAITS)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
+        }
+
+        @Test
+        fun localVertexEquality() {
+            val vertex1 = LocalVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_1)
+            assertEquals(VertexLabels.LOCAL, LocalVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.DECLARATION, VertexBaseTraits.LOCAL_LIKE, VertexBaseTraits.CALL_REPR), LocalVertex.TRAITS)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.code, STRING_1)
+        }
+
+        @Test
+        fun memberVertexEquality() {
+            val vertex1 = MemberVertex(STRING_1, STRING_1, STRING_1, INT_1)
+            assertEquals(VertexLabels.META_DATA, MetaDataVertex.LABEL)
+            assertEquals(EnumSet.noneOf(VertexBaseTraits::class.java), MetaDataVertex.TRAITS)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.code, STRING_1)
+        }
+
+        @Test
+        fun metaDataVertexEquality() {
+            val vertex1 = MetaDataVertex(STRING_1, STRING_1)
+            assertEquals(VertexLabels.META_DATA, MetaDataVertex.LABEL)
+            assertEquals(EnumSet.noneOf(VertexBaseTraits::class.java), MetaDataVertex.TRAITS)
+            assertEquals(vertex1.language, STRING_1)
+            assertEquals(vertex1.version, STRING_1)
+        }
+
+        @Test
+        fun methodParameterInVertexEquality() {
+            val vertex1 = MethodParameterInVertex(STRING_1, STRING_1, EVAL_1, STRING_1, INT_1, INT_1)
+            assertEquals(VertexLabels.METHOD_PARAMETER_IN, MethodParameterInVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.AST_NODE, VertexBaseTraits.DECLARATION, VertexBaseTraits.CFG_NODE), MethodParameterInVertex.TRAITS)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.code, STRING_1)
+        }
+
+        @Test
+        fun methodRefVertexEquality() {
+            val vertex1 = MethodRefVertex(STRING_1, INT_1, INT_1, STRING_1, STRING_1, INT_1)
+            assertEquals(VertexLabels.METHOD_REF, MethodRefVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.EXPRESSION), MethodRefVertex.TRAITS)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
+            assertEquals(vertex1.methodFullName, STRING_1)
+            assertEquals(vertex1.methodInstFullName, STRING_1)
+            assertEquals(vertex1.code, STRING_1)
+        }
+
+        @Test
+        fun methodReturnVertexEquality() {
+            val vertex1 = MethodReturnVertex(STRING_1, STRING_1, EVAL_1, INT_1, INT_1)
+            assertEquals(VertexLabels.METHOD_RETURN, MethodReturnVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.CFG_NODE, VertexBaseTraits.TRACKING_POINT), MethodReturnVertex.TRAITS)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+        }
+
+        @Test
+        fun methodVertexEquality() {
+            val vertex1 = MethodVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_1)
+            assertEquals(VertexLabels.METHOD, MethodVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.AST_NODE, VertexBaseTraits.DECLARATION, VertexBaseTraits.CFG_NODE), MethodVertex.TRAITS)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.signature, STRING_1)
+            assertEquals(vertex1.fullName, STRING_1)
+        }
+
+        @Test
+        fun modifierVertexEquality() {
+            val vertex1 = ModifierVertex(MOD_1, INT_1)
+            assertEquals(VertexLabels.MODIFIER, ModifierVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.AST_NODE), ModifierVertex.TRAITS)
+            assertEquals(vertex1.name, MOD_1)
+            assertEquals(vertex1.order, INT_1)
+        }
+
+        @Test
+        fun namespaceBlockVertexEquality() {
+            val vertex1 = NamespaceBlockVertex(STRING_1, STRING_1, INT_1)
+            assertEquals(VertexLabels.NAMESPACE_BLOCK, NamespaceBlockVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.AST_NODE), NamespaceBlockVertex.TRAITS)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.fullName, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+        }
+
+        @Test
+        fun returnVertexEquality() {
+            val vertex1 = ReturnVertex(INT_1, INT_1, INT_1, STRING_1)
+            assertEquals(VertexLabels.RETURN, ReturnVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.EXPRESSION), ReturnVertex.TRAITS)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
+            assertEquals(vertex1.code, STRING_1)
+        }
+
+        @Test
+        fun typeArgumentVertexEquality() {
+            val vertex1 = TypeArgumentVertex(INT_1)
+            assertEquals(VertexLabels.TYPE_ARGUMENT, TypeArgumentVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.AST_NODE), TypeArgumentVertex.TRAITS)
+            assertEquals(vertex1.order, INT_1)
+        }
+
+        @Test
+        fun typeDeclVertexEquality() {
+            val vertex1 = TypeDeclVertex(STRING_1, STRING_1, STRING_1)
+            assertEquals(VertexLabels.TYPE_DECL, TypeDeclVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.AST_NODE), TypeDeclVertex.TRAITS)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.fullName, STRING_1)
+            assertEquals(vertex1.typeDeclFullName, STRING_1)
+        }
+
+        @Test
+        fun typeParameterVertexEquality() {
+            val vertex1 = TypeParameterVertex(STRING_1, INT_1)
+            assertEquals(VertexLabels.TYPE_PARAMETER, TypeParameterVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.AST_NODE), TypeParameterVertex.TRAITS)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.order, INT_1)
+        }
+
+        @Test
+        fun typeVertexEquality() {
+            val vertex1 = TypeVertex(STRING_1, STRING_1, STRING_1)
+            assertEquals(VertexLabels.TYPE, TypeVertex.LABEL)
+            assertEquals(EnumSet.noneOf(VertexBaseTraits::class.java), TypeVertex.TRAITS)
+            assertEquals(vertex1.name, STRING_1)
+            assertEquals(vertex1.fullName, STRING_1)
+            assertEquals(vertex1.typeDeclFullName, STRING_1)
+        }
+
+        @Test
+        fun unknownVertexEquality() {
+            val vertex1 = UnknownVertex(STRING_1, INT_1, INT_1, INT_1, STRING_1)
+            assertEquals(VertexLabels.UNKNOWN, UnknownVertex.LABEL)
+            assertEquals(EnumSet.of(VertexBaseTraits.EXPRESSION), UnknownVertex.TRAITS)
+            assertEquals(vertex1.order, INT_1)
+            assertEquals(vertex1.typeFullName, STRING_1)
+            assertEquals(vertex1.lineNumber, INT_1)
+            assertEquals(vertex1.argumentIndex, INT_1)
+            assertEquals(vertex1.code, STRING_1)
+        }
+
+        @Test
+        fun testInterfaceDefaults() {
+            assertEquals("UNKNOWN", GraPLVertex.LABEL.toString())
+            assertEquals(EnumSet.noneOf(VertexBaseTraits::class.java), GraPLVertex.TRAITS)
         }
     }
 
