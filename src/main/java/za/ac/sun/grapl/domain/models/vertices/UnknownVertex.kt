@@ -2,13 +2,20 @@ package za.ac.sun.grapl.domain.models.vertices
 
 import za.ac.sun.grapl.domain.enums.VertexBaseTraits
 import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.ASTVertex
 import za.ac.sun.grapl.domain.models.GraPLVertex
 import java.util.*
 
 /**
  * A language-specific node
  */
-class UnknownVertex(val code: String, val order: Int, val argumentIndex: Int, val lineNumber: Int, val typeFullName: String) : GraPLVertex {
+class UnknownVertex(
+        val code: String,
+        order: Int,
+        val argumentIndex: Int,
+        val lineNumber: Int,
+        val typeFullName: String
+) : ASTVertex(order) {
     override fun toString(): String {
         return "UnknownVertex{" +
                 "code='" + code + '\'' +

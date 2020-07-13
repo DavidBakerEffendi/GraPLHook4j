@@ -2,13 +2,21 @@ package za.ac.sun.grapl.domain.models.vertices
 
 import za.ac.sun.grapl.domain.enums.VertexBaseTraits
 import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.ASTVertex
 import za.ac.sun.grapl.domain.models.GraPLVertex
 import java.util.*
 
 /**
  * Reference to a method instance
  */
-class MethodRefVertex(val code: String, val order: Int, val argumentIndex: Int, val methodInstFullName: String, val methodFullName: String, val lineNumber: Int) : GraPLVertex {
+class MethodRefVertex(
+        val code: String,
+        order: Int,
+        val argumentIndex: Int,
+        val methodInstFullName: String,
+        val methodFullName: String,
+        val lineNumber: Int
+) : ASTVertex(order) {
     override fun toString(): String {
         return "MethodRefVertex{" +
                 "code='" + code + '\'' +

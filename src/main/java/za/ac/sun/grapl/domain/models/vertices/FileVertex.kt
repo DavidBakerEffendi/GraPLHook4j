@@ -2,13 +2,14 @@ package za.ac.sun.grapl.domain.models.vertices
 
 import za.ac.sun.grapl.domain.enums.VertexBaseTraits
 import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.ASTVertex
 import za.ac.sun.grapl.domain.models.GraPLVertex
 import java.util.*
 
 /**
  * Node representing a source file. Often also the AST root
  */
-class FileVertex(val name: String, val order: Int) : GraPLVertex {
+class FileVertex(val name: String, order: Int) : ASTVertex(order) {
     override fun toString(): String {
         return "FileVertex{" +
                 "name='" + name + '\'' +
