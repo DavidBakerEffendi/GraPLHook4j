@@ -2,13 +2,14 @@ package za.ac.sun.grapl.domain.models.vertices
 
 import za.ac.sun.grapl.domain.enums.VertexBaseTraits
 import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.ASTVertex
 import za.ac.sun.grapl.domain.models.GraPLVertex
 import java.util.*
 
 /**
  * Member of a class struct or union
  */
-class MemberVertex(val code: String, val name: String, val typeFullName: String, val order: Int) : GraPLVertex {
+class MemberVertex(val code: String, val name: String, val typeFullName: String, order: Int) : ASTVertex(order) {
     override fun toString(): String {
         return "MemberVertex{" +
                 "code='" + code + '\'' +

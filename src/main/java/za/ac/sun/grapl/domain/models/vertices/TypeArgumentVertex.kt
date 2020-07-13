@@ -2,13 +2,14 @@ package za.ac.sun.grapl.domain.models.vertices
 
 import za.ac.sun.grapl.domain.enums.VertexBaseTraits
 import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.ASTVertex
 import za.ac.sun.grapl.domain.models.GraPLVertex
 import java.util.*
 
 /**
  * Argument for a TYPE_PARAMETER that belongs to a TYPE. It binds another TYPE to a TYPE_PARAMETER
  */
-class TypeArgumentVertex(val order: Int) : GraPLVertex {
+class TypeArgumentVertex(order: Int) : ASTVertex(order) {
     override fun toString(): String {
         return "TypeArgumentVertex{" +
                 "order=" + order +

@@ -2,6 +2,7 @@ package za.ac.sun.grapl.domain.models.vertices
 
 import za.ac.sun.grapl.domain.enums.VertexBaseTraits
 import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.ASTVertex
 import za.ac.sun.grapl.domain.models.GraPLVertex
 import java.util.*
 
@@ -14,10 +15,10 @@ import java.util.*
 class FieldIdentifierVertex(
         val code: String,
         val canonicalName: String,
-        val order: Int,
+        order: Int,
         val argumentIndex: Int,
         val lineNumber: Int
-) : GraPLVertex {
+) : ASTVertex(order) {
     override fun toString(): String {
         return "FieldIdentifierVertex{" +
                 "code='" + code + '\'' +

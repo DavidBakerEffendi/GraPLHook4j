@@ -2,13 +2,14 @@ package za.ac.sun.grapl.domain.models.vertices
 
 import za.ac.sun.grapl.domain.enums.VertexBaseTraits
 import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.ASTVertex
 import za.ac.sun.grapl.domain.models.GraPLVertex
 import java.util.*
 
 /**
  * Type parameter of TYPE_DECL or METHOD
  */
-class TypeParameterVertex(val name: String, val order: Int) : GraPLVertex {
+class TypeParameterVertex(val name: String, order: Int) : ASTVertex(order) {
     override fun toString(): String {
         return "TypeParameterVertex{" +
                 "name='" + name + '\'' +

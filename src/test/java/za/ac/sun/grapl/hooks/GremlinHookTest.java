@@ -13,7 +13,7 @@ import java.util.EnumSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GremlinHookTest {
+abstract public class GremlinHookTest {
 
     final static Logger logger = LogManager.getLogger();
 
@@ -189,7 +189,7 @@ public class GremlinHookTest {
             final FileVertex f = new FileVertex("Test", 0);
             this.m = new MethodVertex(ROOT_METHOD, "io.grapl.Test.run", "(I)", 0, 0);
             this.hook.joinFileVertexTo(f, m);
-            this.hook.assignToBlock(m, new BlockVertex(FIRST_BLOCK, 1, 1, "INTEGER", 5), 0);
+            this.hook.createAndAssignToBlock(m, new BlockVertex(FIRST_BLOCK, 1, 1, "INTEGER", 5));
         }
 
         @AfterEach
@@ -211,7 +211,7 @@ public class GremlinHookTest {
         @Test
         public void testBlockJoinBlockTest() {
             final BlockVertex bv2 = new BlockVertex(TEST_ID, 2, 1, "INTEGER", 6);
-            this.hook.assignToBlock(m, bv2, 1);
+            this.hook.createAndAssignToBlock(m, bv2, 1);
 
             this.hook.startTransaction();
             assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
@@ -224,7 +224,7 @@ public class GremlinHookTest {
         @Test
         public void testAssignLiteralToBlock() {
             final LiteralVertex lv = new LiteralVertex(TEST_ID, 2, 1, "INTEGER", 5);
-            this.hook.assignToBlock(m, lv, 1);
+            this.hook.createAndAssignToBlock(m, lv, 1);
 
             this.hook.startTransaction();
             assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
@@ -237,7 +237,7 @@ public class GremlinHookTest {
         @Test
         public void testAssignLiteralToBlockSlow() {
             final LiteralVertex lv = new LiteralVertex(TEST_ID, 2, 1, "INTEGER", 5);
-            this.hook.assignToBlock(lv, 1);
+            this.hook.createAndAssignToBlock(lv, 1);
 
             this.hook.startTransaction();
             assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
@@ -250,7 +250,7 @@ public class GremlinHookTest {
         @Test
         public void testAssignLocalToBlock() {
             final LocalVertex lv = new LocalVertex("1", TEST_ID, "INTEGER", 5, 2);
-            this.hook.assignToBlock(m, lv, 1);
+            this.hook.createAndAssignToBlock(m, lv, 1);
 
             this.hook.startTransaction();
             assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
@@ -263,7 +263,7 @@ public class GremlinHookTest {
         @Test
         public void testAssignLocalToBlockSlow() {
             final LocalVertex lv = new LocalVertex("1", TEST_ID, "INTEGER", 5, 2);
-            this.hook.assignToBlock(lv, 1);
+            this.hook.createAndAssignToBlock(lv, 1);
 
             this.hook.startTransaction();
             assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
@@ -276,7 +276,7 @@ public class GremlinHookTest {
         @Test
         public void testAssignControlToBlock() {
             final ControlStructureVertex lv = new ControlStructureVertex(TEST_ID, 2, 2, 1);
-            this.hook.assignToBlock(m, lv, 1);
+            this.hook.createAndAssignToBlock(m, lv, 1);
 
             this.hook.startTransaction();
             assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
@@ -289,7 +289,7 @@ public class GremlinHookTest {
         @Test
         public void testAssignControlToBlockSlow() {
             final ControlStructureVertex lv = new ControlStructureVertex(TEST_ID, 2, 2, 1);
-            this.hook.assignToBlock(lv, 1);
+            this.hook.createAndAssignToBlock(lv, 1);
 
             this.hook.startTransaction();
             assertTrue(this.hook.g.V().has(BlockVertex.LABEL.toString(), "name", FIRST_BLOCK)
@@ -389,8 +389,8 @@ public class GremlinHookTest {
             FileVertex f = new FileVertex("Test", 0);
             MethodVertex m = new MethodVertex("root", "io.grapl.Test.run", "(I)", 0, 0);
             this.hook.joinFileVertexTo(f, m);
-            this.hook.assignToBlock(m, new BlockVertex("firstBlock", 1, 1, "INTEGER", 5), 0);
-            this.hook.assignToBlock(m, new BlockVertex("secondBlock", 2, 1, "INTEGER", 6), 0);
+            this.hook.createAndAssignToBlock(m, new BlockVertex("firstBlock", 1, 1, "INTEGER", 5));
+            this.hook.createAndAssignToBlock(m, new BlockVertex("secondBlock", 2, 1, "INTEGER", 6));
             assertEquals(2, this.hook.maxOrder());
         }
 
@@ -418,7 +418,7 @@ public class GremlinHookTest {
 
         @Test
         public void testEmptyGraph() {
-            assertFalse(this.hook.isBlock(0));
+            assertFalse(this.hook.isASTVertex(0));
         }
 
         @Test
@@ -426,12 +426,12 @@ public class GremlinHookTest {
             final FileVertex f = new FileVertex("Test", 0);
             final MethodVertex m = new MethodVertex("root", "io.grapl.Test.run", "(I)", 0, 1);
             this.hook.joinFileVertexTo(f, m);
-            this.hook.assignToBlock(m, new BlockVertex("firstBlock", 2, 1, "INTEGER", 5), 0);
-            this.hook.assignToBlock(m, new BlockVertex("secondBlock", 3, 1, "INTEGER", 6), 0);
-            assertFalse(this.hook.isBlock(0));
-            assertFalse(this.hook.isBlock(1));
-            assertTrue(this.hook.isBlock(2));
-            assertTrue(this.hook.isBlock(3));
+            this.hook.createAndAssignToBlock(m, new BlockVertex("firstBlock", 2, 1, "INTEGER", 5));
+            this.hook.createAndAssignToBlock(m, new BlockVertex("secondBlock", 3, 1, "INTEGER", 6));
+            assertTrue(this.hook.isASTVertex(0));
+            assertTrue(this.hook.isASTVertex(1));
+            assertTrue(this.hook.isASTVertex(2));
+            assertTrue(this.hook.isASTVertex(3));
         }
 
         @Test
@@ -440,8 +440,8 @@ public class GremlinHookTest {
             final MethodVertex m = new MethodVertex("root", "io.grapl.Test.run", "(I)", 0, 1);
             this.hook.joinFileVertexTo(f, m);
 
-            assertFalse(this.hook.isBlock(0));
-            assertFalse(this.hook.isBlock(1));
+            assertTrue(this.hook.isASTVertex(0));
+            assertTrue(this.hook.isASTVertex(1));
         }
     }
 
@@ -462,7 +462,7 @@ public class GremlinHookTest {
         }
 
         @Test
-        public void testUpdateOnOneBlockPropertyThatExists() {
+        public void testUpdateOnOneBlockPropertyFromParent() {
             final String keyToTest = "typeFullName";
             final String initValue = "INTEGER";
             final String updatedValue = "VOID";
@@ -471,11 +471,28 @@ public class GremlinHookTest {
             final FileVertex f = new FileVertex("Test", 0);
             final MethodVertex m = new MethodVertex("root", "io.grapl.Test.run", "(I)", 0, 1);
             this.hook.joinFileVertexTo(f, m);
-            this.hook.assignToBlock(m, new BlockVertex("firstBlock", 1, 1, initValue, 5), 0);
+            this.hook.createAndAssignToBlock(m, new BlockVertex("firstBlock", 2, 1, initValue, 5));
             this.hook.startTransaction();
             assertTrue(this.hook.g.V().hasLabel(BlockVertex.LABEL.toString()).has(keyToTest, initValue).hasNext());
             this.hook.endTransaction();
-            this.hook.updateBlockProperty(m, 1, keyToTest, updatedValue);
+            this.hook.updateASTVertexProperty(m, 2, keyToTest, updatedValue);
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.V().hasLabel(BlockVertex.LABEL.toString()).has(keyToTest, updatedValue).hasNext());
+            this.hook.endTransaction();
+        }
+
+        @Test
+        public void testUpdateOnOneBlockPropertyWithoutParent() {
+            final String keyToTest = "typeFullName";
+            final String initValue = "INTEGER";
+            final String updatedValue = "VOID";
+            assertNotEquals(initValue, updatedValue);
+
+            this.hook.createVertex(new BlockVertex("firstBlock", 1, 1, initValue, 5));
+            this.hook.startTransaction();
+            assertTrue(this.hook.g.V().hasLabel(BlockVertex.LABEL.toString()).has(keyToTest, initValue).hasNext());
+            this.hook.endTransaction();
+            this.hook.updateASTVertexProperty(1, keyToTest, updatedValue);
             this.hook.startTransaction();
             assertTrue(this.hook.g.V().hasLabel(BlockVertex.LABEL.toString()).has(keyToTest, updatedValue).hasNext());
             this.hook.endTransaction();
@@ -484,8 +501,8 @@ public class GremlinHookTest {
     }
 
     @Nested()
-    @DisplayName("Block manipulation queries")
-    class GremlinBlockManipulation {
+    @DisplayName("AST vertex unstructured manipulation queries")
+    class GremlinASTManipulation {
 
         private IHook hook;
         private final int TEST_ID_1 = 1;
@@ -496,29 +513,25 @@ public class GremlinHookTest {
         @BeforeEach
         public void setUp() {
             this.hook = provideHook();
-        }
-
-        @AfterEach
-        public void tearDown() {
             this.hook.clearGraph();
         }
 
         @Test
         public void testCreatingFreeBlock() {
-            assertFalse(this.hook.isBlock(TEST_ID_1));
-            this.hook.createFreeBlock(bv1);
-            assertTrue(this.hook.isBlock(TEST_ID_1));
+            assertFalse(this.hook.isASTVertex(TEST_ID_1));
+            this.hook.createVertex(bv1);
+            assertTrue(this.hook.isASTVertex(TEST_ID_1));
         }
 
         @Test
         public void testCreatingAndJoiningFreeBlocks() {
-            this.hook.createFreeBlock(bv1);
-            this.hook.createFreeBlock(bv2);
-            assertFalse(this.hook.areBlocksJoined(TEST_ID_1, TEST_ID_2));
-            assertFalse(this.hook.areBlocksJoined(TEST_ID_2, TEST_ID_1));
-            this.hook.joinBlocks(TEST_ID_1, TEST_ID_2);
-            assertTrue(this.hook.areBlocksJoined(TEST_ID_1, TEST_ID_2));
-            assertTrue(this.hook.areBlocksJoined(TEST_ID_2, TEST_ID_1));
+            this.hook.createVertex(bv1);
+            this.hook.createVertex(bv2);
+            assertFalse(this.hook.areASTVerticesJoinedByEdge(TEST_ID_1, TEST_ID_2, EdgeLabels.AST));
+            assertFalse(this.hook.areASTVerticesJoinedByEdge(TEST_ID_2, TEST_ID_1, EdgeLabels.AST));
+            this.hook.joinASTVerticesByOrder(TEST_ID_1, TEST_ID_2, EdgeLabels.AST);
+            assertTrue(this.hook.areASTVerticesJoinedByEdge(TEST_ID_1, TEST_ID_2, EdgeLabels.AST));
+            assertTrue(this.hook.areASTVerticesJoinedByEdge(TEST_ID_2, TEST_ID_1, EdgeLabels.AST));
         }
     }
 }

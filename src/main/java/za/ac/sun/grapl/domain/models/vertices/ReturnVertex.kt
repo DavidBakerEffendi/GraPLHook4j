@@ -2,13 +2,14 @@ package za.ac.sun.grapl.domain.models.vertices
 
 import za.ac.sun.grapl.domain.enums.VertexBaseTraits
 import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.ASTVertex
 import za.ac.sun.grapl.domain.models.GraPLVertex
 import java.util.*
 
 /**
  * A return instruction
  */
-class ReturnVertex(val lineNumber: Int, val order: Int, val argumentIndex: Int, val code: String) : GraPLVertex {
+class ReturnVertex(val lineNumber: Int, order: Int, val argumentIndex: Int, val code: String) : ASTVertex(order) {
     override fun toString(): String {
         return "ReturnVertex{" +
                 "lineNumber=" + lineNumber +

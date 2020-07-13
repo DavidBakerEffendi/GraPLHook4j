@@ -181,86 +181,62 @@ public abstract class GremlinHook implements IHook {
     }
 
     @Override
-    public void assignToBlock(final MethodVertex rootMethod, final LocalVertex local, final int blockOrder) {
+    public void createAndAssignToBlock(final MethodVertex parentVertex, final GraPLVertex newVertex) {
         startTransaction();
-        createTinkerGraphEdge(findBlock(rootMethod, blockOrder), EdgeLabels.AST, createTinkerGraphVertex(local));
+        createTinkerGraphEdge(findASTVertex(parentVertex, parentVertex.getOrder()), EdgeLabels.AST, createTinkerGraphVertex(newVertex));
         endTransaction();
     }
 
     @Override
-    public void assignToBlock(final LocalVertex local, int blockOrder) {
+    public void createAndAssignToBlock(final MethodVertex parentVertex, final GraPLVertex newVertex, final int blockOrder) {
         startTransaction();
-        createTinkerGraphEdge(findBlock(blockOrder), EdgeLabels.AST, createTinkerGraphVertex(local));
+        createTinkerGraphEdge(findASTVertex(parentVertex, blockOrder), EdgeLabels.AST, createTinkerGraphVertex(newVertex));
         endTransaction();
     }
 
     @Override
-    public void assignToBlock(final MethodVertex rootMethod, final LiteralVertex literal, final int blockOrder) {
+    public void createAndAssignToBlock(final GraPLVertex control, final int blockOrder) {
         startTransaction();
-        createTinkerGraphEdge(findBlock(rootMethod, blockOrder), EdgeLabels.AST, createTinkerGraphVertex(literal));
+        createTinkerGraphEdge(findASTVertex(blockOrder), EdgeLabels.AST, createTinkerGraphVertex(control));
         endTransaction();
     }
 
     @Override
-    public void assignToBlock(final LiteralVertex literal, int blockOrder) {
+    public void updateASTVertexProperty(final MethodVertex rootMethod, final int order, final String key, final String value) {
         startTransaction();
-        createTinkerGraphEdge(findBlock(blockOrder), EdgeLabels.AST, createTinkerGraphVertex(literal));
+        g.V(findASTVertex(rootMethod, order)).property(key, value).iterate();
         endTransaction();
     }
 
     @Override
-    public void assignToBlock(final MethodVertex rootMethod, final BlockVertex block, final int blockOrder) {
+    public void updateASTVertexProperty(final int order, final String key, final String value) {
         startTransaction();
-        if (blockOrder == 0) {
-            createTinkerGraphEdge(findVertex(rootMethod), EdgeLabels.AST, createTinkerGraphVertex(block));
-        } else {
-            createTinkerGraphEdge(findBlock(rootMethod, blockOrder), EdgeLabels.AST, createTinkerGraphVertex(block));
-        }
+        g.V(findASTVertex(order)).property(key, value).iterate();
         endTransaction();
     }
 
     @Override
-    public void assignToBlock(final MethodVertex rootMethod, final ControlStructureVertex control, final int blockOrder) {
-        startTransaction();
-        createTinkerGraphEdge(findBlock(rootMethod, blockOrder), EdgeLabels.AST, createTinkerGraphVertex(control));
-        endTransaction();
-    }
-
-    @Override
-    public void assignToBlock(final ControlStructureVertex control, int blockOrder) {
-        startTransaction();
-        createTinkerGraphEdge(findBlock(blockOrder), EdgeLabels.AST, createTinkerGraphVertex(control));
-        endTransaction();
-    }
-
-    @Override
-    public void updateBlockProperty(final MethodVertex rootMethod, final int blockOrder, final String key, final String value) {
-        startTransaction();
-        g.V(findBlock(rootMethod, blockOrder)).property(key, value).iterate();
-        endTransaction();
-    }
-
-    @Override
-    public void createFreeBlock(final BlockVertex block) {
+    public void createVertex(final GraPLVertex block) {
         startTransaction();
         createTinkerGraphVertex(block);
         endTransaction();
     }
 
     @Override
-    public void joinBlocks(int blockFrom, int blockTo) {
+    public void joinASTVerticesByOrder(final int blockFrom, final int blockTo, final EdgeLabels edgeLabel) {
         startTransaction();
-        createTinkerGraphEdge(findBlock(blockFrom), EdgeLabels.AST, findBlock(blockTo));
+        createTinkerGraphEdge(findASTVertex(blockFrom), edgeLabel, findASTVertex(blockTo));
         endTransaction();
     }
 
     @Override
-    public boolean areBlocksJoined(int blockFrom, int blockTo) {
+    public boolean areASTVerticesJoinedByEdge(final int blockFrom, final int blockTo, final EdgeLabels edgeLabel) {
         startTransaction();
-        final Vertex a = findBlock(blockFrom);
-        final Vertex b = findBlock(blockTo);
-        final Edge edge = g.V(a).outE(EdgeLabels.AST.toString()).filter(inV().is(b)).tryNext()
-                .orElseGet(() -> g.V(b).outE(EdgeLabels.AST.toString()).filter(inV().is(a)).tryNext().orElse(null));
+        final Vertex a = findASTVertex(blockFrom);
+        final Vertex b = findASTVertex(blockTo);
+        final Edge edge = g.V(a).outE(EdgeLabels.AST.toString()).filter(inV().is(b)).hasLabel(edgeLabel.name()).tryNext()
+                .orElseGet(() -> g.V(b).outE(EdgeLabels.AST.toString()).filter(inV().is(a)).hasLabel(edgeLabel.name()).tryNext()
+                        .orElse(null));
         endTransaction();
         return edge != null;
     }
@@ -276,9 +252,9 @@ public abstract class GremlinHook implements IHook {
     }
 
     @Override
-    public boolean isBlock(final int blockOrder) {
+    public boolean isASTVertex(final int blockOrder) {
         startTransaction();
-        boolean result = g.V().has(BlockVertex.LABEL.toString(), "order", String.valueOf(blockOrder)).hasNext();
+        boolean result = g.V().has("order", String.valueOf(blockOrder)).hasNext();
         endTransaction();
         return result;
     }
@@ -313,7 +289,8 @@ public abstract class GremlinHook implements IHook {
      * @param blockOrder the AST order under which this block occurs.
      * @return the {@link Vertex} associated with the AST block.
      */
-    private Vertex findBlock(final MethodVertex root, final int blockOrder) {
+    private Vertex findASTVertex(final MethodVertex root, final int blockOrder) {
+        if (root.getOrder() == blockOrder) return g.V(findVertex(root)).next();
         return g.V(findVertex(root)).repeat(__.out("AST")).emit()
                 .has("order", String.valueOf(blockOrder)).next();
     }
@@ -322,11 +299,11 @@ public abstract class GremlinHook implements IHook {
      * Finds the associated {@link Vertex} in the graph to the block based on the AST order
      * under which this block occurs in the graph.
      *
-     * @param blockOrder the AST order under which this block occurs.
+     * @param order the AST order under which this block occurs.
      * @return the {@link Vertex} associated with the AST block.
      */
-    private Vertex findBlock(final int blockOrder) {
-        return g.V().hasLabel(BlockVertex.LABEL.toString()).has("order", String.valueOf(blockOrder)).next();
+    private Vertex findASTVertex(final int order) {
+        return g.V().has("order", String.valueOf(order)).next();
     }
 
     /**
@@ -367,9 +344,9 @@ public abstract class GremlinHook implements IHook {
     private Edge createTinkerGraphEdge(final Vertex v1, final EdgeLabels edgeLabel, final Vertex v2) {
 
         if (this instanceof TinkerGraphHook) {
-            return v1.addEdge(edgeLabel.toString(), v2, T.id, UUID.randomUUID());
+            return v1.addEdge(edgeLabel.name(), v2, T.id, UUID.randomUUID());
         } else {
-            return g.V(v1.id()).addE(edgeLabel.toString()).to(g.V(v2.id())).next();
+            return g.V(v1.id()).addE(edgeLabel.name()).to(g.V(v2.id())).next();
         }
     }
 

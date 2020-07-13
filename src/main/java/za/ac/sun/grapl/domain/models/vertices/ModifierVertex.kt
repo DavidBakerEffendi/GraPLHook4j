@@ -3,13 +3,14 @@ package za.ac.sun.grapl.domain.models.vertices
 import za.ac.sun.grapl.domain.enums.ModifierTypes
 import za.ac.sun.grapl.domain.enums.VertexBaseTraits
 import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.ASTVertex
 import za.ac.sun.grapl.domain.models.GraPLVertex
 import java.util.*
 
 /**
  * A modifier, e.g., static, public, private
  */
-class ModifierVertex(val name: ModifierTypes, val order: Int) : GraPLVertex {
+class ModifierVertex(val name: ModifierTypes, order: Int) : ASTVertex(order) {
     override fun toString(): String {
         return "ModifierVertex{" +
                 "name=" + name +

@@ -3,13 +3,21 @@ package za.ac.sun.grapl.domain.models.vertices
 import za.ac.sun.grapl.domain.enums.EvaluationStrategies
 import za.ac.sun.grapl.domain.enums.VertexBaseTraits
 import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.ASTVertex
 import za.ac.sun.grapl.domain.models.GraPLVertex
 import java.util.*
 
 /**
  * This node represents a formal parameter going towards the callee side
  */
-class MethodParameterInVertex(val code: String, val name: String, val evaluationStrategy: EvaluationStrategies, val typeFullName: String, val lineNumber: Int, val order: Int) : GraPLVertex {
+class MethodParameterInVertex(
+        val code: String,
+        val name: String,
+        val evaluationStrategy: EvaluationStrategies,
+        val typeFullName: String,
+        val lineNumber: Int,
+        order: Int
+) : ASTVertex(order) {
     override fun toString(): String {
         return "MethodParameterInVertex{" +
                 "code='" + code + '\'' +

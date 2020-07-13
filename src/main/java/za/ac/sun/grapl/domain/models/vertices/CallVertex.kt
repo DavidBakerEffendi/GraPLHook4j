@@ -3,6 +3,7 @@ package za.ac.sun.grapl.domain.models.vertices
 import za.ac.sun.grapl.domain.enums.DispatchTypes
 import za.ac.sun.grapl.domain.enums.VertexBaseTraits
 import za.ac.sun.grapl.domain.enums.VertexLabels
+import za.ac.sun.grapl.domain.models.ASTVertex
 import za.ac.sun.grapl.domain.models.GraPLVertex
 import java.util.*
 
@@ -12,7 +13,7 @@ import java.util.*
 class CallVertex(
         val code: String,
         val name: String,
-        val order: Int,
+        order: Int,
         val methodInstFullName: String,
         val methodFullName: String,
         val argumentIndex: Int,
@@ -20,7 +21,7 @@ class CallVertex(
         val signature: String,
         val typeFullName: String,
         val lineNumber: Int
-) : GraPLVertex {
+) : ASTVertex(order) {
     override fun toString(): String {
         return "CallVertex{" +
                 "code='" + code + '\'' +

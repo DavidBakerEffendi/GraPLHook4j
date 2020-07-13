@@ -1,6 +1,8 @@
 package za.ac.sun.grapl.hooks;
 
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import za.ac.sun.grapl.domain.enums.EdgeLabels;
+import za.ac.sun.grapl.domain.models.GraPLVertex;
 import za.ac.sun.grapl.domain.models.vertices.*;
 
 public interface IHook {
@@ -68,103 +70,78 @@ public interface IHook {
     void joinNamespaceBlocks(NamespaceBlockVertex from, NamespaceBlockVertex to);
 
     /**
-     * Creates and assigns the {@link LocalVertex} to the associated {@link BlockVertex} vertex in the database
-     * identified by the given {@link MethodVertex} and AST order of the block.
+     * Creates and assigns the {@link GraPLVertex} to the associated {@link MethodVertex} vertex in the
+     * database identified by the given {@link MethodVertex}.
      *
-     * @param rootMethod the {@link MethodVertex} which is the root of the search.
-     * @param local      the {@link LocalVertex} to associate with the block.
-     * @param blockOrder the AST order under which this block occurs.
+     * @param parentVertex the {@link MethodVertex} to connect.
+     * @param newVertex    the {@link GraPLVertex} to associate with the block.
      */
-    void assignToBlock(MethodVertex rootMethod, LocalVertex local, int blockOrder);
+    void createAndAssignToBlock(final MethodVertex parentVertex, final GraPLVertex newVertex);
 
     /**
-     * Slower version of {@link IHook#assignToBlock(MethodVertex, LocalVertex, int)}
-     *
-     * @param local      the {@link LocalVertex} to associate with the block.
-     * @param blockOrder the AST order under which this block occurs.
-     */
-    void assignToBlock(LocalVertex local, int blockOrder);
-
-    /**
-     * Creates and assigns the {@link LiteralVertex} to the associated {@link BlockVertex} vertex in the database
-     * identified by the given {@link MethodVertex} and AST order of the block.
-     *
-     * @param rootMethod the {@link MethodVertex} which is the root of the search.
-     * @param literal    the {@link LiteralVertex} to associate with the block.
-     * @param blockOrder the AST order under which this block occurs.
-     */
-    void assignToBlock(MethodVertex rootMethod, LiteralVertex literal, int blockOrder);
-
-    /**
-     * Slower version of {@link IHook#assignToBlock(MethodVertex, LiteralVertex, int)}
-     *
-     * @param literal      the {@link LiteralVertex} to associate with the block.
-     * @param blockOrder the AST order under which this block occurs.
-     */
-    void assignToBlock(LiteralVertex literal, int blockOrder);
-
-    /**
-     * Creates and assigns the {@link BlockVertex} to the associated {@link BlockVertex} vertex in the database
-     * identified by the given {@link MethodVertex} and AST order of the block.
-     *
-     * @param rootMethod the {@link MethodVertex} which is the root of the search.
-     * @param block      the {@link BlockVertex} to associate with the block.
-     * @param blockOrder the AST order under which this block occurs.
-     */
-    void assignToBlock(MethodVertex rootMethod, BlockVertex block, int blockOrder);
-
-    /**
-     * Creates and assigns the {@link ControlStructureVertex} to the associated {@link BlockVertex} vertex in the
+     * Creates and assigns the {@link GraPLVertex} to the associated {@link BlockVertex} vertex in the
      * database identified by the given {@link MethodVertex} and AST order of the block.
      *
-     * @param rootMethod the {@link MethodVertex} which is the root of the search.
-     * @param control    the {@link ControlStructureVertex} to associate with the block.
+     * @param rootVertex the {@link MethodVertex} which is the root of the search.
+     * @param newVertex  the {@link GraPLVertex} to associate with the block.
      * @param blockOrder the AST order under which this block occurs.
      */
-    void assignToBlock(MethodVertex rootMethod, ControlStructureVertex control, int blockOrder);
+    void createAndAssignToBlock(final MethodVertex rootVertex, final GraPLVertex newVertex, final int blockOrder);
 
     /**
-     * Slower version of {@link IHook#assignToBlock(MethodVertex, ControlStructureVertex, int)}
+     * Creates and assigns the {@link GraPLVertex} to the associated {@link BlockVertex} vertex in the
+     * database identified purely by the order.
      *
-     * @param control      the {@link ControlStructureVertex} to associate with the block.
+     * @param newVertex  the {@link GraPLVertex} to associate with the block.
      * @param blockOrder the AST order under which this block occurs.
      */
-    void assignToBlock(ControlStructureVertex control, int blockOrder);
+    void createAndAssignToBlock(final GraPLVertex newVertex, final int blockOrder);
 
     /**
-     * Updates a key-value pair on a {@link BlockVertex} in the database identified by the given {@link MethodVertex}
+     * Updates a key-value pair on a {@link GraPLVertex} in the database identified by the given {@link MethodVertex}
      * and AST order of the block.
      *
-     * @param rootMethod the {@link MethodVertex} which is the root of the search.
-     * @param blockOrder the AST order under which this block occurs.
+     * @param rootVertex the {@link MethodVertex} which is the root of the search.
+     * @param order      the AST order under which this block occurs.
      * @param key        the key of the property to upsert.
      * @param value      the value to upsert the key with.
      */
-    void updateBlockProperty(MethodVertex rootMethod, int blockOrder, String key, String value);
+    void updateASTVertexProperty(final MethodVertex rootVertex, int order, String key, String value);
 
     /**
-     * Creates a free-floating {@link BlockVertex}
+     * Updates a key-value pair on a {@link GraPLVertex} in the database identified by the given AST order of the block.
      *
-     * @param block the {@link BlockVertex} to create.
+     * @param order the AST order under which this block occurs.
+     * @param key   the key of the property to upsert.
+     * @param value the value to upsert the key with.
      */
-    void createFreeBlock(BlockVertex block);
+    void updateASTVertexProperty(final int order, final String key, final String value);
+
+    /**
+     * Creates a free-floating {@link GraPLVertex}
+     *
+     * @param graPLVertex the {@link GraPLVertex} to create.
+     */
+    void createVertex(GraPLVertex graPLVertex);
 
     /**
      * Creates an edge between two {@link BlockVertex} objects.
      *
      * @param blockFrom AST order of the from block.
      * @param blockTo   AST order of the to block.
+     * @param edgeLabel The label to be attached to the edge.
      */
-    void joinBlocks(int blockFrom, int blockTo);
+    void joinASTVerticesByOrder(int blockFrom, int blockTo, EdgeLabels edgeLabel);
 
     /**
      * Checked if there is an edge between two {@link BlockVertex} objects.
      *
      * @param blockFrom AST order of the from block.
      * @param blockTo   AST order of the to block.
-     * @return
+     * @param edgeLabel The label to be attached to the edge.
+     * @return true if joined by an edge, false if otherwise.
      */
-    boolean areBlocksJoined(int blockFrom, int blockTo);
+    boolean areASTVerticesJoinedByEdge(int blockFrom, int blockTo, EdgeLabels edgeLabel);
 
     /**
      * Traverses the AST nodes to search for the largest order value.
@@ -174,12 +151,12 @@ public interface IHook {
     int maxOrder();
 
     /**
-     * Searches for a {@link BlockVertex} associated with this order.
+     * Searches for a {@link GraPLVertex} associated with this order.
      *
-     * @param blockOrder the {@link BlockVertex} order.
-     * @return true if there is a {@link BlockVertex} with this order value, false if otherwise.
+     * @param blockOrder the {@link GraPLVertex} order.
+     * @return true if there is a {@link GraPLVertex} with this order value, false if otherwise.
      */
-    boolean isBlock(int blockOrder);
+    boolean isASTVertex(int blockOrder);
 
     /**
      * Clears the current loaded graph of all vertices and edges.
