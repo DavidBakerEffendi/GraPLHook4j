@@ -5,6 +5,7 @@ import za.ac.sun.grapl.domain.enums.VertexBaseTraits
 import za.ac.sun.grapl.domain.enums.VertexLabels
 import za.ac.sun.grapl.domain.models.ASTVertex
 import za.ac.sun.grapl.domain.models.GraPLVertex
+import za.ac.sun.grapl.domain.models.MethodDescriptorVertex
 import java.util.*
 
 /**
@@ -12,12 +13,12 @@ import java.util.*
  */
 class MethodParameterInVertex(
         val code: String,
-        val name: String,
+        name: String,
         val evaluationStrategy: EvaluationStrategies,
-        val typeFullName: String,
+        typeFullName: String,
         val lineNumber: Int,
         order: Int
-) : ASTVertex(order) {
+) : MethodDescriptorVertex(name, typeFullName, order) {
     override fun toString(): String {
         return "MethodParameterInVertex{" +
                 "code='" + code + '\'' +

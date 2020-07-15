@@ -5,18 +5,19 @@ import za.ac.sun.grapl.domain.enums.VertexBaseTraits
 import za.ac.sun.grapl.domain.enums.VertexLabels
 import za.ac.sun.grapl.domain.models.ASTVertex
 import za.ac.sun.grapl.domain.models.GraPLVertex
+import za.ac.sun.grapl.domain.models.MethodDescriptorVertex
 import java.util.*
 
 /**
  * A formal method return
  */
 class MethodReturnVertex(
-        val name: String,
-        val typeFullName: String,
+        name: String,
+        typeFullName: String,
         val evaluationStrategy: EvaluationStrategies,
         val lineNumber: Int,
         order: Int
-) : ASTVertex(order) {
+) :  MethodDescriptorVertex(name, typeFullName, order) {
     override fun toString(): String {
         return "MethodReturnVertex{" +
                 "name='" + name + '\'' +
