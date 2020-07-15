@@ -4,12 +4,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
 import za.ac.sun.grapl.domain.enums.*;
-import za.ac.sun.grapl.domain.models.GraPLVertex;
 import za.ac.sun.grapl.domain.models.vertices.*;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.EnumSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -119,7 +117,7 @@ abstract public class GremlinHookTest {
             assertTrue(this.hook.g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
             assertTrue(this.hook.g.V().hasLabel(MethodVertex.LABEL.toString())
                     .out(EdgeLabels.AST.toString())
-                    .has(ModifierVertex.LABEL.toString(), "name", ModifierTypes.PUBLIC.toString())
+                    .has(ModifierVertex.LABEL.toString(), "name", ModifierTypes.PUBLIC)
                     .hasNext());
             this.hook.endTransaction();
         }

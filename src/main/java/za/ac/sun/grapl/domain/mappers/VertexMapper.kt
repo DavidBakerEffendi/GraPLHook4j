@@ -8,12 +8,12 @@ class VertexMapper {
 
     companion object {
         @JvmStatic
-        fun propertiesToMap(objectVertex: GraPLVertex): MutableMap<String, String> {
-            val properties = emptyMap<String, String>().toMutableMap()
+        fun propertiesToMap(objectVertex: GraPLVertex): MutableMap<String, Any> {
+            val properties = emptyMap<String, Any>().toMutableMap()
             properties["label"] = objectVertex.javaClass.getDeclaredField("LABEL").get(objectVertex).toString()
             objectVertex::class.memberProperties.forEach {
                 if (it.visibility == KVisibility.PUBLIC) {
-                    properties[it.name] = it.getter.call(objectVertex).toString()
+                    properties[it.name] = it.getter.call(objectVertex)!!
                 }
             }
             return properties
