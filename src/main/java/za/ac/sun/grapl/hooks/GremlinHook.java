@@ -76,7 +76,7 @@ public abstract class GremlinHook implements IHook {
      */
     private Vertex findVertex(final FileVertex from) {
         return g.V().has(FileVertex.LABEL.toString(), "name", from.getName())
-                .has("order", String.valueOf(from.getOrder())).next();
+                .has("order", from.getOrder()).next();
     }
 
     /**
@@ -108,7 +108,7 @@ public abstract class GremlinHook implements IHook {
      */
     private boolean vertexNotPresent(final FileVertex v) {
         return !g.V().has(FileVertex.LABEL.toString(), "name", v.getName())
-                .has("order", String.valueOf(v.getOrder())).hasNext();
+                .has("order", v.getOrder()).hasNext();
     }
 
     @Override
@@ -246,7 +246,7 @@ public abstract class GremlinHook implements IHook {
         startTransaction();
         int result = 0;
         if (g.V().has("order").hasNext())
-            result = Integer.parseInt(g.V().order().by("order", desc).limit(1).values("order").next().toString());
+            result = (int) g.V().order().by("order", desc).limit(1).values("order").next();
         endTransaction();
         return result;
     }
@@ -254,7 +254,7 @@ public abstract class GremlinHook implements IHook {
     @Override
     public boolean isASTVertex(final int blockOrder) {
         startTransaction();
-        boolean result = g.V().has("order", String.valueOf(blockOrder)).hasNext();
+        boolean result = g.V().has("order", blockOrder).hasNext();
         endTransaction();
         return result;
     }
@@ -292,7 +292,7 @@ public abstract class GremlinHook implements IHook {
     private Vertex findASTVertex(final MethodVertex root, final int blockOrder) {
         if (root.getOrder() == blockOrder) return g.V(findVertex(root)).next();
         return g.V(findVertex(root)).repeat(__.out("AST")).emit()
-                .has("order", String.valueOf(blockOrder)).next();
+                .has("order", blockOrder).next();
     }
 
     /**
@@ -303,7 +303,7 @@ public abstract class GremlinHook implements IHook {
      * @return the {@link Vertex} associated with the AST block.
      */
     private Vertex findASTVertex(final int order) {
-        return g.V().has("order", String.valueOf(order)).next();
+        return g.V().has("order", order).next();
     }
 
     /**
@@ -314,9 +314,9 @@ public abstract class GremlinHook implements IHook {
      * @return the newly created {@link Vertex}.
      */
     private Vertex createTinkerGraphVertex(final GraPLVertex gv) {
-        final Map<String, String> propertyMap = VertexMapper.propertiesToMap(gv);
+        final Map<String, Object> propertyMap = VertexMapper.propertiesToMap(gv);
         // Get the implementing class label parameter
-        final String label = propertyMap.remove("label");
+        final String label = (String) propertyMap.remove("label");
         // Get the implementing classes fields and values
         Vertex v;
         if (this instanceof TinkerGraphHook) {
@@ -324,7 +324,7 @@ public abstract class GremlinHook implements IHook {
             propertyMap.forEach(v::property);
         } else {
             GraphTraversal<Vertex, Vertex> traversalPointer = g.addV(label);
-            for (Map.Entry<String, String> f : propertyMap.entrySet()) {
+            for (Map.Entry<String, Object> f : propertyMap.entrySet()) {
                 traversalPointer = traversalPointer.property(f.getKey(), f.getValue());
             }
             v = traversalPointer.next();
