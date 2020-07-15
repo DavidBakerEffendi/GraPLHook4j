@@ -270,7 +270,7 @@ public abstract class GremlinHook implements IHook {
         startTransaction();
         int result = 0;
         if (g.V().has("order").hasNext())
-            result = (int) g.V().order().by("order", desc).limit(1).values("order").next();
+            result = (int) g.V().has("order").order().by("order", desc).limit(1).values("order").next();
         endTransaction();
         return result;
     }
