@@ -117,7 +117,7 @@ abstract public class GremlinHookTest {
             assertTrue(this.hook.g.E().hasLabel(EdgeLabels.AST.toString()).hasNext());
             assertTrue(this.hook.g.V().hasLabel(MethodVertex.LABEL.toString())
                     .out(EdgeLabels.AST.toString())
-                    .has(ModifierVertex.LABEL.toString(), "name", ModifierTypes.PUBLIC)
+                    .has(ModifierVertex.LABEL.toString(), "name", ModifierTypes.PUBLIC.toString())
                     .hasNext());
             this.hook.endTransaction();
         }
