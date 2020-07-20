@@ -16,7 +16,7 @@ public final class JanusGraphHookIntTest extends GremlinHookTest {
     @BeforeAll
     static void setUpAll() throws Exception {
         // Setup schema and build test database
-        hook = new JanusGraphHook.JanusGraphHookBuilder("src/test/resources/conf/remote.properties")
+        hook = new JanusGraphHook.Builder("src/test/resources/conf/remote.properties")
                 .clearDatabase(true)
                 .build();
     }
@@ -28,14 +28,14 @@ public final class JanusGraphHookIntTest extends GremlinHookTest {
     }
 
     @Override
-    public IHookBuilder provideBuilder() {
-        return new JanusGraphHook.JanusGraphHookBuilder("src/test/resources/conf/remote.properties");
+    public GremlinHookBuilder provideBuilder() {
+        return new JanusGraphHook.Builder("src/test/resources/conf/remote.properties");
     }
 
     @Override
     public GremlinHook provideHook() {
         try {
-            return new JanusGraphHook.JanusGraphHookBuilder("src/test/resources/conf/remote.properties").build();
+            return new JanusGraphHook.Builder("src/test/resources/conf/remote.properties").build();
         } catch (Exception e) {
             log.error("Unable to build JanusGraphHook!", e);
             return null;
@@ -46,7 +46,7 @@ public final class JanusGraphHookIntTest extends GremlinHookTest {
     public GremlinHook provideHook(String existingGraph) {
         try {
             return new JanusGraphHook
-                    .JanusGraphHookBuilder("src/test/resources/conf/remote.properties")
+                    .Builder("src/test/resources/conf/remote.properties")
                     .build();
         } catch (Exception e) {
             log.error("Unable to build JanusGraphHook!", e);

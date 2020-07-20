@@ -1,9 +1,6 @@
-package za.ac.sun.grapl.hooks;
+package za.ac.sun.grapl.hooks
 
-public interface IHookBuilder {
-
-    IHookBuilder useExistingGraph(final String graphDir);
-
-    IHook build() throws Exception;
-
+interface IHookBuilder {
+    @Throws(Exception::class)
+    fun build(): IHook?
 }

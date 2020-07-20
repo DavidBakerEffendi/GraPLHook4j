@@ -1,171 +1,169 @@
-package za.ac.sun.grapl.hooks;
+package za.ac.sun.grapl.hooks
 
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-import za.ac.sun.grapl.domain.enums.EdgeLabels;
-import za.ac.sun.grapl.domain.models.GraPLVertex;
-import za.ac.sun.grapl.domain.models.MethodDescriptorVertex;
-import za.ac.sun.grapl.domain.models.vertices.*;
+import za.ac.sun.grapl.domain.enums.EdgeLabels
+import za.ac.sun.grapl.domain.models.GraPLVertex
+import za.ac.sun.grapl.domain.models.MethodDescriptorVertex
+import za.ac.sun.grapl.domain.models.vertices.*
 
-public interface IHook {
-
+interface IHook {
     /**
      * Registers the meta-data of the graph's underlying language.
      *
      * @param vertex vertex holding the language and version information.
      */
-    void registerMetaData(final MetaDataVertex vertex);
+    fun registerMetaData(vertex: MetaDataVertex?)
 
     /**
-     * Creates a {@link Vertex} from a given {@link FileVertex}.
+     * Creates a [Vertex] from a given [FileVertex].
      *
-     * @param v the {@link FileVertex} to translate into a {@link Vertex}.
+     * @param v the [FileVertex] to translate into a [Vertex].
      */
-    void addFileVertex(final FileVertex v);
+    fun addFileVertex(v: FileVertex?)
 
     /**
-     * Creates the given {@link MethodDescriptorVertex} in the database and joins it to the vertex associated with the
-     * given {@link MethodVertex}.
+     * Creates the given [MethodDescriptorVertex] in the database and joins it to the vertex associated with the
+     * given [MethodVertex].
      *
-     * @param from the {@link MethodVertex} in the database.
-     * @param to   the {@link MethodDescriptorVertex} to create and join.
+     * @param from the [MethodVertex] in the database.
+     * @param to   the [MethodDescriptorVertex] to create and join.
      */
-    void createAndAddToMethod(final MethodVertex from, final MethodDescriptorVertex to);
+    fun createAndAddToMethod(from: MethodVertex?, to: MethodDescriptorVertex?)
 
     /**
-     * Creates the given {@link ModifierVertex} in the database and joins it to the vertex associated with the
-     * given {@link MethodVertex}.
+     * Creates the given [ModifierVertex] in the database and joins it to the vertex associated with the
+     * given [MethodVertex].
      *
-     * @param from the {@link MethodVertex} in the database.
-     * @param to   the {@link ModifierVertex} to create and join.
+     * @param from the [MethodVertex] in the database.
+     * @param to   the [ModifierVertex] to create and join.
      */
-    void createAndAddToMethod(final MethodVertex from, final ModifierVertex to);
+    fun createAndAddToMethod(from: MethodVertex?, to: ModifierVertex?)
 
     /**
-     * Joins the vertex associated with the given {@link FileVertex} in the database and the vertex associated with the
-     * given {@link NamespaceBlockVertex}. If there is no associated vertices then they will be created.
+     * Joins the vertex associated with the given [FileVertex] in the database and the vertex associated with the
+     * given [NamespaceBlockVertex]. If there is no associated vertices then they will be created.
      *
-     * @param to   the {@link FileVertex} in the database.
-     * @param from the {@link NamespaceBlockVertex} in the database.
+     * @param to   the [FileVertex] in the database.
+     * @param from the [NamespaceBlockVertex] in the database.
      */
-    void joinFileVertexTo(final FileVertex to, final NamespaceBlockVertex from);
+    fun joinFileVertexTo(to: FileVertex?, from: NamespaceBlockVertex?)
 
     /**
-     * Joins the vertex associated with the given {@link FileVertex} in the database and the vertex associated with the
-     * given {@link MethodVertex}. If there is no associated vertices then they will be created.
+     * Joins the vertex associated with the given [FileVertex] in the database and the vertex associated with the
+     * given [MethodVertex]. If there is no associated vertices then they will be created.
      *
-     * @param from the {@link FileVertex} in the database.
-     * @param to   the {@link MethodVertex} in the database.
+     * @param from the [FileVertex] in the database.
+     * @param to   the [MethodVertex] in the database.
      */
-    void joinFileVertexTo(final FileVertex from, final MethodVertex to);
+    fun joinFileVertexTo(from: FileVertex?, to: MethodVertex?)
 
     /**
-     * Joins two namespace block vertices associated with the given {@link NamespaceBlockVertex} parameters. If one or
-     * both of the {@link NamespaceBlockVertex} parameters do no have an associated vertex in the database, they are
+     * Joins two namespace block vertices associated with the given [NamespaceBlockVertex] parameters. If one or
+     * both of the [NamespaceBlockVertex] parameters do no have an associated vertex in the database, they are
      * created.
      *
      * @param from the from vertex.
      * @param to   the to vertex.
      */
-    void joinNamespaceBlocks(final NamespaceBlockVertex from, final NamespaceBlockVertex to);
+    fun joinNamespaceBlocks(from: NamespaceBlockVertex?, to: NamespaceBlockVertex?)
 
     /**
-     * Creates and assigns the {@link GraPLVertex} to the associated {@link MethodVertex} vertex in the
-     * database identified by the given {@link MethodVertex}.
+     * Creates and assigns the [GraPLVertex] to the associated [MethodVertex] vertex in the
+     * database identified by the given [MethodVertex].
      *
-     * @param parentVertex the {@link MethodVertex} to connect.
-     * @param newVertex    the {@link GraPLVertex} to associate with the block.
+     * @param parentVertex the [MethodVertex] to connect.
+     * @param newVertex    the [GraPLVertex] to associate with the block.
      */
-    void createAndAssignToBlock(final MethodVertex parentVertex, final GraPLVertex newVertex);
+    fun createAndAssignToBlock(parentVertex: MethodVertex?, newVertex: GraPLVertex?)
 
     /**
-     * Creates and assigns the {@link GraPLVertex} to the associated {@link BlockVertex} vertex in the
-     * database identified by the given {@link MethodVertex} and AST order of the block.
+     * Creates and assigns the [GraPLVertex] to the associated [BlockVertex] vertex in the
+     * database identified by the given [MethodVertex] and AST order of the block.
      *
-     * @param rootVertex the {@link MethodVertex} which is the root of the search.
-     * @param newVertex  the {@link GraPLVertex} to associate with the block.
+     * @param rootVertex the [MethodVertex] which is the root of the search.
+     * @param newVertex  the [GraPLVertex] to associate with the block.
      * @param blockOrder the AST order under which this block occurs.
      */
-    void createAndAssignToBlock(final MethodVertex rootVertex, final GraPLVertex newVertex, final int blockOrder);
+    fun createAndAssignToBlock(rootVertex: MethodVertex?, newVertex: GraPLVertex?, blockOrder: Int)
 
     /**
-     * Creates and assigns the {@link GraPLVertex} to the associated {@link BlockVertex} vertex in the
+     * Creates and assigns the [GraPLVertex] to the associated [BlockVertex] vertex in the
      * database identified purely by the order.
      *
-     * @param newVertex  the {@link GraPLVertex} to associate with the block.
+     * @param newVertex  the [GraPLVertex] to associate with the block.
      * @param blockOrder the AST order under which this block occurs.
      */
-    void createAndAssignToBlock(final GraPLVertex newVertex, final int blockOrder);
+    fun createAndAssignToBlock(newVertex: GraPLVertex?, blockOrder: Int)
 
     /**
-     * Updates a key-value pair on a {@link GraPLVertex} in the database identified by the given {@link MethodVertex}
+     * Updates a key-value pair on a [GraPLVertex] in the database identified by the given [MethodVertex]
      * and AST order of the block.
      *
-     * @param rootVertex the {@link MethodVertex} which is the root of the search.
+     * @param rootVertex the [MethodVertex] which is the root of the search.
      * @param order      the AST order under which this block occurs.
      * @param key        the key of the property to upsert.
      * @param value      the value to upsert the key with.
      */
-    void updateASTVertexProperty(final MethodVertex rootVertex, int order, String key, String value);
+    fun updateASTVertexProperty(rootVertex: MethodVertex?, order: Int, key: String?, value: String?)
 
     /**
-     * Updates a key-value pair on a {@link GraPLVertex} in the database identified by the given AST order of the block.
+     * Updates a key-value pair on a [GraPLVertex] in the database identified by the given AST order of the block.
      *
      * @param order the AST order under which this block occurs.
      * @param key   the key of the property to upsert.
      * @param value the value to upsert the key with.
      */
-    void updateASTVertexProperty(final int order, final String key, final String value);
+    fun updateASTVertexProperty(order: Int, key: String?, value: String?)
 
     /**
-     * Creates a free-floating {@link GraPLVertex}
+     * Creates a free-floating [GraPLVertex]
      *
-     * @param graPLVertex the {@link GraPLVertex} to create.
+     * @param graPLVertex the [GraPLVertex] to create.
      */
-    void createVertex(final GraPLVertex graPLVertex);
+    fun createVertex(graPLVertex: GraPLVertex?)
 
     /**
-     * Creates an edge between two {@link BlockVertex} objects.
+     * Creates an edge between two [BlockVertex] objects.
      *
      * @param blockFrom AST order of the from block.
      * @param blockTo   AST order of the to block.
      * @param edgeLabel The label to be attached to the edge.
      */
-    void joinASTVerticesByOrder(final int blockFrom, final int blockTo, final EdgeLabels edgeLabel);
+    fun joinASTVerticesByOrder(blockFrom: Int, blockTo: Int, edgeLabel: EdgeLabels?)
 
     /**
-     * Checked if there is an edge between two {@link BlockVertex} objects.
+     * Checked if there is an edge between two [BlockVertex] objects.
      *
      * @param blockFrom AST order of the from block.
      * @param blockTo   AST order of the to block.
      * @param edgeLabel The label to be attached to the edge.
      * @return true if joined by an edge, false if otherwise.
      */
-    boolean areASTVerticesJoinedByEdge(final int blockFrom, final int blockTo, final EdgeLabels edgeLabel);
+    fun areASTVerticesJoinedByEdge(blockFrom: Int, blockTo: Int, edgeLabel: EdgeLabels?): Boolean
 
     /**
      * Traverses the AST nodes to search for the largest order value.
      *
      * @return the largest order property.
      */
-    int maxOrder();
+    fun maxOrder(): Int
 
     /**
-     * Searches for a {@link GraPLVertex} associated with this order.
+     * Searches for a [GraPLVertex] associated with this order.
      *
-     * @param blockOrder the {@link GraPLVertex} order.
-     * @return true if there is a {@link GraPLVertex} with this order value, false if otherwise.
+     * @param blockOrder the [GraPLVertex] order.
+     * @return true if there is a [GraPLVertex] with this order value, false if otherwise.
      */
-    boolean isASTVertex(final int blockOrder);
+    fun isASTVertex(blockOrder: Int): Boolean
 
     /**
      * Clears the current loaded graph of all vertices and edges.
      */
-    void clearGraph();
+    fun clearGraph()
 
     /**
      * Closes the connection to the graph database.
      */
-    void close();
+    fun close()
 
     /**
      * Exports the current graph to the serialized format specified by the extension in exportDir
@@ -173,5 +171,5 @@ public interface IHook {
      *
      * @param exportDir The file to export the graph to.
      */
-    void exportCurrentGraph(final String exportDir);
+    fun exportCurrentGraph(exportDir: String?)
 }

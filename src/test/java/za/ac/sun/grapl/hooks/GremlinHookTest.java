@@ -39,7 +39,7 @@ abstract public class GremlinHookTest {
      * @return a built hook.
      */
     public GremlinHook provideHook() {
-        return new TinkerGraphHook.TinkerGraphHookBuilder().build();
+        return new TinkerGraphHook.Builder().build();
     }
 
     /**
@@ -50,17 +50,17 @@ abstract public class GremlinHookTest {
      * @return a hook connected to a graph database populated with the contents of the file at the given path.
      */
     public GremlinHook provideHook(String existingGraph) {
-        return new TinkerGraphHook.TinkerGraphHookBuilder().useExistingGraph(existingGraph).build();
+        return new TinkerGraphHook.Builder().useExistingGraph(existingGraph).build();
     }
 
     /**
      * Provides a hook builder to continue to configure.
-     * Default is a {@link za.ac.sun.grapl.hooks.TinkerGraphHook.TinkerGraphHookBuilder}.
+     * Default is a {@link za.ac.sun.grapl.hooks.TinkerGraphHook.Builder}.
      *
      * @return an {@link IHookBuilder} to build with.
      */
-    public IHookBuilder provideBuilder() {
-        return new TinkerGraphHook.TinkerGraphHookBuilder();
+    public GremlinHookBuilder provideBuilder() {
+        return new TinkerGraphHook.Builder();
     }
 
     @Nested

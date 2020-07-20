@@ -1,138 +1,120 @@
-package za.ac.sun.grapl.hooks;
+package za.ac.sun.grapl.hooks
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource;
-import org.apache.tinkerpop.gremlin.structure.Graph;
-import org.apache.tinkerpop.gremlin.structure.Transaction;
+import org.apache.logging.log4j.LogManager
+import org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource
+import org.apache.tinkerpop.gremlin.structure.Graph
+import org.apache.tinkerpop.gremlin.structure.Transaction
+import java.io.File
 
-import java.io.File;
+class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder.graph) {
 
-public final class JanusGraphHook extends GremlinHook {
-
-    private static final Logger log = LogManager.getLogger();
-
-    private final Graph graph;
-    private final boolean supportsTransactions;
-    private final String conf;
-    private Transaction tx;
-
-    private JanusGraphHook(JanusGraphHookBuilder builder) {
-        super(builder.graph);
-        this.conf = builder.conf;
-        this.graph = super.graph;
-        if (builder.graphDir != null) super.graph.traversal().io(builder.graphDir).read().iterate();
-        this.supportsTransactions = graph.features().graph().supportsTransactions();
-        try {
-            if (builder.clearGraph) clearGraph();
-        } catch (Exception e) {
-            log.warn("Unable to clear graph!", e);
-        }
-    }
-
-    @Override
-    protected void startTransaction() {
+    private val supportsTransactions: Boolean
+    private val conf: String
+    private var tx: Transaction? = null
+    override fun startTransaction() {
         if (supportsTransactions) {
-            log.debug("Supports tx");
-            if (tx == null || !tx.isOpen()) {
-                log.debug("Created new tx");
+            log.debug("Supports tx")
+            if (tx == null || !tx!!.isOpen) {
+                log.debug("Created new tx")
                 try {
-                    tx = AnonymousTraversalSource.traversal().withRemote(conf).tx();
-                } catch (Exception e) {
-                    log.error("Unable to create transaction!");
+                    tx = AnonymousTraversalSource.traversal().withRemote(conf).tx()
+                } catch (e: Exception) {
+                    log.error("Unable to create transaction!")
                 }
             }
         } else {
-            log.debug("Does not support tx");
+            log.debug("Does not support tx")
         }
         try {
-            super.setTraversalSource(AnonymousTraversalSource.traversal().withRemote(conf));
-        } catch (Exception e) {
-            log.error("Unable to create transaction!");
+            super.setTraversalSource(AnonymousTraversalSource.traversal().withRemote(conf))
+        } catch (e: Exception) {
+            log.error("Unable to create transaction!")
         }
     }
 
-    @Override
-    protected void endTransaction() {
+    override fun endTransaction() {
         if (supportsTransactions) {
-            boolean success = false;
-            int failures = 0;
-            final int waitTime = 5000;
+            var success = false
+            var failures = 0
+            val waitTime = 5000
             do {
                 try {
-                    if (tx == null) return;
-                    if (!tx.isOpen()) return;
-                    tx.commit();
-                    success = true;
-                } catch (IllegalStateException e) {
-                    failures++;
+                    if (tx == null) return
+                    if (!tx!!.isOpen) return
+                    tx!!.commit()
+                    success = true
+                } catch (e: IllegalStateException) {
+                    failures++
                     if (failures > 3) {
-                        log.error("Failed to commit transaction " + failures + " time(s). Aborting...");
-                        return;
+                        log.error("Failed to commit transaction $failures time(s). Aborting...")
+                        return
                     } else {
-                        log.warn("Failed to commit transaction " + failures + " time(s). Backing off and retrying...");
+                        log.warn("Failed to commit transaction $failures time(s). Backing off and retrying...")
                         try {
-                            Thread.sleep(waitTime);
-                        } catch (Exception ignored) {
+                            Thread.sleep(waitTime.toLong())
+                        } catch (ignored: Exception) {
                         }
                     }
                 }
-            } while (!success);
+            } while (!success)
         } else {
-            super.endTransaction();
+            super.endTransaction()
         }
     }
 
-    @Override
-    public void exportCurrentGraph(String exportDir) {
-        if (!isValidExportPath(exportDir)) {
-            throw new IllegalArgumentException("Unsupported graph extension! Supported types are GraphML," +
-                    " GraphSON, and Gryo.");
+    override fun exportCurrentGraph(exportDir: String) {
+        require(isValidExportPath(exportDir)) {
+            "Unsupported graph extension! Supported types are GraphML," +
+                    " GraphSON, and Gryo."
         }
-        final String ext = exportDir.substring(exportDir.lastIndexOf('.') + 1).toLowerCase();
-        startTransaction();
-        switch (ext) {
-            case ("kryo"):
-            case ("json"):
-            case ("xml"):
-                throw new UnsupportedOperationException("Export to Kryo, XML, and JSON currently not supported using the JanusGraphHook.");
+        val ext = exportDir.substring(exportDir.lastIndexOf('.') + 1).toLowerCase()
+        startTransaction()
+        when (ext) {
+            "kryo", "json", "xml" -> throw UnsupportedOperationException("Export to Kryo, XML, and JSON currently not supported using the JanusGraphHook.")
         }
-        endTransaction();
+        endTransaction()
     }
 
-    public static class JanusGraphHookBuilder implements IHookBuilder {
-        private String graphDir;
-        private boolean clearGraph;
-        private final String conf;
-        private Graph graph;
+    data class Builder(
+            var conf: String,
+            var graphDir: String? = null,
+            var clearGraph: Boolean = false
+    ) : GremlinHookBuilder {
+        var graph: Graph? = null
 
-        public JanusGraphHookBuilder(final String pathToConf) {
-            if (pathToConf == null) throw new AssertionError("Config path may not be null! See " +
-                    "https://docs.janusgraph.org/connecting/java/ for how to configure JanusGraph remote connections.");
-            this.conf = pathToConf;
-        }
+        constructor(conf: String): this(conf, null, false)
 
-        public JanusGraphHookBuilder clearDatabase(final boolean clearDatabase) {
-            this.clearGraph = clearDatabase;
-            return this;
-        }
+        fun clearDatabase(clearGraph: Boolean) = apply { this.clearGraph = clearGraph }
 
-        public JanusGraphHookBuilder useExistingGraph(final String graphDir) {
-            if (!isValidExportPath(graphDir)) {
-                throw new IllegalArgumentException("Unsupported graph extension! Supported types are GraphML," +
-                        " GraphSON, and Gryo.");
-            } else if (!new File(graphDir).exists()) {
-                throw new IllegalArgumentException("No existing serialized graph file was found at " + graphDir);
+        override fun useExistingGraph(graphDir: String): Builder {
+            require(isValidExportPath(graphDir)) {
+                "Unsupported graph extension! Supported types are GraphML," +
+                        " GraphSON, and Gryo."
             }
-            this.graphDir = graphDir;
-            return this;
+            require(File(graphDir).exists()) { "No existing serialized graph file was found at $graphDir" }
+            this.graphDir = graphDir
+            return this
         }
 
-        public JanusGraphHook build() throws Exception {
-            graph = AnonymousTraversalSource.traversal().withRemote(conf).getGraph();
-            return new JanusGraphHook(this);
+        @Throws(Exception::class)
+        override fun build(): JanusGraphHook {
+            graph = AnonymousTraversalSource.traversal().withRemote(conf).graph
+            return JanusGraphHook(this)
         }
-
     }
 
+    companion object {
+        private val log = LogManager.getLogger()
+    }
+
+    init {
+        conf = builder.conf
+        if (builder.graphDir != null) graph.traversal().io<Any>(builder.graphDir).read().iterate()
+        supportsTransactions = graph.features().graph().supportsTransactions()
+        try {
+            if (builder.clearGraph) clearGraph()
+        } catch (e: Exception) {
+            log.warn("Unable to clear graph!", e)
+        }
+    }
 }
