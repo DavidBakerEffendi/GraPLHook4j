@@ -12,6 +12,7 @@ repositories {
         url = uri('https://repo.maven.apache.org/maven2')
     }
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
@@ -20,6 +21,7 @@ dependencies {
     implementation 'org.apache.tinkerpop:gremlin-core:3.4.6'
     implementation 'org.apache.tinkerpop:tinkergraph-gremlin:3.4.6'
     implementation 'org.janusgraph:janusgraph-driver:0.5.2'
+    // implementation 'com.tigergraph:tg-jdbc-driver:1.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.4.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.3.72"
@@ -34,23 +36,43 @@ test {
     }
 }
 
-task integrationTest(type: Test) {
+task janusGraphIntTest(type: Test) {
     useJUnitPlatform()
-    description = "Execute integration tests."
+    description = "Execute JanusGraph integration tests."
     group = "verification"
-    include "**/*IT*", "**/*IntTest*"
+    include "**/*JanusGraph*"
 
     testLogging {
         events 'FAILED', 'SKIPPED'
     }
     doFirst {
-        dockerCompose.exposeAsEnvironment(integrationTest)
+        dockerCompose.exposeAsEnvironment(janusGraphIntTest)
+    }
+}
+
+task tigerGraphIntTest(type: Test) {
+    useJUnitPlatform()
+    description = "Execute TigerGraph integration tests."
+    group = "verification"
+    include "**/*TigerGraph*"
+
+    testLogging {
+        events 'FAILED', 'SKIPPED'
+    }
+    doFirst {
+        dockerCompose.exposeAsEnvironment(tigerGraphIntTest)
     }
 }
 
 dockerCompose {
-    useComposeFiles = ['src/test/resources/docker/janus-berkeleyje-lucene.yml']
-    isRequiredBy(project.tasks.integrationTest)
+    janusGraphSetup {
+        useComposeFiles = ['src/test/resources/docker/janus-berkeleyje-lucene.yml']
+        isRequiredBy(project.tasks.janusGraphIntTest)
+    }
+    tigerGraphSetup {
+        useComposeFiles = ['src/test/resources/docker/tigergraph.yml']
+        isRequiredBy(project.tasks.tigerGraphIntTest)
+    }
 }
 
 jacoco {
@@ -64,7 +86,7 @@ jacocoTestReport {
         html.enabled true
         csv.enabled false
     }
-    executionData test, integrationTest
+    executionData test, janusGraphIntTest, tigerGraphIntTest
 }
 
 check.dependsOn jacocoTestCoverageVerification

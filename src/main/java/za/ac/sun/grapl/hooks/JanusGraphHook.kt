@@ -62,12 +62,12 @@ class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder
         }
     }
 
-    override fun exportCurrentGraph(exportDir: String) {
+    override fun exportCurrentGraph(exportDir: String?) {
         require(isValidExportPath(exportDir)) {
             "Unsupported graph extension! Supported types are GraphML," +
                     " GraphSON, and Gryo."
         }
-        val ext = exportDir.substring(exportDir.lastIndexOf('.') + 1).toLowerCase()
+        val ext = exportDir?.substring(exportDir.lastIndexOf('.') + 1)?.toLowerCase()
         startTransaction()
         when (ext) {
             "kryo", "json", "xml" -> throw UnsupportedOperationException("Export to Kryo, XML, and JSON currently not supported using the JanusGraphHook.")
@@ -86,7 +86,7 @@ class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder
 
         fun clearDatabase(clearGraph: Boolean) = apply { this.clearGraph = clearGraph }
 
-        override fun useExistingGraph(graphDir: String): Builder {
+        override fun useExistingGraph(graphDir: String): IHookBuilder {
             require(isValidExportPath(graphDir)) {
                 "Unsupported graph extension! Supported types are GraphML," +
                         " GraphSON, and Gryo."
