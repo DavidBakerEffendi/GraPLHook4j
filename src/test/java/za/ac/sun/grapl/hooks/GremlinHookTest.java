@@ -11,9 +11,9 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-abstract public class GremlinHookTest {
+public class GremlinHookTest {
 
-    final static Logger logger = LogManager.getLogger();
+    final static Logger logger = LogManager.getLogger(GremlinHookTest.class);
 
     final static String tempDir = System.getProperty("java.io.tmpdir");
     final static String testGraphML = tempDir + "/grapl/graplhook4j_test.xml";

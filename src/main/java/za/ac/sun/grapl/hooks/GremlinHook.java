@@ -23,7 +23,7 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 
 public abstract class GremlinHook implements IHook {
 
-    private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LogManager.getLogger(GremlinHook.class);
     protected final Graph graph;
     protected GraphTraversalSource g;
 
