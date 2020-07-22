@@ -8,27 +8,28 @@ import java.io.File
 
 class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder.graph) {
 
+    private val logger = LogManager.getLogger(JanusGraphHook::class.java)
     private val supportsTransactions: Boolean
     private val conf: String
     private var tx: Transaction? = null
     override fun startTransaction() {
         if (supportsTransactions) {
-            log.debug("Supports tx")
+            logger.debug("Supports tx")
             if (tx == null || !tx!!.isOpen) {
-                log.debug("Created new tx")
+                logger.debug("Created new tx")
                 try {
                     tx = AnonymousTraversalSource.traversal().withRemote(conf).tx()
                 } catch (e: Exception) {
-                    log.error("Unable to create transaction!")
+                    logger.error("Unable to create transaction!")
                 }
             }
         } else {
-            log.debug("Does not support tx")
+            logger.debug("Does not support tx")
         }
         try {
             super.setTraversalSource(AnonymousTraversalSource.traversal().withRemote(conf))
         } catch (e: Exception) {
-            log.error("Unable to create transaction!")
+            logger.error("Unable to create transaction!")
         }
     }
 
@@ -46,10 +47,10 @@ class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder
                 } catch (e: IllegalStateException) {
                     failures++
                     if (failures > 3) {
-                        log.error("Failed to commit transaction $failures time(s). Aborting...")
+                        logger.error("Failed to commit transaction $failures time(s). Aborting...")
                         return
                     } else {
-                        log.warn("Failed to commit transaction $failures time(s). Backing off and retrying...")
+                        logger.warn("Failed to commit transaction $failures time(s). Backing off and retrying...")
                         try {
                             Thread.sleep(waitTime.toLong())
                         } catch (ignored: Exception) {
@@ -103,10 +104,6 @@ class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder
         }
     }
 
-    companion object {
-        private val log = LogManager.getLogger()
-    }
-
     init {
         conf = builder.conf
         if (builder.graphDir != null) graph.traversal().io<Any>(builder.graphDir).read().iterate()
@@ -114,7 +111,7 @@ class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder
         try {
             if (builder.clearGraph) clearGraph()
         } catch (e: Exception) {
-            log.warn("Unable to clear graph!", e)
+            logger.warn("Unable to clear graph!", e)
         }
     }
 }

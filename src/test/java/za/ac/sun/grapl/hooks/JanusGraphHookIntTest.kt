@@ -3,9 +3,11 @@ package za.ac.sun.grapl.hooks
 import org.apache.logging.log4j.LogManager
 import org.junit.jupiter.api.*
 import za.ac.sun.grapl.domain.models.vertices.FileVertex
-import za.ac.sun.grapl.hooks.JanusGraphHook
 
 class JanusGraphHookIntTest : GremlinHookTest() {
+
+    private val logger = LogManager.getLogger(JanusGraphHookIntTest::class.java)
+
     override fun provideBuilder(): GremlinHookBuilder {
         return JanusGraphHook.Builder("src/test/resources/conf/remote.properties")
     }
@@ -14,7 +16,7 @@ class JanusGraphHookIntTest : GremlinHookTest() {
         return try {
             JanusGraphHook.Builder("src/test/resources/conf/remote.properties").build()
         } catch (e: Exception) {
-            log.error("Unable to build JanusGraphHook!", e)
+            logger.error("Unable to build JanusGraphHook!", e)
             null
         }
     }
@@ -24,7 +26,7 @@ class JanusGraphHookIntTest : GremlinHookTest() {
             JanusGraphHook.Builder("src/test/resources/conf/remote.properties")
                     .build()
         } catch (e: Exception) {
-            log.error("Unable to build JanusGraphHook!", e)
+            logger.error("Unable to build JanusGraphHook!", e)
             null
         }
     }
@@ -67,7 +69,6 @@ class JanusGraphHookIntTest : GremlinHookTest() {
     }
 
     companion object {
-        private val log = LogManager.getLogger()
         private var hook: JanusGraphHook? = null
 
         @BeforeAll

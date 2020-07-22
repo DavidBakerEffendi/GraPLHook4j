@@ -23,7 +23,7 @@ import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.inV;
 
 public abstract class GremlinHook implements IHook {
 
-    private static final Logger log = LogManager.getLogger(GremlinHook.class);
+    private static final Logger logger = LogManager.getLogger(GremlinHook.class);
     protected final Graph graph;
     protected GraphTraversalSource g;
 
@@ -39,7 +39,7 @@ public abstract class GremlinHook implements IHook {
         try {
             this.g.close();
         } catch (Exception e) {
-            log.warn("Unable to close existing transaction! Object will be orphaned and a new traversal will continue.");
+            logger.warn("Unable to close existing transaction! Object will be orphaned and a new traversal will continue.");
         }
     }
 
@@ -47,7 +47,7 @@ public abstract class GremlinHook implements IHook {
         try {
             this.graph.close();
         } catch (Exception e) {
-            log.warn("Exception thrown while attempting to close graph.", e);
+            logger.warn("Exception thrown while attempting to close graph.", e);
         }
     }
 

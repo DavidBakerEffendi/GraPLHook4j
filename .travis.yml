@@ -21,7 +21,8 @@ cache:
 
 script:
   - ./gradlew test
-  - ./gradlew integrationTest
+  - ./gradlew janusGraphIntTest
+  - ./gradlew tigerGraphIntTest
   - ./gradlew jacocoTestReport
 
 after_success:

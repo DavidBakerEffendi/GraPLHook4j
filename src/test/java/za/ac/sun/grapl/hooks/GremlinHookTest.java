@@ -13,8 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class GremlinHookTest {
 
-    final static Logger logger = LogManager.getLogger(GremlinHookTest.class);
-
+    private final static Logger logger = LogManager.getLogger(GremlinHookTest.class);
     final static String tempDir = System.getProperty("java.io.tmpdir");
     final static String testGraphML = tempDir + "/grapl/graplhook4j_test.xml";
     final static String testGraphSON = tempDir + "/grapl/graplhook4j_test.json";
