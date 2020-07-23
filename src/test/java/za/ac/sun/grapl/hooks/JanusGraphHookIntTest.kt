@@ -84,8 +84,8 @@ class JanusGraphHookIntTest : GremlinHookTest() {
         @AfterAll
         @JvmStatic
         internal fun tearDownAll() {
-            hook!!.clearGraph()
-            hook!!.close()
+            hook?.clearGraph()
+            hook?.close()
         }
     }
 }
