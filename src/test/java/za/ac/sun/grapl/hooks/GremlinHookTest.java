@@ -133,7 +133,7 @@ public class GremlinHookTest {
         public void setUp() {
             this.hook = provideHook();
             this.f = new FileVertex("Test", 1);
-            this.hook.addFileVertex(f);
+            this.hook.createVertex(f);
         }
 
         @AfterEach
@@ -439,75 +439,6 @@ public class GremlinHookTest {
 
             assertTrue(this.hook.isASTVertex(0));
             assertTrue(this.hook.isASTVertex(1));
-        }
-    }
-
-    @Nested
-    @DisplayName("Metadata Tests")
-    class GremlinMetadataTests {
-
-        private GremlinHook hook;
-        private final String LANG1 = "Java";
-        private final String LANG2 = "Kotlin";
-        private final String VER1 = "51";
-        private final String VER2 = "52";
-
-        @BeforeEach
-        public void setUp() {
-            this.hook = provideHook();
-        }
-
-        @AfterEach
-        public void tearDown() {
-            this.hook.clearGraph();
-        }
-
-        @Test
-        public void testCreateMetadataVertex() {
-            final MetaDataVertex vertex1 = new MetaDataVertex(LANG1, VER1);
-            hook.registerMetaData(vertex1);
-            hook.startTransaction();
-
-            assertTrue(hook.g.V().has(MetaDataVertex.LABEL.name(), "language", LANG1).has("version", VER1).hasNext());
-            hook.endTransaction();
-        }
-
-        @Test
-        public void testRegisterMetaDataVertexSameVersion() {
-            final MetaDataVertex vertex1 = new MetaDataVertex(LANG1, VER1);
-            final MetaDataVertex vertex2 = new MetaDataVertex(LANG2, VER1);
-            hook.registerMetaData(vertex1);
-
-            hook.startTransaction();
-            assertTrue(hook.g.V().has(MetaDataVertex.LABEL.name(), "language", LANG1).has("version", VER1).hasNext());
-            assertFalse(hook.g.V().has(MetaDataVertex.LABEL.name(), "language", LANG2).has("version", VER1).hasNext());
-            hook.endTransaction();
-
-            hook.registerMetaData(vertex2);
-
-            hook.startTransaction();
-            assertTrue(hook.g.V().has(MetaDataVertex.LABEL.name(), "language", LANG1).has("version", VER1).hasNext());
-            assertTrue(hook.g.V().has(MetaDataVertex.LABEL.name(), "language", LANG2).has("version", VER1).hasNext());
-            hook.endTransaction();
-        }
-
-        @Test
-        public void testRegisterMetaDataVertexSameLanguage() {
-            final MetaDataVertex vertex1 = new MetaDataVertex(LANG1, VER1);
-            final MetaDataVertex vertex2 = new MetaDataVertex(LANG1, VER2);
-            hook.registerMetaData(vertex1);
-
-            hook.startTransaction();
-            assertTrue(hook.g.V().has(MetaDataVertex.LABEL.name(), "language", LANG1).has("version", VER1).hasNext());
-            assertFalse(hook.g.V().has(MetaDataVertex.LABEL.name(), "language", LANG2).has("version", VER1).hasNext());
-            hook.endTransaction();
-
-            hook.registerMetaData(vertex2);
-
-            hook.startTransaction();
-            assertTrue(hook.g.V().has(MetaDataVertex.LABEL.name(), "language", LANG1).has("version", VER1).hasNext());
-            assertTrue(hook.g.V().has(MetaDataVertex.LABEL.name(), "language", LANG1).has("version", VER2).hasNext());
-            hook.endTransaction();
         }
     }
 

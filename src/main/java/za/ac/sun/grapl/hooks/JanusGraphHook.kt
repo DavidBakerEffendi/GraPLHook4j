@@ -12,6 +12,7 @@ class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder
     private val supportsTransactions: Boolean
     private val conf: String
     private var tx: Transaction? = null
+
     override fun startTransaction() {
         if (supportsTransactions) {
             logger.debug("Supports tx")

@@ -2,6 +2,8 @@ package za.ac.sun.grapl.hooks
 
 import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.shaded.jackson.databind.ObjectMapper
+import org.json.JSONArray
+import org.json.JSONObject
 import za.ac.sun.grapl.domain.enums.EdgeLabels
 import za.ac.sun.grapl.domain.enums.VertexLabels
 import za.ac.sun.grapl.domain.mappers.VertexMapper
@@ -23,6 +25,7 @@ class TigerGraphHook private constructor(
 
     val logger = LogManager.getLogger(TigerGraphHook::class.java)
     val api: String
+    val objectMapper = ObjectMapper()
 
     init {
         api = "http${if (pathToCert != null) "s" else ""}://$hostname:$port"
@@ -37,10 +40,6 @@ class TigerGraphHook private constructor(
     }
 
     override fun joinFileVertexTo(from: FileVertex, to: MethodVertex) {
-        TODO("Not yet implemented")
-    }
-
-    override fun registerMetaData(vertex: MetaDataVertex) {
         TODO("Not yet implemented")
     }
 
@@ -64,19 +63,13 @@ class TigerGraphHook private constructor(
         TODO("Not yet implemented")
     }
 
-    override fun maxOrder(): Int {
-        TODO("Not yet implemented")
-    }
+    override fun maxOrder() = (get("query/$GRAPH_NAME/maxOrder").first() as JSONObject)["@@maxAstOrder"] as Int
 
     override fun updateASTVertexProperty(rootVertex: MethodVertex, order: Int, key: String, value: String) {
         TODO("Not yet implemented")
     }
 
     override fun updateASTVertexProperty(order: Int, key: String, value: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun addFileVertex(v: FileVertex) {
         TODO("Not yet implemented")
     }
 
@@ -123,13 +116,33 @@ class TigerGraphHook private constructor(
                 delete("graph/$GRAPH_NAME/delete_by_type/vertices/${it.name}")
             }
 
+    private fun headers(): Map<String, String> = mapOf("Content-Type" to "application/json")
+
+    private fun get(endpoint: String): JSONArray {
+        var tryCount = 0
+        while (++tryCount < MAX_RETRY) {
+            val response = khttp.get(
+                    url ="$api/$endpoint",
+                    headers = headers()
+            )
+            logger.debug("Get ${response.url}")
+            logger.debug("Response ${response.text}")
+            when {
+                response.statusCode == 200 -> return response.jsonObject["results"] as JSONArray
+                tryCount >= MAX_RETRY -> throw IOException("Could not complete get request due to status code ${response.statusCode} at $api/$endpoint")
+                else -> sleep(500)
+            }
+        }
+        return JSONArray()
+    }
+
     private fun post(endpoint: String, payload: Map<String, Any>) {
         var tryCount = 0
-        val objectMapper = ObjectMapper()
+
         while (++tryCount < MAX_RETRY) {
             val response = khttp.post(
                     url ="$api/$endpoint",
-                    headers = mapOf("Content-Type" to "application/json"),
+                    headers = headers(),
                     data = objectMapper.writeValueAsString(payload)
             )
             logger.debug("Post ${response.url} ${response.request.data}")
@@ -145,7 +158,7 @@ class TigerGraphHook private constructor(
     private fun delete(endpoint: String) {
         var tryCount = 0
         while (++tryCount < MAX_RETRY) {
-            val response = khttp.delete("$api/$endpoint")
+            val response = khttp.delete(url = "$api/$endpoint", headers = headers())
             logger.debug("Delete ${response.url}")
             logger.debug("Response ${response.text}")
             when {

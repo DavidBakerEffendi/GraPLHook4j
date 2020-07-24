@@ -6,19 +6,6 @@ import za.ac.sun.grapl.domain.models.MethodDescriptorVertex
 import za.ac.sun.grapl.domain.models.vertices.*
 
 interface IHook {
-    /**
-     * Registers the meta-data of the graph's underlying language.
-     *
-     * @param vertex vertex holding the language and version information.
-     */
-    fun registerMetaData(vertex: MetaDataVertex)
-
-    /**
-     * Creates a [Vertex] from a given [FileVertex].
-     *
-     * @param v the [FileVertex] to translate into a [Vertex].
-     */
-    fun addFileVertex(v: FileVertex)
 
     /**
      * Creates the given [MethodDescriptorVertex] in the database and joins it to the vertex associated with the

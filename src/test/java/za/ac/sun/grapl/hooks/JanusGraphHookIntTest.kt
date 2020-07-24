@@ -38,32 +38,32 @@ class JanusGraphHookIntTest : GremlinHookTest() {
         @Test
         fun testExportingGraphML() {
             val hook = provideHook()
-            hook?.addFileVertex(FileVertex("Test1", 0))
-            hook?.addFileVertex(FileVertex("Test2", 1))
+            hook?.createVertex(FileVertex("Test1", 0))
+            hook?.createVertex(FileVertex("Test2", 1))
             Assertions.assertThrows(UnsupportedOperationException::class.java) { hook?.exportCurrentGraph(testGraphML) }
         }
 
         @Test
         fun testExportingGraphJSON() {
             val hook = provideHook()
-            hook?.addFileVertex(FileVertex("Test1", 0))
-            hook?.addFileVertex(FileVertex("Test2", 1))
+            hook?.createVertex(FileVertex("Test1", 0))
+            hook?.createVertex(FileVertex("Test2", 1))
             Assertions.assertThrows(UnsupportedOperationException::class.java) { hook?.exportCurrentGraph(testGraphSON) }
         }
 
         @Test
         fun testExportingGryo() {
             val hook = provideHook()
-            hook?.addFileVertex(FileVertex("Test1", 0))
-            hook?.addFileVertex(FileVertex("Test2", 1))
+            hook?.createVertex(FileVertex("Test1", 0))
+            hook?.createVertex(FileVertex("Test2", 1))
             Assertions.assertThrows(UnsupportedOperationException::class.java) { hook?.exportCurrentGraph(testGryo) }
         }
 
         @Test
         fun testExportingInvalidFileType() {
             val hook = provideHook()
-            hook?.addFileVertex(FileVertex("Test1", 0))
-            hook?.addFileVertex(FileVertex("Test2", 1))
+            hook?.createVertex(FileVertex("Test1", 0))
+            hook?.createVertex(FileVertex("Test2", 1))
             Assertions.assertThrows(IllegalArgumentException::class.java) { hook?.exportCurrentGraph("/tmp/grapl/invalid.txt") }
         }
     }

@@ -20,8 +20,8 @@ class TinkerGraphHookTest : GremlinHookTest() {
         @Test
         fun testImportingGraphML() {
             val hook = provideHook()
-            hook.addFileVertex(FileVertex("Test1", 0))
-            hook.addFileVertex(FileVertex("Test2", 1))
+            hook.createVertex(FileVertex("Test1", 0))
+            hook.createVertex(FileVertex("Test2", 1))
             hook.exportCurrentGraph(testGraphML)
             Assertions.assertDoesNotThrow<GremlinHook> { provideHook(testGraphML) }
             val g = testGraph!!.traversal()
@@ -33,8 +33,8 @@ class TinkerGraphHookTest : GremlinHookTest() {
         @Test
         fun testImportingGraphJSON() {
             val hook = provideHook()
-            hook.addFileVertex(FileVertex("Test1", 0))
-            hook.addFileVertex(FileVertex("Test2", 1))
+            hook.createVertex(FileVertex("Test1", 0))
+            hook.createVertex(FileVertex("Test2", 1))
             hook.exportCurrentGraph(testGraphSON)
             Assertions.assertDoesNotThrow<GremlinHook> { provideHook(testGraphSON) }
             val g = testGraph!!.traversal()
@@ -46,8 +46,8 @@ class TinkerGraphHookTest : GremlinHookTest() {
         @Test
         fun testImportingGryo() {
             val hook = provideHook()
-            hook.addFileVertex(FileVertex("Test1", 0))
-            hook.addFileVertex(FileVertex("Test2", 1))
+            hook.createVertex(FileVertex("Test1", 0))
+            hook.createVertex(FileVertex("Test2", 1))
             hook.exportCurrentGraph(testGryo)
             Assertions.assertDoesNotThrow<GremlinHook> { provideHook(testGryo) }
             val g = testGraph!!.traversal()
@@ -74,8 +74,8 @@ class TinkerGraphHookTest : GremlinHookTest() {
         @Test
         fun testExportingGraphML() {
             val hook = provideHook()
-            hook.addFileVertex(FileVertex("Test1", 0))
-            hook.addFileVertex(FileVertex("Test2", 1))
+            hook.createVertex(FileVertex("Test1", 0))
+            hook.createVertex(FileVertex("Test2", 1))
             hook.exportCurrentGraph(testGraphML)
             Assertions.assertTrue(File(testGraphML).exists())
         }
@@ -83,8 +83,8 @@ class TinkerGraphHookTest : GremlinHookTest() {
         @Test
         fun testExportingGraphJSON() {
             val hook = provideHook()
-            hook.addFileVertex(FileVertex("Test1", 0))
-            hook.addFileVertex(FileVertex("Test2", 1))
+            hook.createVertex(FileVertex("Test1", 0))
+            hook.createVertex(FileVertex("Test2", 1))
             hook.exportCurrentGraph(testGraphSON)
             Assertions.assertTrue(File(testGraphSON).exists())
         }
@@ -92,8 +92,8 @@ class TinkerGraphHookTest : GremlinHookTest() {
         @Test
         fun testExportingGryo() {
             val hook = provideHook()
-            hook.addFileVertex(FileVertex("Test1", 0))
-            hook.addFileVertex(FileVertex("Test2", 1))
+            hook.createVertex(FileVertex("Test1", 0))
+            hook.createVertex(FileVertex("Test2", 1))
             hook.exportCurrentGraph(testGryo)
             Assertions.assertTrue(File(testGryo).exists())
         }
@@ -101,8 +101,8 @@ class TinkerGraphHookTest : GremlinHookTest() {
         @Test
         fun testExportingInvalidFileType() {
             val hook = provideHook()
-            hook.addFileVertex(FileVertex("Test1", 0))
-            hook.addFileVertex(FileVertex("Test2", 1))
+            hook.createVertex(FileVertex("Test1", 0))
+            hook.createVertex(FileVertex("Test2", 1))
             Assertions.assertThrows(IllegalArgumentException::class.java) { hook.exportCurrentGraph("/tmp/grapl/invalid.txt") }
         }
     }
