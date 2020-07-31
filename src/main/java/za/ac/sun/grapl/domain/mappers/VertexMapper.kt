@@ -27,7 +27,7 @@ class VertexMapper {
         }
 
         @JvmStatic
-        fun mapToVertex(map: MutableMap<String, Any>): GraPLVertex {
+        fun mapToVertex(map: Map<String, Any>): GraPLVertex {
             when (valueOf(map["label"] as String)) {
                 ARRAY_INITIALIZER -> return ArrayInitializerVertex(order = map["order"] as Int)
                 BINDING -> return BindingVertex(

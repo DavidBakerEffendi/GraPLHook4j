@@ -197,4 +197,22 @@ CREATE QUERY maxOrder() FOR GRAPH cpg {
   PRINT @@maxAstOrder;
 }
 
+CREATE QUERY findVertexByAstOrder(INT astOrder) FOR GRAPH cpg {
+  start = {ANY};
+  result = SELECT s
+           FROM start:s
+           WHERE s.astOrder == astOrder;
+  PRINT result;
+}
+
+CREATE QUERY isASTVertex(INT astOrder) FOR GRAPH cpg {
+  BOOL result;
+  start = {ANY};
+  temp = SELECT s
+         FROM start:s
+         WHERE s.astOrder == astOrder;
+  IF temp.size() > 0 THEN result = TRUE; ELSE result = FALSE; END;
+  PRINT result;
+}
+
 INSTALL QUERY ALL
