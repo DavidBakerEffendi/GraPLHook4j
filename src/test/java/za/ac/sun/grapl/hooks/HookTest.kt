@@ -227,17 +227,17 @@ abstract class HookTest {
         open fun setUp() {
             hook = provideHook() ?: throw NullPointerException("Could not create hook!")
             hook.clearGraph()
-            f = FileVertex("Test", 0)
-            m = MethodVertex("root", "io.grapl.Test.run", "(I)", 0, 1)
+            f = FileVertex(STRING_1, INT_1)
+            m = MethodVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_2)
             assertNotEquals(initValue, updatedValue)
-            hook.createVertex(BlockVertex("firstBlock", 1, 1, initValue, 5))
+            hook.createVertex(BlockVertex(STRING_1, INT_3, INT_1, initValue, INT_2))
         }
 
         @Test
         open fun testEmptyGraph() = assertFalse(this.hook.isASTVertex(INT_1))
 
         @Test
-        open fun testUpdateOnOneBlockProperty() = hook.updateASTVertexProperty(1, keyToTest, updatedValue)
+        open fun testUpdateOnOneBlockProperty() = hook.updateASTVertexProperty(INT_3, keyToTest, updatedValue)
     }
 
     @Nested
