@@ -260,17 +260,6 @@ public abstract class GremlinHook implements IHook {
         endTransaction();
     }
 
-    @Override
-    public void exportCurrentGraph(@NotNull String exportDir) {
-        if (!isValidExportPath(exportDir)) {
-            throw new IllegalArgumentException("Unsupported graph extension! Supported types are GraphML," +
-                    " GraphSON, and Gryo.");
-        }
-        startTransaction();
-        this.g.io(exportDir).write().iterate();
-        endTransaction();
-    }
-
     /**
      * Finds the associated {@link Vertex} in the graph to the block based on the {@link MethodVertex} and the AST order
      * under which this block occurs under this {@link MethodVertex}.

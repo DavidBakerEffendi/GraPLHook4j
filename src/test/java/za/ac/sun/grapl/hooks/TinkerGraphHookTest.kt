@@ -3,13 +3,30 @@ package za.ac.sun.grapl.hooks
 import org.apache.tinkerpop.gremlin.structure.Graph
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import za.ac.sun.grapl.domain.models.vertices.FileVertex
 import java.io.File
 
 class TinkerGraphHookTest : GremlinHookTest() {
+
+    override fun provideHook(): TinkerGraphHook {
+        return super.provideHook() as TinkerGraphHook
+    }
+
+    /**
+     * Provides a hook with the contents of a serialized graph to populate the graph with.
+     * Default is a [TinkerGraphHook].
+     *
+     * @param existingGraph the path to a GraphML, GraphSON, or Gryo graph.
+     * @return a hook connected to a graph database populated with the contents of the file at the given path.
+     */
+    fun provideHook(existingGraph: String): TinkerGraphHook {
+        return TinkerGraphHook.Builder().useExistingGraph(existingGraph).build()
+    }
+
     @Nested
     @DisplayName("Graph import file types")
-    internal inner class ValidateGraphImportFileTypes {
+    inner class ValidateGraphImportFileTypes {
         private var testGraph: Graph? = null
 
         @BeforeEach
@@ -23,7 +40,7 @@ class TinkerGraphHookTest : GremlinHookTest() {
             hook.createVertex(FileVertex("Test1", 0))
             hook.createVertex(FileVertex("Test2", 1))
             hook.exportCurrentGraph(testGraphML)
-            Assertions.assertDoesNotThrow<GremlinHook> { provideHook(testGraphML) }
+            assertDoesNotThrow<GremlinHook> { provideHook(testGraphML) }
             val g = testGraph!!.traversal()
             g.io<Any>(testGraphML).read().iterate()
             Assertions.assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test1").hasNext())
@@ -36,7 +53,7 @@ class TinkerGraphHookTest : GremlinHookTest() {
             hook.createVertex(FileVertex("Test1", 0))
             hook.createVertex(FileVertex("Test2", 1))
             hook.exportCurrentGraph(testGraphSON)
-            Assertions.assertDoesNotThrow<GremlinHook> { provideHook(testGraphSON) }
+            assertDoesNotThrow<GremlinHook> { provideHook(testGraphSON) }
             val g = testGraph!!.traversal()
             g.io<Any>(testGraphSON).read().iterate()
             Assertions.assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test1").hasNext())
@@ -49,7 +66,7 @@ class TinkerGraphHookTest : GremlinHookTest() {
             hook.createVertex(FileVertex("Test1", 0))
             hook.createVertex(FileVertex("Test2", 1))
             hook.exportCurrentGraph(testGryo)
-            Assertions.assertDoesNotThrow<GremlinHook> { provideHook(testGryo) }
+            assertDoesNotThrow<GremlinHook> { provideHook(testGryo) }
             val g = testGraph!!.traversal()
             g.io<Any>(testGryo).read().iterate()
             Assertions.assertTrue(g.V().has(FileVertex.LABEL.toString(), "name", "Test1").hasNext())
@@ -69,8 +86,7 @@ class TinkerGraphHookTest : GremlinHookTest() {
 
     @Nested
     @DisplayName("Graph export file types")
-    internal inner class ValidateGraphExportFileTypes {
-
+    inner class ValidateGraphExportFileTypes {
         @Test
         fun testExportingGraphML() {
             val hook = provideHook()

@@ -13,8 +13,7 @@ import java.util.*
 class ModelTest {
 
     @Nested
-    @DisplayName("Domain model to string tests")
-    inner class DomainModelToStringTest {
+    inner class `Domain model to string tests` {
         @Test
         fun arrayInitializerVertexToString() {
             val vertex = ArrayInitializerVertex(INT_1)
@@ -161,8 +160,7 @@ class ModelTest {
     }
 
     @Nested
-    @DisplayName("Domain model equal tests")
-    inner class DomainModelEqualTest {
+    inner class `Domain model equal tests` {
 
         private fun assertVertexEquality(vertex1: GraPLVertex, vertex2: GraPLVertex, vertex3: GraPLVertex) {
             assertEquals(vertex1, vertex1)
@@ -507,8 +505,7 @@ class ModelTest {
     }
 
     @Nested
-    @DisplayName("Domain model property tests")
-    inner class DomainModelPropertyTest {
+    inner class `Domain model property tests` {
         @Test
         fun arrayInitializerVertexEquality() {
             val vertex1 = ArrayInitializerVertex(INT_1)

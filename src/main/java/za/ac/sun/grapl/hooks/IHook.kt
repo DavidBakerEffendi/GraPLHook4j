@@ -151,12 +151,4 @@ interface IHook {
      * Closes the connection to the graph database.
      */
     fun close()
-
-    /**
-     * Exports the current graph to the serialized format specified by the extension in exportDir
-     * path, to the path specified under exportDir.
-     *
-     * @param exportDir The file to export the graph to.
-     */
-    fun exportCurrentGraph(exportDir: String)
 }

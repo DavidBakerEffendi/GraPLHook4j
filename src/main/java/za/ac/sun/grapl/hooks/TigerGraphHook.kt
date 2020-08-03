@@ -16,20 +16,15 @@ import java.util.*
 
 
 class TigerGraphHook private constructor(
-        val hostname: String,
-        val port: Int,
-        val username: String,
-        val password: String,
-        val pathToCert: String?
+        hostname: String,
+        port: Int,
+        secure: Boolean,
+        private val authKey: String?
 ) : IHook {
 
     private val logger = LogManager.getLogger(TigerGraphHook::class.java)
-    private val api: String = "http${if (pathToCert != null) "s" else ""}://$hostname:$port"
+    private val api: String = "http${if (secure) "s" else ""}://$hostname:$port"
     private val objectMapper = ObjectMapper()
-
-    override fun exportCurrentGraph(exportDir: String) {
-        TODO("Not yet implemented")
-    }
 
     override fun joinFileVertexTo(to: FileVertex, from: NamespaceBlockVertex) = upsertAndJoinVertices(from, to, EdgeLabels.AST)
 
@@ -47,9 +42,7 @@ class TigerGraphHook private constructor(
 
     override fun areASTVerticesJoinedByEdge(blockFrom: Int, blockTo: Int, edgeLabel: EdgeLabels): Boolean = ((get("query/$GRAPH_NAME/areASTVerticesJoinedByEdge?blockFrom=$blockFrom&blockTo=$blockTo&edgeLabel=${edgeLabel.name}")).first() as JSONObject)["result"] as Boolean
 
-    override fun joinNamespaceBlocks(from: NamespaceBlockVertex, to: NamespaceBlockVertex) {
-        upsertAndJoinVertices(from, to, EdgeLabels.AST)
-    }
+    override fun joinNamespaceBlocks(from: NamespaceBlockVertex, to: NamespaceBlockVertex) = upsertAndJoinVertices(from, to, EdgeLabels.AST)
 
     override fun maxOrder() = (get("query/$GRAPH_NAME/maxOrder").first() as JSONObject)["@@maxAstOrder"] as Int
 
@@ -186,7 +179,11 @@ class TigerGraphHook private constructor(
                 delete("graph/$GRAPH_NAME/delete_by_type/vertices/${it.name}")
             }
 
-    private fun headers(): Map<String, String> = mapOf("Content-Type" to "application/json")
+    private fun headers(): Map<String, String> = if (authKey == null) {
+        mapOf("Content-Type" to "application/json")
+    } else {
+        mapOf("Content-Type" to "application/json", "Authorization" to "Bearer $authKey")
+    }
 
     private fun get(endpoint: String): JSONArray {
         var tryCount = 0
@@ -242,8 +239,6 @@ class TigerGraphHook private constructor(
     companion object {
         private const val DEFAULT_HOSTNAME = "127.0.0.1"
         private const val DEFAULT_PORT = 9000
-        private const val DEFAULT_USER = "tigergraph"
-        private const val DEFAULT_PASSWORD = "tigergraph"
         private const val GRAPH_NAME = "cpg"
         private const val MAX_RETRY = 5
     }
@@ -251,20 +246,18 @@ class TigerGraphHook private constructor(
     data class Builder(
             var hostname: String = DEFAULT_HOSTNAME,
             var port: Int = DEFAULT_PORT,
-            var username: String = DEFAULT_USER,
-            var password: String = DEFAULT_PASSWORD,
-            var pathToCert: String?
+            var secure: Boolean = false,
+            var authKey: String?
     ) : IHookBuilder {
 
-        constructor() : this(DEFAULT_HOSTNAME, DEFAULT_PORT, DEFAULT_USER, DEFAULT_PASSWORD, null)
+        constructor() : this(DEFAULT_HOSTNAME, DEFAULT_PORT, false,null)
 
         fun hostname(hostname: String) = apply { this.hostname = hostname }
         fun port(port: Int) = apply { this.port = port }
-        fun username(username: String) = apply { this.username = username }
-        fun password(password: String) = apply { this.password = password }
-        fun pathToCert(pathToCert: String) = apply { this.pathToCert = pathToCert }
+        fun secure(secure: Boolean) = apply { this.secure = secure }
+        fun authKey(authKey: String) = apply { this.authKey = authKey }
 
-        override fun build(): TigerGraphHook = TigerGraphHook(hostname, port, username, password, pathToCert)
+        override fun build(): TigerGraphHook = TigerGraphHook(hostname, port, secure, authKey)
 
     }
 }
