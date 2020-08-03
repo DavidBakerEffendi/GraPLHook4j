@@ -30,7 +30,7 @@ dependencies {
 
 test {
     useJUnitPlatform()
-    // exclude "**/*IT*", "**/*IntTest*"
+    exclude "**/*IT*", "**/*IntTest*"
 
     testLogging {
         events 'FAILED', 'SKIPPED'

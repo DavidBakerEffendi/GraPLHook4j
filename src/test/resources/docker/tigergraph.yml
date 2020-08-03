@@ -12,7 +12,7 @@ services:
       - ../conf/tg-schema.gsql:/docker-entrypoint-initdb.d/tg-schema.gsql
     healthcheck:
       test: ["CMD-SHELL", "curl --fail http://localhost:9000/echo/cpg || exit 1"]
-      interval: 5s
+      interval: 30s
       timeout: 10s
       retries: 5
     ulimits:
