@@ -197,12 +197,13 @@ CREATE QUERY maxOrder() FOR GRAPH cpg {
   PRINT @@maxAstOrder;
 }
 
-CREATE QUERY findVertexByAstOrder(INT astOrder) FOR GRAPH cpg {
+CREATE QUERY findVertexByAstOrder(INT astOrder) FOR GRAPH cpg RETURNS (Set<VERTEX>) {
   start = {ANY};
   result = SELECT s
            FROM start:s
            WHERE s.astOrder == astOrder;
   PRINT result;
+  RETURN result;
 }
 
 CREATE QUERY isASTVertex(INT astOrder) FOR GRAPH cpg {
@@ -212,6 +213,18 @@ CREATE QUERY isASTVertex(INT astOrder) FOR GRAPH cpg {
          FROM start:s
          WHERE s.astOrder == astOrder;
   IF temp.size() > 0 THEN result = TRUE; ELSE result = FALSE; END;
+  PRINT result;
+}
+
+CREATE QUERY areASTVerticesJoinedByEdge(INT blockFrom, INT blockTo, STRING edgeLabel) FOR GRAPH cpg {
+  bool result;
+  setFrom = {ANY};
+  temp = SELECT tgt
+          FROM setFrom:src -(:e)- :tgt
+          WHERE src.astOrder == blockFrom
+            AND tgt.astOrder == blockTo
+            AND e.name == edgeLabel;
+  result = (temp.size() > 0);
   PRINT result;
 }
 

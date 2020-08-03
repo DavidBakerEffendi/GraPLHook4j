@@ -31,32 +31,24 @@ class TigerGraphHook private constructor(
         TODO("Not yet implemented")
     }
 
-    override fun joinFileVertexTo(to: FileVertex, from: NamespaceBlockVertex) {
-        upsertAndJoinVertices(from, to)
-    }
+    override fun joinFileVertexTo(to: FileVertex, from: NamespaceBlockVertex) = upsertAndJoinVertices(from, to, EdgeLabels.AST)
 
-    override fun joinFileVertexTo(from: FileVertex, to: MethodVertex) {
-        upsertAndJoinVertices(from, to)
-    }
+    override fun joinFileVertexTo(from: FileVertex, to: MethodVertex) = upsertAndJoinVertices(from, to, EdgeLabels.AST)
 
-    override fun createAndAddToMethod(from: MethodVertex, to: MethodDescriptorVertex) {
-        upsertAndJoinVertices(from, to)
-    }
+    override fun createAndAddToMethod(from: MethodVertex, to: MethodDescriptorVertex) = upsertAndJoinVertices(from, to, EdgeLabels.AST)
 
-    override fun createAndAddToMethod(from: MethodVertex, to: ModifierVertex) {
-        upsertAndJoinVertices(from, to)
-    }
+    override fun createAndAddToMethod(from: MethodVertex, to: ModifierVertex) = upsertAndJoinVertices(from, to, EdgeLabels.AST)
 
     override fun joinASTVerticesByOrder(blockFrom: Int, blockTo: Int, edgeLabel: EdgeLabels) {
-        TODO("Not yet implemented")
+        val from = getVertexByASTOrder(blockFrom)
+        val to = getVertexByASTOrder(blockTo)
+        if (from != null && to != null) upsertAndJoinVertices(from, to, EdgeLabels.AST)
     }
 
-    override fun areASTVerticesJoinedByEdge(blockFrom: Int, blockTo: Int, edgeLabel: EdgeLabels): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun areASTVerticesJoinedByEdge(blockFrom: Int, blockTo: Int, edgeLabel: EdgeLabels): Boolean = ((get("query/$GRAPH_NAME/areASTVerticesJoinedByEdge?blockFrom=$blockFrom&blockTo=$blockTo&edgeLabel=${edgeLabel.name}")).first() as JSONObject)["result"] as Boolean
 
     override fun joinNamespaceBlocks(from: NamespaceBlockVertex, to: NamespaceBlockVertex) {
-        upsertAndJoinVertices(from, to)
+        upsertAndJoinVertices(from, to, EdgeLabels.AST)
     }
 
     override fun maxOrder() = (get("query/$GRAPH_NAME/maxOrder").first() as JSONObject)["@@maxAstOrder"] as Int
@@ -78,16 +70,13 @@ class TigerGraphHook private constructor(
 
     override fun isASTVertex(blockOrder: Int): Boolean = ((get("query/$GRAPH_NAME/isASTVertex?astOrder=$blockOrder")).first() as JSONObject)["result"] as Boolean
 
-    override fun createAndAssignToBlock(parentVertex: MethodVertex, newVertex: GraPLVertex) {
-        TODO("Not yet implemented")
-    }
+    override fun createAndAssignToBlock(parentVertex: MethodVertex, newVertex: GraPLVertex) = upsertAndJoinVertices(parentVertex, newVertex, EdgeLabels.AST)
 
-    override fun createAndAssignToBlock(rootVertex: MethodVertex, newVertex: GraPLVertex, blockOrder: Int) {
-        TODO("Not yet implemented")
-    }
+    override fun createAndAssignToBlock(rootVertex: MethodVertex, newVertex: GraPLVertex, blockOrder: Int) = createAndAssignToBlock(newVertex, blockOrder)
 
     override fun createAndAssignToBlock(newVertex: GraPLVertex, blockOrder: Int) {
-        TODO("Not yet implemented")
+        val from = getVertexByASTOrder(blockOrder) ?: return
+        upsertAndJoinVertices(from, newVertex, EdgeLabels.AST)
     }
 
     override fun createVertex(graPLVertex: GraPLVertex) {
@@ -97,14 +86,14 @@ class TigerGraphHook private constructor(
         post("graph/$GRAPH_NAME", payload)
     }
 
-    fun createVertex(graPLVertex: GraPLVertex, id: String) {
+    private fun createVertex(graPLVertex: GraPLVertex, id: String) {
         val payload = mutableMapOf<String, Any>(
                 "vertices" to createVertexPayload(graPLVertex, id)
         )
         post("graph/$GRAPH_NAME", payload)
     }
 
-    private fun upsertAndJoinVertices(from: GraPLVertex, to: GraPLVertex) {
+    private fun upsertAndJoinVertices(from: GraPLVertex, to: GraPLVertex, edgeLabel: EdgeLabels) {
         val toPayload = createVertexPayload(to)
         val fromPayload = createVertexPayload(from)
         val payload = mutableMapOf(
@@ -112,7 +101,7 @@ class TigerGraphHook private constructor(
                         toPayload.keys.first() to toPayload.values.first(),
                         fromPayload.keys.first() to fromPayload.values.first()
                 ),
-                "edges" to createEdgePayload(from, to, EdgeLabels.AST)
+                "edges" to createEdgePayload(from, to, edgeLabel)
         )
         post("graph/$GRAPH_NAME", payload)
     }
@@ -175,6 +164,17 @@ class TigerGraphHook private constructor(
             }
         }
         return map
+    }
+
+    private fun getVertexByASTOrder(order: Int): GraPLVertex? {
+        val result = (get("query/$GRAPH_NAME/findVertexByAstOrder?astOrder=$order").first() as JSONObject)["result"] as JSONArray
+        if (result.length() > 0) {
+            val vertexMap = result.first() as JSONObject
+            val flatMap = flattenVertexResult(vertexMap)
+            // Update key-value pair and reconstruct as GraPLVertex
+            return VertexMapper.mapToVertex(flatMap)
+        }
+        return null
     }
 
     override fun close() {
