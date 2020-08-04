@@ -1,37 +1,17 @@
 package za.ac.sun.grapl.hooks;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.*;
-import za.ac.sun.grapl.domain.enums.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import za.ac.sun.grapl.domain.enums.EdgeLabels;
 import za.ac.sun.grapl.domain.models.vertices.*;
 
-import java.io.File;
-import java.util.Arrays;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class GremlinHookTest extends HookTest {
-
-    private final static Logger logger = LogManager.getLogger(GremlinHookTest.class);
-    final static String tempDir = System.getProperty("java.io.tmpdir");
-    final static String testGraphML = tempDir + "/grapl/graplhook4j_test.xml";
-    final static String testGraphSON = tempDir + "/grapl/graplhook4j_test.json";
-    final static String testGryo = tempDir + "/grapl/graplhook4j_test.kryo";
-
-    @AfterAll
-    static void tearDownAll() {
-        final File[] testFiles = new File[]{new File(testGraphML), new File(testGraphSON), new File(testGryo)};
-        Arrays.stream(testFiles).forEach(file -> {
-            try {
-                if (!file.delete())
-                    logger.warn("Could not clear test resources.");
-            } catch (Exception e) {
-                logger.warn("Could not clear test resources.", e);
-            }
-        });
-    }
 
     /**
      * Provides a hook to a new database hook. Default is a new {@link TinkerGraphHook}.

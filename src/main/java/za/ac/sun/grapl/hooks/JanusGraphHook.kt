@@ -4,6 +4,9 @@ import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource
 import org.apache.tinkerpop.gremlin.structure.Graph
 import org.apache.tinkerpop.gremlin.structure.Transaction
+import org.apache.tinkerpop.gremlin.structure.Vertex
+import za.ac.sun.grapl.domain.mappers.VertexMapper.Companion.propertiesToMap
+import za.ac.sun.grapl.domain.models.GraPLVertex
 import java.io.File
 
 class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder.graph) {
@@ -64,6 +67,23 @@ class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder
         }
     }
 
+    /**
+     * Given a [GraPLVertex], creates a [Vertex] and translates the object's field properties to key-value
+     * pairs on the [Vertex] object. This is then added to this hook's [Graph].
+     *
+     * @param gv the [GraPLVertex] to translate into a [Vertex].
+     * @return the newly created [Vertex].
+     */
+    override fun createTinkerPopVertex(gv: GraPLVertex): Vertex {
+        val propertyMap = propertiesToMap(gv)
+        // Get the implementing class label parameter
+        val label = propertyMap.remove("label") as String?
+        // Get the implementing classes fields and values
+        var traversalPointer = g.addV(label)
+        for ((key, value) in propertyMap) traversalPointer = traversalPointer.property(key, value)
+        return traversalPointer.next()
+    }
+
     data class Builder(
             var conf: String,
             var graphDir: String? = null,
@@ -71,7 +91,7 @@ class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder
     ) : GremlinHookBuilder {
         var graph: Graph? = null
 
-        constructor(conf: String): this(conf, null, false)
+        constructor(conf: String) : this(conf, null, false)
 
         fun clearDatabase(clearGraph: Boolean) = apply { this.clearGraph = clearGraph }
 

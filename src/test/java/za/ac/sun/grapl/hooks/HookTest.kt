@@ -14,56 +14,48 @@ import za.ac.sun.grapl.domain.models.vertices.*
  */
 abstract class HookTest {
 
-    open fun provideHook(): IHook? = provideBuilder().build()
+    open fun provideHook(): IHook = provideBuilder().build() ?: throw NullPointerException("Could not create hook!")
 
     open fun provideBuilder(): IHookBuilder = TinkerGraphHook.Builder()
 
-    @Nested
     @DisplayName("Join method vertex to method related vertices")
-    open inner class CheckMethodJoinInteraction {
+    abstract inner class CheckMethodJoinInteraction {
         protected lateinit var hook: IHook
         private lateinit var m: MethodVertex
 
         @BeforeEach
         open fun setUp() {
-            hook = provideHook() ?: throw NullPointerException("Could not create hook!")
+            hook = provideHook()
             val f = FileVertex(STRING_1, INT_1)
-            m = MethodVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_1)
+            m = MethodVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_2)
             hook.joinFileVertexTo(f, m)
         }
 
-        @AfterEach
-        open fun tearDown() = hook.clearGraph()
-
         @Test
         open fun joinMethodToMethodParamIn() =
-                hook.createAndAddToMethod(m, MethodParameterInVertex(STRING_1, STRING_1, EVAL_1, STRING_1, INT_1, INT_1))
+                hook.createAndAddToMethod(m, MethodParameterInVertex(STRING_1, STRING_1, EVAL_1, STRING_1, INT_1, INT_3))
 
         @Test
         open fun joinMethodToMethodReturn() =
-                hook.createAndAddToMethod(m, MethodReturnVertex(STRING_1, STRING_1, EVAL_1, INT_1, INT_1))
+                hook.createAndAddToMethod(m, MethodReturnVertex(STRING_1, STRING_1, EVAL_1, INT_1, INT_3))
 
 
         @Test
         open fun joinMethodToModifier() =
-                hook.createAndAddToMethod(m, ModifierVertex(MOD_1, INT_1))
+                hook.createAndAddToMethod(m, ModifierVertex(MOD_1, INT_3))
     }
 
-    @Nested
     @DisplayName("Join file vertex to file related vertices")
-    open inner class FileJoinInteraction {
+    abstract inner class FileJoinInteraction {
         protected lateinit var hook: IHook
         private lateinit var f: FileVertex
 
         @BeforeEach
         open fun setUp() {
-            hook = provideHook() ?: throw NullPointerException("Could not create hook!")
+            hook = provideHook()
             f = FileVertex(STRING_1, INT_1)
             hook.createVertex(f)
         }
-
-        @AfterEach
-        open fun tearDown() = hook.clearGraph()
 
         @Test
         open fun testJoinFile2NamespaceBlock() =
@@ -74,23 +66,19 @@ abstract class HookTest {
                 hook.joinFileVertexTo(f, MethodVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_1))
     }
 
-    @Nested
     @DisplayName("Check block vertex join behaviour")
-    open inner class BlockJoinInteraction {
+    abstract inner class BlockJoinInteraction {
         protected lateinit var hook: IHook
         private lateinit var m: MethodVertex
 
         @BeforeEach
         open fun setUp() {
-            hook = provideHook() ?: throw NullPointerException("Could not create hook!")
+            hook = provideHook()
             val f = FileVertex(STRING_1, INT_1)
             m = MethodVertex(ROOT_METHOD, STRING_2, STRING_2, INT_1, INT_2)
             hook.joinFileVertexTo(f, m)
             hook.createAndAssignToBlock(m, BlockVertex(FIRST_BLOCK, INT_3, INT_1, STRING_1, INT_1))
         }
-
-        @AfterEach
-        open fun tearDown() = hook.clearGraph()
 
         @Test
         open fun testMethodJoinBlockTest() = Unit // Simply check that the setup is correct
@@ -108,20 +96,16 @@ abstract class HookTest {
         open fun testAssignControlToBlock() = hook.createAndAssignToBlock(ControlStructureVertex(TEST_ID, 2, INT_4, 1), INT_3)
     }
 
-    @Nested
     @DisplayName("Check namespace block related behaviour")
-    open inner class NamespaceBlockJoinInteraction {
+    abstract inner class NamespaceBlockJoinInteraction {
         protected lateinit var hook: IHook
         private lateinit var root: NamespaceBlockVertex
 
         @BeforeEach
         open fun setUp() {
-            hook = provideHook() ?: throw NullPointerException("Could not create hook!")
+            hook = provideHook()
             root = NamespaceBlockVertex(ROOT_PACKAGE, ROOT_PACKAGE, INT_1)
         }
-
-        @AfterEach
-        open fun tearDown() = hook.clearGraph()
 
         @Test
         open fun joinTwoNamespaceBlocks() {
@@ -145,18 +129,14 @@ abstract class HookTest {
         }
     }
 
-    @Nested
     @DisplayName("Aggregate queries")
-    open inner class AggregateQueries {
+    abstract inner class AggregateQueries {
         private lateinit var hook: IHook
 
         @BeforeEach
         open fun setUp() {
-            hook = provideHook() ?: throw NullPointerException("Could not create hook!")
+            hook = provideHook()
         }
-
-        @AfterEach
-        open fun tearDown() = hook.clearGraph()
 
         @Test
         open fun testEmptyGraph() = assertEquals(0, hook.maxOrder())
@@ -172,18 +152,14 @@ abstract class HookTest {
         }
     }
 
-    @Nested
     @DisplayName("Simple boolean checks")
-    open inner class BooleanChecks {
+    abstract inner class BooleanChecks {
         private lateinit var hook: IHook
 
         @BeforeEach
         open fun setUp() {
-            hook = provideHook() ?: throw NullPointerException("Could not create hook!")
+            hook = provideHook()
         }
-
-        @AfterEach
-        open fun tearDown() = hook.clearGraph()
 
         @Test
         open fun testEmptyGraph() = assertFalse(this.hook.isASTVertex(INT_1))
@@ -213,9 +189,8 @@ abstract class HookTest {
         }
     }
 
-    @Nested
     @DisplayName("Update Checks")
-    open inner class UpdateChecks {
+    abstract inner class UpdateChecks {
         protected lateinit var hook: IHook
         private lateinit var f: FileVertex
         private lateinit var m: MethodVertex
@@ -225,7 +200,7 @@ abstract class HookTest {
 
         @BeforeEach
         open fun setUp() {
-            hook = provideHook() ?: throw NullPointerException("Could not create hook!")
+            hook = provideHook()
             hook.clearGraph()
             f = FileVertex(STRING_1, INT_1)
             m = MethodVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_2)
@@ -240,22 +215,18 @@ abstract class HookTest {
         open fun testUpdateOnOneBlockProperty() = hook.updateASTVertexProperty(INT_3, keyToTest, updatedValue)
     }
 
-    @Nested
     @DisplayName("AST vertex unstructured manipulation queries")
-    open inner class ASTManipulation {
+    abstract inner class ASTManipulation {
         private lateinit var hook: IHook
         private lateinit var bv1: BlockVertex
         private lateinit var bv2: BlockVertex
 
         @BeforeEach
         open fun setUp() {
-            hook = provideHook() ?: throw NullPointerException("Could not create hook!")
+            hook = provideHook()
             bv1 = BlockVertex(STRING_1, INT_1, INT_1, STRING_1, INT_1)
             bv2 = BlockVertex(STRING_1, INT_2, INT_1, STRING_1, INT_1)
         }
-
-        @AfterEach
-        open fun tearDown() = hook.clearGraph()
 
         @Test
         open fun testCreatingFreeBlock() {
@@ -275,6 +246,9 @@ abstract class HookTest {
             assertTrue(hook.areASTVerticesJoinedByEdge(INT_2, INT_1, EdgeLabels.AST))
         }
     }
+
+    @AfterEach
+    open fun tearDown() = provideHook().clearGraph()
 
     companion object {
         const val STRING_1 = "TEST1"
