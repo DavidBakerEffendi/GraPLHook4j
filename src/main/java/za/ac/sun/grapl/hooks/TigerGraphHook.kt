@@ -176,7 +176,7 @@ class TigerGraphHook private constructor(
 
     override fun clearGraph() =
             EnumSet.allOf(VertexLabels::class.java).forEach {
-                delete("graph/$GRAPH_NAME/delete_by_type/vertices/${it.name}")
+                delete("graph/$GRAPH_NAME/delete_by_type/vertices/${it.name}_VERT")
             }
 
     private fun headers(): Map<String, String> = if (authKey == null) {
