@@ -187,16 +187,6 @@ CREATE DIRECTED EDGE UNKNOWN_UNKNOWN (FROM UNKNOWN_VERT, TO UNKNOWN_VERT, name S
 
 CREATE GRAPH cpg (*)
 
-CREATE QUERY maxOrder() FOR GRAPH cpg {
-  MaxAccum<INT> @@maxAstOrder;
-  @@maxAstOrder += 0;
-  start = {ANY};
-  result = SELECT s
-           FROM start:s
-           ACCUM @@maxAstOrder += s.astOrder;
-  PRINT @@maxAstOrder;
-}
-
 CREATE QUERY findVertexByAstOrder(INT astOrder) FOR GRAPH cpg RETURNS (Set<VERTEX>) {
   start = {ANY};
   result = SELECT s
@@ -221,11 +211,24 @@ CREATE QUERY areASTVerticesJoinedByEdge(INT blockFrom, INT blockTo, STRING edgeL
   setFrom = {ANY};
   temp = SELECT tgt
           FROM setFrom:src -(:e)- :tgt
-          WHERE src.astOrder == blockFrom
-            AND tgt.astOrder == blockTo
+          WHERE ((src.astOrder == blockFrom
+            AND tgt.astOrder == blockTo)
+            OR
+            (src.astOrder == blockTo
+            AND tgt.astOrder == blockFrom))
             AND e.name == edgeLabel;
   result = (temp.size() > 0);
   PRINT result;
+}
+
+CREATE QUERY maxOrder() FOR GRAPH cpg {
+  MaxAccum<INT> @@maxAstOrder;
+  @@maxAstOrder += 0;
+  start = {ANY};
+  result = SELECT s
+           FROM start:s
+           ACCUM @@maxAstOrder += s.astOrder;
+  PRINT @@maxAstOrder;
 }
 
 INSTALL QUERY ALL
