@@ -146,7 +146,7 @@ class TigerGraphHook private constructor(
         )
     }
 
-    private fun flattenVertexResult(o: JSONObject): MutableMap<String, Any> {
+    fun flattenVertexResult(o: JSONObject): MutableMap<String, Any> {
         val map = mutableMapOf<String, Any>()
         val attributes = o["attributes"] as JSONObject
         map["label"] = (o["v_type"] as String).removeSuffix("_VERT")

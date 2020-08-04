@@ -2,7 +2,6 @@ package za.ac.sun.grapl.hooks;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Edge;
@@ -14,7 +13,10 @@ import za.ac.sun.grapl.domain.enums.EdgeLabels;
 import za.ac.sun.grapl.domain.mappers.VertexMapper;
 import za.ac.sun.grapl.domain.models.GraPLVertex;
 import za.ac.sun.grapl.domain.models.MethodDescriptorVertex;
-import za.ac.sun.grapl.domain.models.vertices.*;
+import za.ac.sun.grapl.domain.models.vertices.FileVertex;
+import za.ac.sun.grapl.domain.models.vertices.MethodVertex;
+import za.ac.sun.grapl.domain.models.vertices.ModifierVertex;
+import za.ac.sun.grapl.domain.models.vertices.NamespaceBlockVertex;
 
 import java.util.Map;
 import java.util.UUID;
