@@ -18,6 +18,9 @@ abstract class HookTest {
 
     open fun provideBuilder(): IHookBuilder = TinkerGraphHook.Builder()
 
+    @AfterEach
+    open fun tearDown() = provideHook().clearGraph()
+
     @DisplayName("Join method vertex to method related vertices")
     abstract inner class CheckMethodJoinInteraction {
         protected lateinit var hook: IHook
@@ -129,6 +132,32 @@ abstract class HookTest {
         }
     }
 
+    @DisplayName("Update Checks")
+    abstract inner class UpdateChecks {
+        protected lateinit var hook: IHook
+        private lateinit var f: FileVertex
+        private lateinit var m: MethodVertex
+        protected val keyToTest = "typeFullName"
+        protected val initValue = "INTEGER"
+        protected val updatedValue = "VOID"
+
+        @BeforeEach
+        open fun setUp() {
+            hook = provideHook()
+            hook.clearGraph()
+            f = FileVertex(STRING_1, INT_1)
+            m = MethodVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_2)
+            assertNotEquals(initValue, updatedValue)
+            hook.createVertex(BlockVertex(STRING_1, INT_3, INT_1, initValue, INT_2))
+        }
+
+        @Test
+        open fun testEmptyGraph() = assertFalse(this.hook.isASTVertex(INT_1))
+
+        @Test
+        open fun testUpdateOnOneBlockProperty() = hook.updateASTVertexProperty(INT_3, keyToTest, updatedValue)
+    }
+
     @DisplayName("Aggregate queries")
     abstract inner class AggregateQueries {
         private lateinit var hook: IHook
@@ -189,32 +218,6 @@ abstract class HookTest {
         }
     }
 
-    @DisplayName("Update Checks")
-    abstract inner class UpdateChecks {
-        protected lateinit var hook: IHook
-        private lateinit var f: FileVertex
-        private lateinit var m: MethodVertex
-        protected val keyToTest = "typeFullName"
-        protected val initValue = "INTEGER"
-        protected val updatedValue = "VOID"
-
-        @BeforeEach
-        open fun setUp() {
-            hook = provideHook()
-            hook.clearGraph()
-            f = FileVertex(STRING_1, INT_1)
-            m = MethodVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_2)
-            assertNotEquals(initValue, updatedValue)
-            hook.createVertex(BlockVertex(STRING_1, INT_3, INT_1, initValue, INT_2))
-        }
-
-        @Test
-        open fun testEmptyGraph() = assertFalse(this.hook.isASTVertex(INT_1))
-
-        @Test
-        open fun testUpdateOnOneBlockProperty() = hook.updateASTVertexProperty(INT_3, keyToTest, updatedValue)
-    }
-
     @DisplayName("AST vertex unstructured manipulation queries")
     abstract inner class ASTManipulation {
         private lateinit var hook: IHook
@@ -246,9 +249,6 @@ abstract class HookTest {
             assertTrue(hook.areASTVerticesJoinedByEdge(INT_2, INT_1, EdgeLabels.AST))
         }
     }
-
-    @AfterEach
-    open fun tearDown() = provideHook().clearGraph()
 
     companion object {
         const val STRING_1 = "TEST1"

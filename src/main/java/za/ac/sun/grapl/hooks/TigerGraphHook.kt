@@ -87,13 +87,19 @@ class TigerGraphHook private constructor(
     }
 
     private fun upsertAndJoinVertices(from: GraPLVertex, to: GraPLVertex, edgeLabel: EdgeLabels) {
-        val toPayload = createVertexPayload(to)
         val fromPayload = createVertexPayload(from)
+        val toPayload = createVertexPayload(to)
+        val vertexPayload = if (fromPayload.keys.first() == toPayload.keys.first()) mapOf(
+                fromPayload.keys.first() to mapOf(
+                        from.hashCode().toString() to (fromPayload.values.first() as Map<*,*>)[from.hashCode().toString()],
+                        to.hashCode().toString() to (toPayload.values.first() as  Map<*,*>)[to.hashCode().toString()]
+                ))
+        else mapOf(
+                fromPayload.keys.first() to fromPayload.values.first(),
+                toPayload.keys.first() to toPayload.values.first()
+        )
         val payload = mutableMapOf(
-                "vertices" to mapOf(
-                        toPayload.keys.first() to toPayload.values.first(),
-                        fromPayload.keys.first() to fromPayload.values.first()
-                ),
+                "vertices" to vertexPayload,
                 "edges" to createEdgePayload(from, to, edgeLabel)
         )
         post("graph/$GRAPH_NAME", payload)
@@ -250,7 +256,7 @@ class TigerGraphHook private constructor(
             var authKey: String?
     ) : IHookBuilder {
 
-        constructor() : this(DEFAULT_HOSTNAME, DEFAULT_PORT, false,null)
+        constructor() : this(DEFAULT_HOSTNAME, DEFAULT_PORT, false, null)
 
         fun hostname(hostname: String) = apply { this.hostname = hostname }
         fun port(port: Int) = apply { this.port = port }
