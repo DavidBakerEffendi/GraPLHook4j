@@ -307,8 +307,9 @@ class TigerGraphHookIntTest : HookTest() {
             super.joinTwoNamespaceBlocks()
             val namespaceRaw = get("graph/$GRAPH_NAME/vertices/${VertexLabels.NAMESPACE_BLOCK.name}_VERT")
             assertTrue(namespaceRaw.any())
-            val namespace1 = VertexMapper.mapToVertex(tigerGraphHook.flattenVertexResult(namespaceRaw.remove(1) as JSONObject))
-            val namespace2 = VertexMapper.mapToVertex(tigerGraphHook.flattenVertexResult(namespaceRaw.remove(0) as JSONObject))
+            val namespaceVertices = namespaceRaw.map { VertexMapper.mapToVertex(tigerGraphHook.flattenVertexResult(it as JSONObject)) as NamespaceBlockVertex }
+            val namespace1 = namespaceVertices.find { it.name == ROOT_PACKAGE }
+            val namespace2 = namespaceVertices.find { it.name == SECOND_PACKAGE }
             assertTrue(namespace1 is NamespaceBlockVertex)
             assertTrue(namespace2 is NamespaceBlockVertex)
             val namespaceEdges = get("graph/$GRAPH_NAME/edges/${VertexLabels.NAMESPACE_BLOCK.name}_VERT/${namespace1.hashCode()}")
@@ -321,12 +322,10 @@ class TigerGraphHookIntTest : HookTest() {
             super.joinThreeNamespaceBlocks()
             val namespaceRaw = get("graph/$GRAPH_NAME/vertices/${VertexLabels.NAMESPACE_BLOCK.name}_VERT")
             assertTrue(namespaceRaw.any())
-            val namespace1 = VertexMapper.mapToVertex(tigerGraphHook.flattenVertexResult(namespaceRaw.remove(1) as JSONObject))
-            val namespace2 = VertexMapper.mapToVertex(tigerGraphHook.flattenVertexResult(namespaceRaw.remove(0) as JSONObject))
-            val namespace3 = VertexMapper.mapToVertex(tigerGraphHook.flattenVertexResult(namespaceRaw.remove(0) as JSONObject))
-            assertTrue(namespace1 is NamespaceBlockVertex)
-            assertTrue(namespace2 is NamespaceBlockVertex)
-            assertTrue(namespace3 is NamespaceBlockVertex)
+            val namespaceVertices = namespaceRaw.map { VertexMapper.mapToVertex(tigerGraphHook.flattenVertexResult(it as JSONObject)) as NamespaceBlockVertex }
+            val namespace1 = namespaceVertices.find { it.name == ROOT_PACKAGE }
+            val namespace2 = namespaceVertices.find { it.name == SECOND_PACKAGE }
+            val namespace3 = namespaceVertices.find { it.name == THIRD_PACKAGE }
             val namespace1Edges = get("graph/$GRAPH_NAME/edges/${VertexLabels.NAMESPACE_BLOCK.name}_VERT/${namespace1.hashCode()}")
             val namespace2Edges = get("graph/$GRAPH_NAME/edges/${VertexLabels.NAMESPACE_BLOCK.name}_VERT/${namespace2.hashCode()}")
             assertEquals(namespace1.hashCode().toString(), (namespace1Edges.first() as JSONObject)["from_id"])

@@ -119,7 +119,7 @@ abstract class HookTest {
         @Test
         open fun joinThreeNamespaceBlocks() {
             val n1 = NamespaceBlockVertex(SECOND_PACKAGE, "$ROOT_PACKAGE.$SECOND_PACKAGE", INT_2)
-            val n2 = NamespaceBlockVertex(THIRD_PACKAGE, "$ROOT_PACKAGE.$THIRD_PACKAGE", INT_3)
+            val n2 = NamespaceBlockVertex(THIRD_PACKAGE, "$ROOT_PACKAGE.$SECOND_PACKAGE.$THIRD_PACKAGE", INT_3)
             hook.joinNamespaceBlocks(root, n1)
             hook.joinNamespaceBlocks(n1, n2)
         }
