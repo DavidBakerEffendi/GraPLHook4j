@@ -30,7 +30,7 @@ dependencies {
 
 test {
     useJUnitPlatform()
-    include "**/*HookTest*"
+    exclude "**/*IntTest*"
 
     testLogging {
         events 'FAILED', 'SKIPPED'
