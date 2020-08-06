@@ -9,7 +9,10 @@ import za.ac.sun.grapl.domain.enums.VertexLabels
 import za.ac.sun.grapl.domain.mappers.VertexMapper
 import za.ac.sun.grapl.domain.models.GraPLVertex
 import za.ac.sun.grapl.domain.models.MethodDescriptorVertex
-import za.ac.sun.grapl.domain.models.vertices.*
+import za.ac.sun.grapl.domain.models.vertices.FileVertex
+import za.ac.sun.grapl.domain.models.vertices.MethodVertex
+import za.ac.sun.grapl.domain.models.vertices.ModifierVertex
+import za.ac.sun.grapl.domain.models.vertices.NamespaceBlockVertex
 import java.io.IOException
 import java.lang.Thread.sleep
 import java.util.*
@@ -91,8 +94,8 @@ class TigerGraphHook private constructor(
         val toPayload = createVertexPayload(to)
         val vertexPayload = if (fromPayload.keys.first() == toPayload.keys.first()) mapOf(
                 fromPayload.keys.first() to mapOf(
-                        from.hashCode().toString() to (fromPayload.values.first() as Map<*,*>)[from.hashCode().toString()],
-                        to.hashCode().toString() to (toPayload.values.first() as  Map<*,*>)[to.hashCode().toString()]
+                        from.hashCode().toString() to (fromPayload.values.first() as Map<*, *>)[from.hashCode().toString()],
+                        to.hashCode().toString() to (toPayload.values.first() as Map<*, *>)[to.hashCode().toString()]
                 ))
         else mapOf(
                 fromPayload.keys.first() to fromPayload.values.first(),
