@@ -12,7 +12,7 @@ import za.ac.sun.grapl.domain.models.vertices.*
  * Builds the test environments with hook calls - implementing class is required to validate results
  * with concerned database.
  */
-abstract class HookTest {
+abstract class AbstractHookTest {
 
     open fun provideHook(): IHook = provideBuilder().build() ?: throw NullPointerException("Could not create hook!")
 
@@ -135,8 +135,6 @@ abstract class HookTest {
     @DisplayName("Update Checks")
     abstract inner class UpdateChecks {
         protected lateinit var hook: IHook
-        private lateinit var f: FileVertex
-        private lateinit var m: MethodVertex
         protected val keyToTest = "typeFullName"
         protected val initValue = "INTEGER"
         protected val updatedValue = "VOID"
@@ -144,9 +142,6 @@ abstract class HookTest {
         @BeforeEach
         open fun setUp() {
             hook = provideHook()
-            hook.clearGraph()
-            f = FileVertex(STRING_1, INT_1)
-            m = MethodVertex(STRING_1, STRING_1, STRING_1, INT_1, INT_2)
             assertNotEquals(initValue, updatedValue)
             hook.createVertex(BlockVertex(STRING_1, INT_3, INT_1, initValue, INT_2))
         }
@@ -257,12 +252,8 @@ abstract class HookTest {
         const val INT_2 = 1
         const val INT_3 = 2
         const val INT_4 = 3
-        val DISPATCH_1 = DispatchTypes.DYNAMIC_DISPATCH
-        val DISPATCH_2 = DispatchTypes.STATIC_DISPATCH
         val EVAL_1 = EvaluationStrategies.BY_REFERENCE
-        val EVAL_2 = EvaluationStrategies.BY_SHARING
         val MOD_1 = ModifierTypes.ABSTRACT
-        val MOD_2 = ModifierTypes.CONSTRUCTOR
         const val ROOT_METHOD = "root"
         const val FIRST_BLOCK = "firstBlock"
         const val TEST_ID = "test"

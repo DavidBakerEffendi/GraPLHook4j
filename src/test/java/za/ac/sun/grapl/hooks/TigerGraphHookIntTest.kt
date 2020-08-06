@@ -2,7 +2,8 @@ package za.ac.sun.grapl.hooks
 
 import org.json.JSONArray
 import org.json.JSONObject
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -10,7 +11,7 @@ import za.ac.sun.grapl.domain.enums.VertexLabels
 import za.ac.sun.grapl.domain.mappers.VertexMapper
 import za.ac.sun.grapl.domain.models.vertices.*
 
-class TigerGraphHookIntTest : HookTest() {
+class TigerGraphHookIntTest : AbstractHookTest() {
 
     override fun provideHook(): TigerGraphHook = provideBuilder().build()
 
@@ -333,6 +334,21 @@ class TigerGraphHookIntTest : HookTest() {
             assertEquals(namespace2.hashCode().toString(), (namespace2Edges.first() as JSONObject)["from_id"])
             assertEquals(namespace3.hashCode().toString(), (namespace2Edges.first() as JSONObject)["to_id"])
         }
+
+        @Test
+        override fun joinExistingConnection() {
+            super.joinExistingConnection()
+            val namespaceRaw = get("graph/$GRAPH_NAME/vertices/${VertexLabels.NAMESPACE_BLOCK.name}_VERT")
+            assertTrue(namespaceRaw.any())
+            val namespaceVertices = namespaceRaw.map { VertexMapper.mapToVertex(tigerGraphHook.flattenVertexResult(it as JSONObject)) as NamespaceBlockVertex }
+            val namespace1 = namespaceVertices.find { it.name == ROOT_PACKAGE }
+            val namespace2 = namespaceVertices.find { it.name == SECOND_PACKAGE }
+            assertTrue(namespace1 is NamespaceBlockVertex)
+            assertTrue(namespace2 is NamespaceBlockVertex)
+            val namespaceEdges = get("graph/$GRAPH_NAME/edges/${VertexLabels.NAMESPACE_BLOCK.name}_VERT/${namespace1.hashCode()}")
+            assertEquals(namespace1.hashCode().toString(), (namespaceEdges.first() as JSONObject)["from_id"])
+            assertEquals(namespace2.hashCode().toString(), (namespaceEdges.first() as JSONObject)["to_id"])
+        }
     }
 
     @Nested
@@ -343,8 +359,24 @@ class TigerGraphHookIntTest : HookTest() {
         override fun setUp() {
             super.setUp()
             tigerGraphHook = hook as TigerGraphHook
+            val blockRaw = get("graph/$GRAPH_NAME/vertices/${VertexLabels.BLOCK.name}_VERT")
+            assertTrue(blockRaw.any())
+            val blockMap = tigerGraphHook.flattenVertexResult(blockRaw.first() as JSONObject)
+            val block = VertexMapper.mapToVertex(blockMap)
+            assertTrue(block is BlockVertex)
+            assertEquals(super.initValue, blockMap[super.keyToTest])
         }
 
+        @Test
+        override fun testUpdateOnOneBlockProperty() {
+            super.testUpdateOnOneBlockProperty()
+            val blockRaw = get("graph/$GRAPH_NAME/vertices/${VertexLabels.BLOCK.name}_VERT")
+            assertTrue(blockRaw.any())
+            val blockMap = tigerGraphHook.flattenVertexResult(blockRaw.first() as JSONObject)
+            val block = VertexMapper.mapToVertex(blockMap)
+            assertTrue(block is BlockVertex)
+            assertEquals(super.updatedValue, blockMap[super.keyToTest])
+        }
     }
 
     @Nested

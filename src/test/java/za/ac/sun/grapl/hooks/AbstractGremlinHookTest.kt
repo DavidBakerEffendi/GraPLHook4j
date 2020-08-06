@@ -1,272 +1,252 @@
-package za.ac.sun.grapl.hooks;
+package za.ac.sun.grapl.hooks
 
-import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import za.ac.sun.grapl.domain.enums.EdgeLabels;
-import za.ac.sun.grapl.domain.models.vertices.*;
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import za.ac.sun.grapl.domain.enums.EdgeLabels
+import za.ac.sun.grapl.domain.models.vertices.*
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-public abstract class GremlinHookTest extends HookTest {
-
+abstract class AbstractGremlinHookTest : AbstractHookTest() {
     /**
-     * Provides a hook to a new database hook. Default is a new {@link TinkerGraphHook}.
+     * Provides a hook to a new database hook. Default is a new [TinkerGraphHook].
      *
      * @return a built hook.
      */
-    @NotNull
-    @Override
-    public GremlinHook provideHook() {
-        return new TinkerGraphHook.Builder().build();
+    override fun provideHook(): GremlinHook {
+        return TinkerGraphHook.Builder().build()
     }
 
     /**
      * Provides a hook builder to continue to configure.
-     * Default is a {@link za.ac.sun.grapl.hooks.TinkerGraphHook.Builder}.
+     * Default is a [za.ac.sun.grapl.hooks.TinkerGraphHook.Builder].
      *
-     * @return an {@link IHookBuilder} to build with.
+     * @return an [IHookBuilder] to build with.
      */
-    @NotNull
-    @Override
-    public GremlinHookBuilder provideBuilder() {
-        return new TinkerGraphHook.Builder();
+    override fun provideBuilder(): GremlinHookBuilder {
+        return TinkerGraphHook.Builder()
     }
 
     @Nested
-    class GremlinCheckMethodJoinInteraction extends CheckMethodJoinInteraction {
-        GremlinHook gremlinHook;
+    inner class GremlinCheckMethodJoinInteraction : CheckMethodJoinInteraction() {
+        private lateinit var gremlinHook: GremlinHook
 
         @BeforeEach
-        @Override
-        public void setUp() {
-            super.setUp();
-            gremlinHook = (GremlinHook) hook;
+        override fun setUp() {
+            super.setUp()
+            gremlinHook = hook as GremlinHook
         }
 
         @Test
-        @Override
-        public void joinMethodToMethodParamIn() {
-            super.joinMethodToMethodParamIn();
-            gremlinHook.startTransaction();
-            assertTrue(gremlinHook.g.E().hasLabel(EdgeLabels.AST.name()).hasNext());
-            assertTrue(gremlinHook.g.V().hasLabel(MethodVertex.LABEL.name())
-                    .out(EdgeLabels.AST.name())
-                    .has(MethodParameterInVertex.LABEL.name(), "name", HookTest.STRING_1)
-                    .hasNext());
-            gremlinHook.endTransaction();
+        override fun joinMethodToMethodParamIn() {
+            super.joinMethodToMethodParamIn()
+            gremlinHook.startTransaction()
+            Assertions.assertTrue(gremlinHook.g.E().hasLabel(EdgeLabels.AST.name).hasNext())
+            Assertions.assertTrue(gremlinHook.g.V().hasLabel(MethodVertex.LABEL.name)
+                    .out(EdgeLabels.AST.name)
+                    .has(MethodParameterInVertex.LABEL.name, "name", STRING_1)
+                    .hasNext())
+            gremlinHook.endTransaction()
         }
 
         @Test
-        @Override
-        public void joinMethodToMethodReturn() {
-            super.joinMethodToMethodReturn();
-            gremlinHook.startTransaction();
-            assertTrue(gremlinHook.g.E().hasLabel(EdgeLabels.AST.name()).hasNext());
-            assertTrue(gremlinHook.g.V().hasLabel(MethodVertex.LABEL.name())
-                    .out(EdgeLabels.AST.name())
-                    .has(MethodReturnVertex.LABEL.name(), "name", HookTest.STRING_1)
-                    .hasNext());
-            gremlinHook.endTransaction();
+        override fun joinMethodToMethodReturn() {
+            super.joinMethodToMethodReturn()
+            gremlinHook.startTransaction()
+            Assertions.assertTrue(gremlinHook.g.E().hasLabel(EdgeLabels.AST.name).hasNext())
+            Assertions.assertTrue(gremlinHook.g.V().hasLabel(MethodVertex.LABEL.name)
+                    .out(EdgeLabels.AST.name)
+                    .has(MethodReturnVertex.LABEL.name, "name", STRING_1)
+                    .hasNext())
+            gremlinHook.endTransaction()
         }
 
         @Test
-        @Override
-        public void joinMethodToModifier() {
-            super.joinMethodToModifier();
-            gremlinHook.startTransaction();
-            assertTrue(gremlinHook.g.E().hasLabel(EdgeLabels.AST.name()).hasNext());
-            assertTrue(gremlinHook.g.V().hasLabel(MethodVertex.LABEL.name())
-                    .out(EdgeLabels.AST.name())
-                    .has(ModifierVertex.LABEL.name(), "name", HookTest.Companion.getMOD_1().name())
-                    .hasNext());
-            gremlinHook.endTransaction();
+        override fun joinMethodToModifier() {
+            super.joinMethodToModifier()
+            gremlinHook.startTransaction()
+            Assertions.assertTrue(gremlinHook.g.E().hasLabel(EdgeLabels.AST.name).hasNext())
+            Assertions.assertTrue(gremlinHook.g.V().hasLabel(MethodVertex.LABEL.name)
+                    .out(EdgeLabels.AST.name)
+                    .has(ModifierVertex.LABEL.name, "name", MOD_1.name)
+                    .hasNext())
+            gremlinHook.endTransaction()
         }
     }
 
     @Nested
-    class GremlinFileJoinInteraction extends FileJoinInteraction {
-        GremlinHook gremlinHook;
+    inner class GremlinFileJoinInteraction : FileJoinInteraction() {
+        lateinit var gremlinHook: GremlinHook
 
         @BeforeEach
-        @Override
-        public void setUp() {
-            super.setUp();
-            gremlinHook = (GremlinHook) hook;
+        override fun setUp() {
+            super.setUp()
+            gremlinHook = hook as GremlinHook
         }
 
         @Test
-        @Override
-        public void testJoinFile2NamespaceBlock() {
-            super.testJoinFile2NamespaceBlock();
-            gremlinHook.startTransaction();
-            assertTrue(gremlinHook.g.E().hasLabel(EdgeLabels.AST.name()).hasNext());
-            assertTrue(gremlinHook.g.V().has(NamespaceBlockVertex.LABEL.name(), "fullName", HookTest.STRING_1)
-                    .out(EdgeLabels.AST.name())
-                    .hasLabel(FileVertex.LABEL.name())
-                    .hasNext());
-            gremlinHook.endTransaction();
+        override fun testJoinFile2NamespaceBlock() {
+            super.testJoinFile2NamespaceBlock()
+            gremlinHook.startTransaction()
+            Assertions.assertTrue(gremlinHook.g.E().hasLabel(EdgeLabels.AST.name).hasNext())
+            Assertions.assertTrue(gremlinHook.g.V().has(NamespaceBlockVertex.LABEL.name, "fullName", STRING_1)
+                    .out(EdgeLabels.AST.name)
+                    .hasLabel(FileVertex.LABEL.name)
+                    .hasNext())
+            gremlinHook.endTransaction()
         }
 
         @Test
-        @Override
-        public void testJoinFile2Method() {
-            super.testJoinFile2Method();
-            gremlinHook.startTransaction();
-            assertTrue(gremlinHook.g.E().hasLabel(EdgeLabels.AST.name()).hasNext());
-            assertTrue(gremlinHook.g.V().hasLabel(FileVertex.LABEL.name())
-                    .out(EdgeLabels.AST.name())
-                    .has(MethodVertex.LABEL.name(), "fullName", HookTest.STRING_1)
-                    .hasNext());
-            gremlinHook.endTransaction();
+        override fun testJoinFile2Method() {
+            super.testJoinFile2Method()
+            gremlinHook.startTransaction()
+            Assertions.assertTrue(gremlinHook.g.E().hasLabel(EdgeLabels.AST.name).hasNext())
+            Assertions.assertTrue(gremlinHook.g.V().hasLabel(FileVertex.LABEL.name)
+                    .out(EdgeLabels.AST.name)
+                    .has(MethodVertex.LABEL.name, "fullName", STRING_1)
+                    .hasNext())
+            gremlinHook.endTransaction()
         }
     }
 
     @Nested
-    class GremlinBlockJoinInteraction extends BlockJoinInteraction {
-        GremlinHook gremlinHook;
+    inner class GremlinBlockJoinInteraction : BlockJoinInteraction() {
+        lateinit var gremlinHook: GremlinHook
 
         @BeforeEach
-        @Override
-        public void setUp() {
-            super.setUp();
-            gremlinHook = (GremlinHook) hook;
+        override fun setUp() {
+            super.setUp()
+            gremlinHook = hook as GremlinHook
         }
 
         @Test
-        @Override
-        public void testMethodJoinBlockTest() {
-            super.testMethodJoinBlockTest();
-            gremlinHook.startTransaction();
-            assertTrue(gremlinHook.g.E().hasLabel(EdgeLabels.AST.name()).hasNext());
-            assertTrue(gremlinHook.g.V().hasLabel(MethodVertex.LABEL.name())
-                    .out(EdgeLabels.AST.name())
-                    .has(BlockVertex.LABEL.name(), "name", FIRST_BLOCK)
-                    .hasNext());
-            gremlinHook.endTransaction();
+        override fun testMethodJoinBlockTest() {
+            super.testMethodJoinBlockTest()
+            gremlinHook.startTransaction()
+            Assertions.assertTrue(gremlinHook.g.E().hasLabel(EdgeLabels.AST.name).hasNext())
+            Assertions.assertTrue(gremlinHook.g.V().hasLabel(MethodVertex.LABEL.name)
+                    .out(EdgeLabels.AST.name)
+                    .has(BlockVertex.LABEL.name, "name", FIRST_BLOCK)
+                    .hasNext())
+            gremlinHook.endTransaction()
         }
 
         @Test
-        @Override
-        public void testBlockJoinBlockTest() {
-            super.testBlockJoinBlockTest();
-            gremlinHook.startTransaction();
-            assertTrue(gremlinHook.g.V().has(BlockVertex.LABEL.name(), "name", FIRST_BLOCK)
-                    .out(EdgeLabels.AST.name())
-                    .has(BlockVertex.LABEL.name(), "name", TEST_ID)
-                    .hasNext());
-            gremlinHook.endTransaction();
+        override fun testBlockJoinBlockTest() {
+            super.testBlockJoinBlockTest()
+            gremlinHook.startTransaction()
+            Assertions.assertTrue(gremlinHook.g.V().has(BlockVertex.LABEL.name, "name", FIRST_BLOCK)
+                    .out(EdgeLabels.AST.name)
+                    .has(BlockVertex.LABEL.name, "name", TEST_ID)
+                    .hasNext())
+            gremlinHook.endTransaction()
         }
 
         @Test
-        @Override
-        public void testAssignLiteralToBlock() {
-            super.testAssignLiteralToBlock();
-            gremlinHook.startTransaction();
-            assertTrue(gremlinHook.g.V().has(BlockVertex.LABEL.name(), "name", FIRST_BLOCK)
-                    .out(EdgeLabels.AST.name())
-                    .has(LiteralVertex.LABEL.name(), "name", TEST_ID)
-                    .hasNext());
-            gremlinHook.endTransaction();
+        override fun testAssignLiteralToBlock() {
+            super.testAssignLiteralToBlock()
+            gremlinHook.startTransaction()
+            Assertions.assertTrue(gremlinHook.g.V().has(BlockVertex.LABEL.name, "name", FIRST_BLOCK)
+                    .out(EdgeLabels.AST.name)
+                    .has(LiteralVertex.LABEL.name, "name", TEST_ID)
+                    .hasNext())
+            gremlinHook.endTransaction()
         }
 
         @Test
-        @Override
-        public void testAssignLocalToBlock() {
-            super.testAssignLocalToBlock();
-            gremlinHook.startTransaction();
-            assertTrue(gremlinHook.g.V().has(BlockVertex.LABEL.name(), "name", FIRST_BLOCK)
-                    .out(EdgeLabels.AST.name())
-                    .has(LocalVertex.LABEL.name(), "name", TEST_ID)
-                    .hasNext());
-            gremlinHook.endTransaction();
+        override fun testAssignLocalToBlock() {
+            super.testAssignLocalToBlock()
+            gremlinHook.startTransaction()
+            Assertions.assertTrue(gremlinHook.g.V().has(BlockVertex.LABEL.name, "name", FIRST_BLOCK)
+                    .out(EdgeLabels.AST.name)
+                    .has(LocalVertex.LABEL.name, "name", TEST_ID)
+                    .hasNext())
+            gremlinHook.endTransaction()
         }
 
         @Test
-        @Override
-        public void testAssignControlToBlock() {
-            super.testAssignControlToBlock();
-            gremlinHook.startTransaction();
-            assertTrue(gremlinHook.g.V().has(BlockVertex.LABEL.name(), "name", FIRST_BLOCK)
-                    .out(EdgeLabels.AST.name())
-                    .has(ControlStructureVertex.LABEL.name(), "name", TEST_ID)
-                    .hasNext());
-            gremlinHook.endTransaction();
+        override fun testAssignControlToBlock() {
+            super.testAssignControlToBlock()
+            gremlinHook.startTransaction()
+            Assertions.assertTrue(gremlinHook.g.V().has(BlockVertex.LABEL.name, "name", FIRST_BLOCK)
+                    .out(EdgeLabels.AST.name)
+                    .has(ControlStructureVertex.LABEL.name, "name", TEST_ID)
+                    .hasNext())
+            gremlinHook.endTransaction()
         }
     }
 
     @Nested
-    class GremlinNamespaceBlockJoinInteraction extends NamespaceBlockJoinInteraction {
-        GremlinHook gremlinHook;
+    inner class GremlinNamespaceBlockJoinInteraction : NamespaceBlockJoinInteraction() {
+        lateinit var gremlinHook: GremlinHook
 
         @BeforeEach
-        @Override
-        public void setUp() {
-            super.setUp();
-            gremlinHook = (GremlinHook) hook;
+        override fun setUp() {
+            super.setUp()
+            gremlinHook = hook as GremlinHook
         }
 
         @Test
-        @Override
-        public void joinTwoNamespaceBlocks() {
-            super.joinTwoNamespaceBlocks();
-            gremlinHook.startTransaction();
-            assertTrue(gremlinHook.g.V().has(NamespaceBlockVertex.LABEL.name(), "name", ROOT_PACKAGE)
-                    .out(EdgeLabels.AST.name())
-                    .has(NamespaceBlockVertex.LABEL.name(), "name", SECOND_PACKAGE).hasNext());
-            gremlinHook.endTransaction();
+        override fun joinTwoNamespaceBlocks() {
+            super.joinTwoNamespaceBlocks()
+            gremlinHook.startTransaction()
+            Assertions.assertTrue(gremlinHook.g.V().has(NamespaceBlockVertex.LABEL.name, "name", ROOT_PACKAGE)
+                    .out(EdgeLabels.AST.name)
+                    .has(NamespaceBlockVertex.LABEL.name, "name", SECOND_PACKAGE).hasNext())
+            gremlinHook.endTransaction()
         }
 
         @Test
-        @Override
-        public void joinThreeNamespaceBlocks() {
-            super.joinThreeNamespaceBlocks();
-            gremlinHook.startTransaction();
-            assertTrue(gremlinHook.g.V().has(NamespaceBlockVertex.LABEL.name(), "name", ROOT_PACKAGE)
-                    .out(EdgeLabels.AST.name())
-                    .has(NamespaceBlockVertex.LABEL.name(), "name", SECOND_PACKAGE).hasNext());
-            assertTrue(gremlinHook.g.V().has(NamespaceBlockVertex.LABEL.name(), "name", SECOND_PACKAGE)
-                    .out(EdgeLabels.AST.name())
-                    .has(NamespaceBlockVertex.LABEL.name(), "name", THIRD_PACKAGE).hasNext());
-            gremlinHook.endTransaction();
+        override fun joinThreeNamespaceBlocks() {
+            super.joinThreeNamespaceBlocks()
+            gremlinHook.startTransaction()
+            Assertions.assertTrue(gremlinHook.g.V().has(NamespaceBlockVertex.LABEL.name, "name", ROOT_PACKAGE)
+                    .out(EdgeLabels.AST.name)
+                    .has(NamespaceBlockVertex.LABEL.name, "name", SECOND_PACKAGE).hasNext())
+            Assertions.assertTrue(gremlinHook.g.V().has(NamespaceBlockVertex.LABEL.name, "name", SECOND_PACKAGE)
+                    .out(EdgeLabels.AST.name)
+                    .has(NamespaceBlockVertex.LABEL.name, "name", THIRD_PACKAGE).hasNext())
+            gremlinHook.endTransaction()
         }
 
         @Test
-        @Override
-        public void joinExistingConnection() {
-            super.joinExistingConnection();
-            gremlinHook.startTransaction();
-            assertEquals(1, gremlinHook.g.V().has(NamespaceBlockVertex.LABEL.name(), "name", ROOT_PACKAGE)
-                    .out(EdgeLabels.AST.name()).count().next());
-            gremlinHook.endTransaction();
+        override fun joinExistingConnection() {
+            super.joinExistingConnection()
+            gremlinHook.startTransaction()
+            Assertions.assertEquals(1, gremlinHook.g.V().has(NamespaceBlockVertex.LABEL.name, "name", ROOT_PACKAGE)
+                    .out(EdgeLabels.AST.name).count().next())
+            gremlinHook.endTransaction()
         }
     }
 
     @Nested
-    @DisplayName("Update Checks")
-    class GremlinUpsertChecks extends UpdateChecks {
-        GremlinHook gremlinHook;
+    inner class GremlinUpdateChecks : UpdateChecks() {
+        lateinit var gremlinHook: GremlinHook
 
         @BeforeEach
-        @Override
-        public void setUp() {
-            super.setUp();
-            gremlinHook = (GremlinHook) hook;
-            gremlinHook.startTransaction();
-            assertTrue(gremlinHook.g.V().hasLabel(BlockVertex.LABEL.name()).has(super.getKeyToTest(), super.getInitValue()).hasNext());
-            gremlinHook.endTransaction();
+        override fun setUp() {
+            super.setUp()
+            gremlinHook = hook as GremlinHook
+            gremlinHook.startTransaction()
+            Assertions.assertTrue(gremlinHook.g.V().hasLabel(BlockVertex.LABEL.name).has(super.keyToTest, super.initValue).hasNext())
+            gremlinHook.endTransaction()
         }
 
         @Test
-        @Override
-        public void testUpdateOnOneBlockProperty() {
-            super.testUpdateOnOneBlockProperty();
-            gremlinHook.startTransaction();
-            assertTrue(gremlinHook.g.V().hasLabel(BlockVertex.LABEL.name()).has(super.getKeyToTest(), super.getUpdatedValue()).hasNext());
-            gremlinHook.endTransaction();
+        override fun testUpdateOnOneBlockProperty() {
+            super.testUpdateOnOneBlockProperty()
+            gremlinHook.startTransaction()
+            Assertions.assertTrue(gremlinHook.g.V().hasLabel(BlockVertex.LABEL.name).has(super.keyToTest, super.updatedValue).hasNext())
+            gremlinHook.endTransaction()
         }
     }
+
+    @Nested
+    inner class GremlinAggregateQueries : AggregateQueries()
+
+    @Nested
+    inner class GremlinBooleanChecks : BooleanChecks()
+
+    @Nested
+    inner class GremlinASTManipulation : ASTManipulation()
 }

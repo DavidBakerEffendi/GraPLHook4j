@@ -86,14 +86,11 @@ class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder
 
     data class Builder(
             var conf: String,
-            var graphDir: String? = null,
-            var clearGraph: Boolean = false
+            var graphDir: String? = null
     ) : GremlinHookBuilder {
         var graph: Graph? = null
 
-        constructor(conf: String) : this(conf, null, false)
-
-        fun clearDatabase(clearGraph: Boolean) = apply { this.clearGraph = clearGraph }
+        constructor(conf: String) : this(conf, null)
 
         override fun useExistingGraph(graphDir: String): IHookBuilder {
             require(isValidExportPath(graphDir)) {
@@ -116,10 +113,5 @@ class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder
         conf = builder.conf
         if (builder.graphDir != null) graph.traversal().io<Any>(builder.graphDir).read().iterate()
         supportsTransactions = graph.features().graph().supportsTransactions()
-        try {
-            if (builder.clearGraph) clearGraph()
-        } catch (e: Exception) {
-            logger.warn("Unable to clear graph!", e)
-        }
     }
 }

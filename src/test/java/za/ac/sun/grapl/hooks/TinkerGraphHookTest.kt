@@ -9,7 +9,7 @@ import za.ac.sun.grapl.domain.models.vertices.FileVertex
 import java.io.File
 import java.util.*
 
-class TinkerGraphHookTest : GremlinHookTest() {
+class TinkerGraphHookTest : AbstractGremlinHookTest() {
 
     companion object {
         private val tempDir = System.getProperty("java.io.tmpdir")
@@ -32,9 +32,9 @@ class TinkerGraphHookTest : GremlinHookTest() {
         }
     }
 
-    override fun provideHook(): TinkerGraphHook {
-        return super.provideHook() as TinkerGraphHook
-    }
+    override fun provideHook() = provideBuilder().build()
+
+    override fun provideBuilder() = super.provideBuilder() as TinkerGraphHook.Builder
 
     /**
      * Provides a hook with the contents of a serialized graph to populate the graph with.
@@ -145,13 +145,4 @@ class TinkerGraphHookTest : GremlinHookTest() {
             Assertions.assertThrows(IllegalArgumentException::class.java) { hook.exportCurrentGraph("/tmp/grapl/invalid.txt") }
         }
     }
-
-    @Nested
-    inner class TinkerGraphAggregateQueries : AggregateQueries()
-
-    @Nested
-    inner class TinkerGraphBooleanChecks : BooleanChecks()
-
-    @Nested
-    inner class TinkerGraphASTManipulation : ASTManipulation()
 }
