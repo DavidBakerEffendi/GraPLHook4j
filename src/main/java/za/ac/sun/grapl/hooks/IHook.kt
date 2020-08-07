@@ -64,33 +64,12 @@ interface IHook {
 
     /**
      * Creates and assigns the [GraPLVertex] to the associated [BlockVertex] vertex in the
-     * database identified by the given [MethodVertex] and AST order of the block.
-     *
-     * @param rootVertex the [MethodVertex] which is the root of the search.
-     * @param newVertex  the [GraPLVertex] to associate with the block.
-     * @param blockOrder the AST order under which this block occurs.
-     */
-    fun createAndAssignToBlock(rootVertex: MethodVertex, newVertex: GraPLVertex, blockOrder: Int)
-
-    /**
-     * Creates and assigns the [GraPLVertex] to the associated [BlockVertex] vertex in the
      * database identified purely by the order.
      *
      * @param newVertex  the [GraPLVertex] to associate with the block.
      * @param blockOrder the AST order under which this block occurs.
      */
     fun createAndAssignToBlock(newVertex: GraPLVertex, blockOrder: Int)
-
-    /**
-     * Updates a key-value pair on a [GraPLVertex] in the database identified by the given [MethodVertex]
-     * and AST order of the block.
-     *
-     * @param rootVertex the [MethodVertex] which is the root of the search.
-     * @param order      the AST order under which this block occurs.
-     * @param key        the key of the property to upsert.
-     * @param value      the value to upsert the key with.
-     */
-    fun updateASTVertexProperty(rootVertex: MethodVertex, order: Int, key: String, value: String)
 
     /**
      * Updates a key-value pair on a [GraPLVertex] in the database identified by the given AST order of the block.
@@ -125,7 +104,7 @@ interface IHook {
      * @param edgeLabel The label to be attached to the edge.
      * @return true if joined by an edge, false if otherwise.
      */
-    fun areASTVerticesJoinedByEdge(blockFrom: Int, blockTo: Int, edgeLabel: EdgeLabels): Boolean
+    fun areASTVerticesConnected(blockFrom: Int, blockTo: Int, edgeLabel: EdgeLabels): Boolean
 
     /**
      * Traverses the AST nodes to search for the largest order value.

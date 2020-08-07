@@ -180,23 +180,9 @@ public abstract class GremlinHook implements IHook {
     }
 
     @Override
-    public void createAndAssignToBlock(@NotNull final MethodVertex parentVertex, @NotNull final GraPLVertex newVertex, final int blockOrder) {
-        startTransaction();
-        createTinkerGraphEdge(findASTVertex(parentVertex, blockOrder), EdgeLabels.AST, createTinkerPopVertex(newVertex));
-        endTransaction();
-    }
-
-    @Override
     public void createAndAssignToBlock(@NotNull final GraPLVertex newVertex, final int blockOrder) {
         startTransaction();
         createTinkerGraphEdge(findASTVertex(blockOrder), EdgeLabels.AST, createTinkerPopVertex(newVertex));
-        endTransaction();
-    }
-
-    @Override
-    public void updateASTVertexProperty(@NotNull final MethodVertex rootMethod, final int order, @NotNull final String key, @NotNull final String value) {
-        startTransaction();
-        g.V(findASTVertex(rootMethod, order)).property(key, value).iterate();
         endTransaction();
     }
 
@@ -222,7 +208,7 @@ public abstract class GremlinHook implements IHook {
     }
 
     @Override
-    public boolean areASTVerticesJoinedByEdge(final int blockFrom, final int blockTo, final EdgeLabels edgeLabel) {
+    public boolean areASTVerticesConnected(final int blockFrom, final int blockTo, final EdgeLabels edgeLabel) {
         startTransaction();
         final Vertex a = findASTVertex(blockFrom);
         final Vertex b = findASTVertex(blockTo);

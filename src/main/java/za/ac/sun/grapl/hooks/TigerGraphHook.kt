@@ -43,13 +43,11 @@ class TigerGraphHook private constructor(
         if (from != null && to != null) upsertAndJoinVertices(from, to, EdgeLabels.AST)
     }
 
-    override fun areASTVerticesJoinedByEdge(blockFrom: Int, blockTo: Int, edgeLabel: EdgeLabels): Boolean = ((get("query/$GRAPH_NAME/areASTVerticesJoinedByEdge?blockFrom=$blockFrom&blockTo=$blockTo&edgeLabel=${edgeLabel.name}")).first() as JSONObject)["result"] as Boolean
+    override fun areASTVerticesConnected(orderFrom: Int, orderTo: Int, edgeLabel: EdgeLabels): Boolean = ((get("query/$GRAPH_NAME/areASTVerticesJoinedByEdge?blockFrom=$orderFrom&blockTo=$orderTo&edgeLabel=${edgeLabel.name}")).first() as JSONObject)["result"] as Boolean
 
     override fun joinNamespaceBlocks(from: NamespaceBlockVertex, to: NamespaceBlockVertex) = upsertAndJoinVertices(from, to, EdgeLabels.AST)
 
     override fun maxOrder() = (get("query/$GRAPH_NAME/maxOrder").first() as JSONObject)["@@maxAstOrder"] as Int
-
-    override fun updateASTVertexProperty(rootVertex: MethodVertex, order: Int, key: String, value: String) = updateASTVertexProperty(order, key, value)
 
     override fun updateASTVertexProperty(order: Int, key: String, value: String) {
         val result = (get("query/$GRAPH_NAME/findVertexByAstOrder?astOrder=$order").first() as JSONObject)["result"] as JSONArray
@@ -67,8 +65,6 @@ class TigerGraphHook private constructor(
     override fun isASTVertex(blockOrder: Int): Boolean = ((get("query/$GRAPH_NAME/isASTVertex?astOrder=$blockOrder")).first() as JSONObject)["result"] as Boolean
 
     override fun createAndAssignToBlock(parentVertex: MethodVertex, newVertex: GraPLVertex) = upsertAndJoinVertices(parentVertex, newVertex, EdgeLabels.AST)
-
-    override fun createAndAssignToBlock(rootVertex: MethodVertex, newVertex: GraPLVertex, blockOrder: Int) = createAndAssignToBlock(newVertex, blockOrder)
 
     override fun createAndAssignToBlock(newVertex: GraPLVertex, blockOrder: Int) {
         val from = getVertexByASTOrder(blockOrder) ?: return

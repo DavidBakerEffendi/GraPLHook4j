@@ -1,10 +1,7 @@
 package za.ac.sun.grapl.hooks
 
-import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
 import za.ac.sun.grapl.TestDomainResources.Companion.EVAL_1
 import za.ac.sun.grapl.TestDomainResources.Companion.FIRST_BLOCK
 import za.ac.sun.grapl.TestDomainResources.Companion.INT_1
@@ -33,7 +30,7 @@ abstract class AbstractHookTest {
     open fun provideBuilder(): IHookBuilder = TinkerGraphHook.Builder()
 
     @AfterEach
-    open fun tearDown() = provideHook().clearGraph()
+    open fun tearDown() = provideHook().apply { clearGraph() }.close()
 
     @DisplayName("Join method vertex to method related vertices")
     abstract inner class CheckMethodJoinInteraction {
@@ -146,8 +143,9 @@ abstract class AbstractHookTest {
         }
     }
 
+    @Nested
     @DisplayName("Update Checks")
-    abstract inner class UpdateChecks {
+    open inner class UpdateChecks {
         protected lateinit var hook: IHook
         protected val keyToTest = "typeFullName"
         protected val initValue = "INTEGER"
@@ -167,8 +165,9 @@ abstract class AbstractHookTest {
         open fun testUpdateOnOneBlockProperty() = hook.updateASTVertexProperty(INT_3, keyToTest, updatedValue)
     }
 
+    @Nested
     @DisplayName("Aggregate queries")
-    abstract inner class AggregateQueries {
+    open inner class AggregateQueries {
         private lateinit var hook: IHook
 
         @BeforeEach
@@ -190,8 +189,9 @@ abstract class AbstractHookTest {
         }
     }
 
+    @Nested
     @DisplayName("Simple boolean checks")
-    abstract inner class BooleanChecks {
+    open inner class BooleanChecks {
         private lateinit var hook: IHook
 
         @BeforeEach
@@ -227,8 +227,9 @@ abstract class AbstractHookTest {
         }
     }
 
+    @Nested
     @DisplayName("AST vertex unstructured manipulation queries")
-    abstract inner class ASTManipulation {
+    open inner class ASTManipulation {
         private lateinit var hook: IHook
         private lateinit var bv1: BlockVertex
         private lateinit var bv2: BlockVertex
@@ -251,11 +252,11 @@ abstract class AbstractHookTest {
         open fun testCreatingAndJoiningFreeBlocks() {
             hook.createVertex(bv1)
             hook.createVertex(bv2)
-            assertFalse(hook.areASTVerticesJoinedByEdge(INT_1, INT_2, EdgeLabels.AST))
-            assertFalse(hook.areASTVerticesJoinedByEdge(INT_2, INT_1, EdgeLabels.AST))
+            assertFalse(hook.areASTVerticesConnected(INT_1, INT_2, EdgeLabels.AST))
+            assertFalse(hook.areASTVerticesConnected(INT_2, INT_1, EdgeLabels.AST))
             hook.joinASTVerticesByOrder(INT_1, INT_2, EdgeLabels.AST)
-            assertTrue(hook.areASTVerticesJoinedByEdge(INT_1, INT_2, EdgeLabels.AST))
-            assertTrue(hook.areASTVerticesJoinedByEdge(INT_2, INT_1, EdgeLabels.AST))
+            assertTrue(hook.areASTVerticesConnected(INT_1, INT_2, EdgeLabels.AST))
+            assertTrue(hook.areASTVerticesConnected(INT_2, INT_1, EdgeLabels.AST))
         }
     }
 
