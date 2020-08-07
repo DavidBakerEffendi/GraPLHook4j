@@ -4,6 +4,13 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import za.ac.sun.grapl.TestDomainResources.Companion.FIRST_BLOCK
+import za.ac.sun.grapl.TestDomainResources.Companion.MOD_1
+import za.ac.sun.grapl.TestDomainResources.Companion.ROOT_PACKAGE
+import za.ac.sun.grapl.TestDomainResources.Companion.SECOND_PACKAGE
+import za.ac.sun.grapl.TestDomainResources.Companion.STRING_1
+import za.ac.sun.grapl.TestDomainResources.Companion.TEST_ID
+import za.ac.sun.grapl.TestDomainResources.Companion.THIRD_PACKAGE
 import za.ac.sun.grapl.domain.enums.EdgeLabels
 import za.ac.sun.grapl.domain.models.vertices.*
 
@@ -240,13 +247,4 @@ abstract class AbstractGremlinHookTest : AbstractHookTest() {
             gremlinHook.endTransaction()
         }
     }
-
-    @Nested
-    inner class GremlinAggregateQueries : AggregateQueries()
-
-    @Nested
-    inner class GremlinBooleanChecks : BooleanChecks()
-
-    @Nested
-    inner class GremlinASTManipulation : ASTManipulation()
 }

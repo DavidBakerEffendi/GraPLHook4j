@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import za.ac.sun.grapl.TestDomainResources.Companion.ROOT_PACKAGE
+import za.ac.sun.grapl.TestDomainResources.Companion.SECOND_PACKAGE
+import za.ac.sun.grapl.TestDomainResources.Companion.THIRD_PACKAGE
 import za.ac.sun.grapl.domain.enums.VertexLabels
 import za.ac.sun.grapl.domain.mappers.VertexMapper
 import za.ac.sun.grapl.domain.models.vertices.*
@@ -378,15 +381,6 @@ class TigerGraphHookIntTest : AbstractHookTest() {
             assertEquals(super.updatedValue, blockMap[super.keyToTest])
         }
     }
-
-    @Nested
-    inner class RestPPAggregateQueries : AggregateQueries()
-
-    @Nested
-    internal inner class RestPPBooleanChecks : BooleanChecks()
-
-    @Nested
-    internal inner class RestPPASTManipulation : ASTManipulation()
 
     companion object {
         private const val DEFAULT_HOSTNAME = "127.0.0.1"

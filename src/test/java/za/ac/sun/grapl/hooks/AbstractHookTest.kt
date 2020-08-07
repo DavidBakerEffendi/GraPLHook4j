@@ -1,11 +1,25 @@
 package za.ac.sun.grapl.hooks
 
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
-import za.ac.sun.grapl.domain.enums.DispatchTypes
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import za.ac.sun.grapl.TestDomainResources.Companion.EVAL_1
+import za.ac.sun.grapl.TestDomainResources.Companion.FIRST_BLOCK
+import za.ac.sun.grapl.TestDomainResources.Companion.INT_1
+import za.ac.sun.grapl.TestDomainResources.Companion.INT_2
+import za.ac.sun.grapl.TestDomainResources.Companion.INT_3
+import za.ac.sun.grapl.TestDomainResources.Companion.INT_4
+import za.ac.sun.grapl.TestDomainResources.Companion.MOD_1
+import za.ac.sun.grapl.TestDomainResources.Companion.ROOT_METHOD
+import za.ac.sun.grapl.TestDomainResources.Companion.ROOT_PACKAGE
+import za.ac.sun.grapl.TestDomainResources.Companion.SECOND_PACKAGE
+import za.ac.sun.grapl.TestDomainResources.Companion.STRING_1
+import za.ac.sun.grapl.TestDomainResources.Companion.STRING_2
+import za.ac.sun.grapl.TestDomainResources.Companion.TEST_ID
+import za.ac.sun.grapl.TestDomainResources.Companion.THIRD_PACKAGE
 import za.ac.sun.grapl.domain.enums.EdgeLabels
-import za.ac.sun.grapl.domain.enums.EvaluationStrategies
-import za.ac.sun.grapl.domain.enums.ModifierTypes
 import za.ac.sun.grapl.domain.models.vertices.*
 
 /**
@@ -87,7 +101,7 @@ abstract class AbstractHookTest {
         open fun testMethodJoinBlockTest() = Unit // Simply check that the setup is correct
 
         @Test
-        open fun testBlockJoinBlockTest() = hook.createAndAssignToBlock(BlockVertex(TEST_ID, INT_1, INT_4, STRING_1, INT_1), INT_3)
+        open fun testBlockJoinBlockTest() = hook.createAndAssignToBlock(BlockVertex(TEST_ID, INT_4, INT_1, STRING_1, INT_1), INT_3)
 
         @Test
         open fun testAssignLiteralToBlock() = hook.createAndAssignToBlock(LiteralVertex(TEST_ID, INT_4, INT_1, STRING_1, INT_1), INT_3)
@@ -96,7 +110,7 @@ abstract class AbstractHookTest {
         open fun testAssignLocalToBlock() = hook.createAndAssignToBlock(LocalVertex(STRING_1, TEST_ID, STRING_1, INT_1, INT_4), INT_3)
 
         @Test
-        open fun testAssignControlToBlock() = hook.createAndAssignToBlock(ControlStructureVertex(TEST_ID, 2, INT_4, 1), INT_3)
+        open fun testAssignControlToBlock() = hook.createAndAssignToBlock(ControlStructureVertex(TEST_ID, INT_1, INT_4, INT_1), INT_3)
     }
 
     @DisplayName("Check namespace block related behaviour")
@@ -243,23 +257,6 @@ abstract class AbstractHookTest {
             assertTrue(hook.areASTVerticesJoinedByEdge(INT_1, INT_2, EdgeLabels.AST))
             assertTrue(hook.areASTVerticesJoinedByEdge(INT_2, INT_1, EdgeLabels.AST))
         }
-    }
-
-    companion object {
-        const val STRING_1 = "TEST1"
-        const val STRING_2 = "TEST2"
-        const val INT_1 = 0
-        const val INT_2 = 1
-        const val INT_3 = 2
-        const val INT_4 = 3
-        val EVAL_1 = EvaluationStrategies.BY_REFERENCE
-        val MOD_1 = ModifierTypes.ABSTRACT
-        const val ROOT_METHOD = "root"
-        const val FIRST_BLOCK = "firstBlock"
-        const val TEST_ID = "test"
-        const val ROOT_PACKAGE = "za"
-        const val SECOND_PACKAGE = "ac"
-        const val THIRD_PACKAGE = "sun"
     }
 
 }
