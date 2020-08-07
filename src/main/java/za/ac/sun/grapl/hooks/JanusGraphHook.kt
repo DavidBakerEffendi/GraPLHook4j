@@ -4,6 +4,9 @@ import org.apache.logging.log4j.LogManager
 import org.apache.tinkerpop.gremlin.process.traversal.AnonymousTraversalSource
 import org.apache.tinkerpop.gremlin.structure.Graph
 import org.apache.tinkerpop.gremlin.structure.Transaction
+import org.apache.tinkerpop.gremlin.structure.Vertex
+import za.ac.sun.grapl.domain.mappers.VertexMapper.Companion.propertiesToMap
+import za.ac.sun.grapl.domain.models.GraPLVertex
 import java.io.File
 
 class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder.graph) {
@@ -12,6 +15,7 @@ class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder
     private val supportsTransactions: Boolean
     private val conf: String
     private var tx: Transaction? = null
+
     override fun startTransaction() {
         if (supportsTransactions) {
             logger.debug("Supports tx")
@@ -63,29 +67,30 @@ class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder
         }
     }
 
-    override fun exportCurrentGraph(exportDir: String?) {
-        require(isValidExportPath(exportDir)) {
-            "Unsupported graph extension! Supported types are GraphML," +
-                    " GraphSON, and Gryo."
-        }
-        val ext = exportDir?.substring(exportDir.lastIndexOf('.') + 1)?.toLowerCase()
-        startTransaction()
-        when (ext) {
-            "kryo", "json", "xml" -> throw UnsupportedOperationException("Export to Kryo, XML, and JSON currently not supported using the JanusGraphHook.")
-        }
-        endTransaction()
+    /**
+     * Given a [GraPLVertex], creates a [Vertex] and translates the object's field properties to key-value
+     * pairs on the [Vertex] object. This is then added to this hook's [Graph].
+     *
+     * @param gv the [GraPLVertex] to translate into a [Vertex].
+     * @return the newly created [Vertex].
+     */
+    override fun createTinkerPopVertex(gv: GraPLVertex): Vertex {
+        val propertyMap = propertiesToMap(gv)
+        // Get the implementing class label parameter
+        val label = propertyMap.remove("label") as String?
+        // Get the implementing classes fields and values
+        var traversalPointer = g.addV(label)
+        for ((key, value) in propertyMap) traversalPointer = traversalPointer.property(key, value)
+        return traversalPointer.next()
     }
 
     data class Builder(
             var conf: String,
-            var graphDir: String? = null,
-            var clearGraph: Boolean = false
+            var graphDir: String? = null
     ) : GremlinHookBuilder {
         var graph: Graph? = null
 
-        constructor(conf: String): this(conf, null, false)
-
-        fun clearDatabase(clearGraph: Boolean) = apply { this.clearGraph = clearGraph }
+        constructor(conf: String) : this(conf, null)
 
         override fun useExistingGraph(graphDir: String): IHookBuilder {
             require(isValidExportPath(graphDir)) {
@@ -108,10 +113,5 @@ class JanusGraphHook private constructor(builder: Builder) : GremlinHook(builder
         conf = builder.conf
         if (builder.graphDir != null) graph.traversal().io<Any>(builder.graphDir).read().iterate()
         supportsTransactions = graph.features().graph().supportsTransactions()
-        try {
-            if (builder.clearGraph) clearGraph()
-        } catch (e: Exception) {
-            logger.warn("Unable to clear graph!", e)
-        }
     }
 }

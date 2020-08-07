@@ -2,10 +2,20 @@ package za.ac.sun.grapl.domain
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import za.ac.sun.grapl.domain.enums.*
+import za.ac.sun.grapl.TestDomainResources.Companion.DISPATCH_1
+import za.ac.sun.grapl.TestDomainResources.Companion.DISPATCH_2
+import za.ac.sun.grapl.TestDomainResources.Companion.EVAL_1
+import za.ac.sun.grapl.TestDomainResources.Companion.EVAL_2
+import za.ac.sun.grapl.TestDomainResources.Companion.INT_1
+import za.ac.sun.grapl.TestDomainResources.Companion.INT_2
+import za.ac.sun.grapl.TestDomainResources.Companion.MOD_1
+import za.ac.sun.grapl.TestDomainResources.Companion.MOD_2
+import za.ac.sun.grapl.TestDomainResources.Companion.STRING_1
+import za.ac.sun.grapl.TestDomainResources.Companion.STRING_2
+import za.ac.sun.grapl.domain.enums.VertexBaseTraits
+import za.ac.sun.grapl.domain.enums.VertexLabels
 import za.ac.sun.grapl.domain.models.GraPLVertex
 import za.ac.sun.grapl.domain.models.vertices.*
 import java.util.*
@@ -13,8 +23,7 @@ import java.util.*
 class ModelTest {
 
     @Nested
-    @DisplayName("Domain model to string tests")
-    inner class DomainModelToStringTest {
+    inner class `Domain model to string tests` {
         @Test
         fun arrayInitializerVertexToString() {
             val vertex = ArrayInitializerVertex(INT_1)
@@ -161,8 +170,7 @@ class ModelTest {
     }
 
     @Nested
-    @DisplayName("Domain model equal tests")
-    inner class DomainModelEqualTest {
+    inner class `Domain model equal tests` {
 
         private fun assertVertexEquality(vertex1: GraPLVertex, vertex2: GraPLVertex, vertex3: GraPLVertex) {
             assertEquals(vertex1, vertex1)
@@ -507,8 +515,7 @@ class ModelTest {
     }
 
     @Nested
-    @DisplayName("Domain model property tests")
-    inner class DomainModelPropertyTest {
+    inner class `Domain model property tests` {
         @Test
         fun arrayInitializerVertexEquality() {
             val vertex1 = ArrayInitializerVertex(INT_1)
@@ -777,16 +784,4 @@ class ModelTest {
         }
     }
 
-    companion object {
-        const val STRING_1 = "TEST1"
-        const val STRING_2 = "TEST2"
-        const val INT_1 = 0
-        const val INT_2 = 1
-        val DISPATCH_1 = DispatchTypes.DYNAMIC_DISPATCH
-        val DISPATCH_2 = DispatchTypes.STATIC_DISPATCH
-        val EVAL_1 = EvaluationStrategies.BY_REFERENCE
-        val EVAL_2 = EvaluationStrategies.BY_SHARING
-        val MOD_1 = ModifierTypes.ABSTRACT
-        val MOD_2 = ModifierTypes.CONSTRUCTOR
-    }
 }

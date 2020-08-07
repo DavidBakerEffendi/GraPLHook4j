@@ -6,6 +6,16 @@ import java.io.File
 
 class TinkerGraphHook private constructor(builder: Builder) : GremlinHook(TinkerGraph.open(builder.conf)) {
 
+    fun exportCurrentGraph(exportDir: String) {
+        require(isValidExportPath(exportDir)) {
+            "Unsupported graph extension! Supported types are GraphML," +
+                    " GraphSON, and Gryo."
+        }
+        startTransaction()
+        g.io<Any>(exportDir).write().iterate()
+        endTransaction()
+    }
+
     data class Builder(
             var graphDir: String? = null
     ) : GremlinHookBuilder {

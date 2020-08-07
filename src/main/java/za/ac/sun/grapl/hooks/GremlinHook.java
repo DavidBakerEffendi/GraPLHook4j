@@ -2,18 +2,21 @@ package za.ac.sun.grapl.hooks;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.jetbrains.annotations.NotNull;
 import za.ac.sun.grapl.domain.enums.EdgeLabels;
 import za.ac.sun.grapl.domain.mappers.VertexMapper;
 import za.ac.sun.grapl.domain.models.GraPLVertex;
 import za.ac.sun.grapl.domain.models.MethodDescriptorVertex;
-import za.ac.sun.grapl.domain.models.vertices.*;
+import za.ac.sun.grapl.domain.models.vertices.FileVertex;
+import za.ac.sun.grapl.domain.models.vertices.MethodVertex;
+import za.ac.sun.grapl.domain.models.vertices.ModifierVertex;
+import za.ac.sun.grapl.domain.models.vertices.NamespaceBlockVertex;
 
 import java.util.Map;
 import java.util.UUID;
@@ -56,16 +59,6 @@ public abstract class GremlinHook implements IHook {
             final String ext = exportDir.substring(exportDir.lastIndexOf('.') + 1).toLowerCase();
             return ("xml".equals(ext) || "json".equals(ext) || "kryo".equals(ext));
         } else return false;
-    }
-
-    /**
-     * Finds the associated {@link Vertex} in the graph based on the given {@link MetaDataVertex}.
-     *
-     * @param from The {@link MetaDataVertex} to use in the search.
-     * @return the associated {@link Vertex}.
-     */
-    private Vertex findVertex(final MetaDataVertex from) {
-        return g.V().has(MethodVertex.LABEL.toString(), "language", from.getLanguage()).next();
     }
 
     /**
@@ -122,80 +115,55 @@ public abstract class GremlinHook implements IHook {
                 .has("order", v.getOrder()).hasNext();
     }
 
-    /**
-     * Checks if there is an associated {@link Vertex} with the given {@link MetaDataVertex}.
-     *
-     * @param v the {@link MetaDataVertex} to look up.
-     * @return false if there is an associated vertex, true if otherwise.
-     */
-    private boolean vertexNotPresent(final MetaDataVertex v) {
-        return !g.V().has(MetaDataVertex.LABEL.toString(), "language", v.getLanguage())
-                .has("version", v.getVersion()).hasNext();
-    }
-
     @Override
-    public void registerMetaData(final MetaDataVertex vertex) {
-        startTransaction();
-        if (vertexNotPresent(vertex)) createVertex(vertex);
-        endTransaction();
-    }
-
-    @Override
-    public void addFileVertex(final FileVertex v) {
-        startTransaction();
-        createTinkerGraphVertex(v);
-        endTransaction();
-    }
-
-    @Override
-    public void createAndAddToMethod(final MethodVertex from, final MethodDescriptorVertex to) {
+    public void createAndAddToMethod(@NotNull final MethodVertex from, @NotNull final MethodDescriptorVertex to) {
         createAndJoinMethodToAnyAST(from, to);
     }
 
     @Override
-    public void createAndAddToMethod(final MethodVertex from, final ModifierVertex to) {
+    public void createAndAddToMethod(@NotNull final MethodVertex from, @NotNull final ModifierVertex to) {
         createAndJoinMethodToAnyAST(from, to);
     }
 
     private void createAndJoinMethodToAnyAST(final MethodVertex from, final GraPLVertex to) {
         startTransaction();
-        createTinkerGraphEdge(findVertex(from), EdgeLabels.AST, createTinkerGraphVertex(to));
+        createTinkerGraphEdge(findVertex(from), EdgeLabels.AST, createTinkerPopVertex(to));
         endTransaction();
     }
 
     @Override
-    public void joinFileVertexTo(final FileVertex to, final NamespaceBlockVertex from) {
+    public void joinFileVertexTo(@NotNull final FileVertex to, @NotNull final NamespaceBlockVertex from) {
         startTransaction();
         if (vertexNotPresent(from)) {
-            createTinkerGraphVertex(from);
+            createTinkerPopVertex(from);
         }
         if (vertexNotPresent(to)) {
-            createTinkerGraphVertex(to);
+            createTinkerPopVertex(to);
         }
         createTinkerGraphEdge(findVertex(from), EdgeLabels.AST, findVertex(to));
         endTransaction();
     }
 
     @Override
-    public void joinFileVertexTo(final FileVertex from, final MethodVertex to) {
+    public void joinFileVertexTo(@NotNull final FileVertex from, @NotNull final MethodVertex to) {
         startTransaction();
-        if (vertexNotPresent(from)) createTinkerGraphVertex(from);
+        if (vertexNotPresent(from)) createTinkerPopVertex(from);
         if (!g.V(findVertex(from))
                 .out(EdgeLabels.AST.toString())
                 .has("fullName", to.getFullName())
                 .has("signature", to.getSignature())
                 .hasNext()) {
-            createTinkerGraphVertex(to);
+            createTinkerPopVertex(to);
         }
         createTinkerGraphEdge(findVertex(from), EdgeLabels.AST, findVertex(to));
         endTransaction();
     }
 
     @Override
-    public void joinNamespaceBlocks(final NamespaceBlockVertex from, final NamespaceBlockVertex to) {
+    public void joinNamespaceBlocks(@NotNull final NamespaceBlockVertex from, @NotNull final NamespaceBlockVertex to) {
         startTransaction();
-        if (vertexNotPresent(from)) createTinkerGraphVertex(from);
-        if (vertexNotPresent(to)) createTinkerGraphVertex(to);
+        if (vertexNotPresent(from)) createTinkerPopVertex(from);
+        if (vertexNotPresent(to)) createTinkerPopVertex(to);
         Vertex n1 = findVertex(from);
         Vertex n2 = findVertex(to);
         if (!g.V(n1).outE(EdgeLabels.AST.toString()).filter(inV().is(n2)).hasNext()) {
@@ -205,56 +173,42 @@ public abstract class GremlinHook implements IHook {
     }
 
     @Override
-    public void createAndAssignToBlock(final MethodVertex parentVertex, final GraPLVertex newVertex) {
+    public void createAndAssignToBlock(@NotNull final MethodVertex parentVertex, @NotNull final GraPLVertex newVertex) {
         startTransaction();
-        createTinkerGraphEdge(findASTVertex(parentVertex, parentVertex.getOrder()), EdgeLabels.AST, createTinkerGraphVertex(newVertex));
+        createTinkerGraphEdge(findASTVertex(parentVertex, parentVertex.getOrder()), EdgeLabels.AST, createTinkerPopVertex(newVertex));
         endTransaction();
     }
 
     @Override
-    public void createAndAssignToBlock(final MethodVertex parentVertex, final GraPLVertex newVertex, final int blockOrder) {
+    public void createAndAssignToBlock(@NotNull final GraPLVertex newVertex, final int blockOrder) {
         startTransaction();
-        createTinkerGraphEdge(findASTVertex(parentVertex, blockOrder), EdgeLabels.AST, createTinkerGraphVertex(newVertex));
+        createTinkerGraphEdge(findASTVertex(blockOrder), EdgeLabels.AST, createTinkerPopVertex(newVertex));
         endTransaction();
     }
 
     @Override
-    public void createAndAssignToBlock(final GraPLVertex newVertex, final int blockOrder) {
-        startTransaction();
-        createTinkerGraphEdge(findASTVertex(blockOrder), EdgeLabels.AST, createTinkerGraphVertex(newVertex));
-        endTransaction();
-    }
-
-    @Override
-    public void updateASTVertexProperty(final MethodVertex rootMethod, final int order, final String key, final String value) {
-        startTransaction();
-        g.V(findASTVertex(rootMethod, order)).property(key, value).iterate();
-        endTransaction();
-    }
-
-    @Override
-    public void updateASTVertexProperty(final int order, final String key, final String value) {
+    public void updateASTVertexProperty(final int order, @NotNull final String key, @NotNull final String value) {
         startTransaction();
         g.V(findASTVertex(order)).property(key, value).iterate();
         endTransaction();
     }
 
     @Override
-    public void createVertex(final GraPLVertex block) {
+    public void createVertex(@NotNull final GraPLVertex block) {
         startTransaction();
-        createTinkerGraphVertex(block);
+        createTinkerPopVertex(block);
         endTransaction();
     }
 
     @Override
-    public void joinASTVerticesByOrder(final int blockFrom, final int blockTo, final EdgeLabels edgeLabel) {
+    public void joinASTVerticesByOrder(final int blockFrom, final int blockTo, @NotNull final EdgeLabels edgeLabel) {
         startTransaction();
         createTinkerGraphEdge(findASTVertex(blockFrom), edgeLabel, findASTVertex(blockTo));
         endTransaction();
     }
 
     @Override
-    public boolean areASTVerticesJoinedByEdge(final int blockFrom, final int blockTo, final EdgeLabels edgeLabel) {
+    public boolean areASTVerticesConnected(final int blockFrom, final int blockTo, final EdgeLabels edgeLabel) {
         startTransaction();
         final Vertex a = findASTVertex(blockFrom);
         final Vertex b = findASTVertex(blockTo);
@@ -294,17 +248,6 @@ public abstract class GremlinHook implements IHook {
         endTransaction();
     }
 
-    @Override
-    public void exportCurrentGraph(String exportDir) {
-        if (!isValidExportPath(exportDir)) {
-            throw new IllegalArgumentException("Unsupported graph extension! Supported types are GraphML," +
-                    " GraphSON, and Gryo.");
-        }
-        startTransaction();
-        this.g.io(exportDir).write().iterate();
-        endTransaction();
-    }
-
     /**
      * Finds the associated {@link Vertex} in the graph to the block based on the {@link MethodVertex} and the AST order
      * under which this block occurs under this {@link MethodVertex}.
@@ -337,22 +280,13 @@ public abstract class GremlinHook implements IHook {
      * @param gv the {@link GraPLVertex} to translate into a {@link Vertex}.
      * @return the newly created {@link Vertex}.
      */
-    private Vertex createTinkerGraphVertex(final GraPLVertex gv) {
+    protected Vertex createTinkerPopVertex(final GraPLVertex gv) {
         final Map<String, Object> propertyMap = VertexMapper.propertiesToMap(gv);
         // Get the implementing class label parameter
         final String label = (String) propertyMap.remove("label");
         // Get the implementing classes fields and values
-        Vertex v;
-        if (this instanceof TinkerGraphHook) {
-            v = g.getGraph().addVertex(T.label, label, T.id, UUID.randomUUID());
-            propertyMap.forEach(v::property);
-        } else {
-            GraphTraversal<Vertex, Vertex> traversalPointer = g.addV(label);
-            for (Map.Entry<String, Object> f : propertyMap.entrySet()) {
-                traversalPointer = traversalPointer.property(f.getKey(), f.getValue());
-            }
-            v = traversalPointer.next();
-        }
+        final Vertex v = g.getGraph().addVertex(T.label, label, T.id, UUID.randomUUID());
+        propertyMap.forEach(v::property);
         return v;
     }
 
