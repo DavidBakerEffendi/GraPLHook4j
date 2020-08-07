@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import za.ac.sun.grapl.TestDomainResources
+import za.ac.sun.grapl.TestDomainResources.Companion.INT_3
+import za.ac.sun.grapl.TestDomainResources.Companion.INT_4
 import za.ac.sun.grapl.TestDomainResources.Companion.ROOT_PACKAGE
 import za.ac.sun.grapl.TestDomainResources.Companion.SECOND_PACKAGE
 import za.ac.sun.grapl.TestDomainResources.Companion.THIRD_PACKAGE
@@ -204,8 +207,9 @@ class TigerGraphHookIntTest : AbstractHookTest() {
             val methodRaw = get("graph/$GRAPH_NAME/vertices/${VertexLabels.METHOD.name}_VERT")
             assertTrue(blockRaw.any())
             assertTrue(methodRaw.any())
-            val block1 = VertexMapper.mapToVertex(tigerGraphHook.flattenVertexResult(blockRaw.remove(1) as JSONObject))
-            val block2 = VertexMapper.mapToVertex(tigerGraphHook.flattenVertexResult(blockRaw.remove(0) as JSONObject))
+            val blockVertices = blockRaw.map { VertexMapper.mapToVertex(tigerGraphHook.flattenVertexResult(it as JSONObject)) as BlockVertex }
+            val block1 = blockVertices.find { it.order == INT_3 }
+            val block2 = blockVertices.find { it.order == INT_4 }
             val method = VertexMapper.mapToVertex(tigerGraphHook.flattenVertexResult(methodRaw.first() as JSONObject))
             assertTrue(block1 is BlockVertex)
             assertTrue(block2 is BlockVertex)
